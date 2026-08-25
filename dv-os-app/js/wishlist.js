@@ -8,6 +8,39 @@ const wlForm = document.getElementById('wlForm');
 let wishlistEntries = [];
 let editingWlId = null;
 
+const WL_CART_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>';
+
+/* ---------- Totali (estratto per essere richiamabile anche dal toggle carrello, senza ridisegnare tutta la griglia) ---------- */
+function updateWishlistTotals() {
+  let totalAll = 0;
+  let totalCart = 0;
+  let countCart = 0;
+  wishlistEntries.forEach(item => {
+    const price = Number(item.price);
+    const hasPrice = !Number.isNaN(price);
+    if (hasPrice) totalAll += price;
+    if (item.in_cart && hasPrice) totalCart += price;
+    if (item.in_cart) countCart++;
+  });
+  document.getElementById('wlTotalAll').textContent = fmtPrice(totalAll, 'EUR');
+  document.getElementById('wlTotalCart').textContent = fmtPrice(totalCart, 'EUR');
+  document.getElementById('wlCountAll').textContent = wishlistEntries.length;
+  document.getElementById('wlCountCart').textContent = countCart;
+}
+
+/* ---------- Animazione "aggiunto al carrello": icona che vola su e svanisce ---------- */
+function cartAddedBurst(btn) {
+  const rect = btn.getBoundingClientRect();
+  const ghost = document.createElement('div');
+  ghost.className = 'wl-cart-burst';
+  ghost.innerHTML = WL_CART_ICON;
+  document.body.appendChild(ghost);
+  ghost.style.left = (rect.left + rect.width / 2) + 'px';
+  ghost.style.top = (rect.top + rect.height / 2) + 'px';
+  requestAnimationFrame(() => ghost.classList.add('go'));
+  ghost.addEventListener('animationend', () => ghost.remove());
+}
+
 /* ---------- Caricamento ---------- */
 async function loadWishlist() {
   try {
@@ -35,25 +68,15 @@ function renderWishlist() {
   wlGrid.innerHTML = '';
   wlEmpty.style.display = wishlistEntries.length ? 'none' : 'block';
 
-  let totalAll = 0;
-  let totalCart = 0;
-  let countCart = 0;
-
   wishlistEntries.forEach(item => {
-    const price = Number(item.price);
-    const hasPrice = !Number.isNaN(price);
-    if (hasPrice) totalAll += price;
-    if (item.in_cart && hasPrice) { totalCart += price; }
-    if (item.in_cart) countCart++;
-
     const card = document.createElement('div');
     card.className = 'wl-card hud' + (item.in_cart ? ' in-cart' : '');
     card.innerHTML = `
       <div class="corners"><span></span><span></span><span></span><span></span></div>
-      <label class="wl-check">
-        <input type="checkbox" ${item.in_cart ? 'checked' : ''}>
-        <span>Nel carrello</span>
-      </label>
+      <button type="button" class="wl-cart-btn${item.in_cart ? ' active' : ''}" aria-pressed="${item.in_cart ? 'true' : 'false'}" title="${item.in_cart ? 'Rimuovi dal carrello' : 'Aggiungi al carrello'}">
+        <span class="wl-cart-icon">${WL_CART_ICON}</span>
+        <span class="wl-cart-label">${item.in_cart ? 'NEL CARRELLO' : 'AGGIUNGI'}</span>
+      </button>
       <div class="wl-img-wrap">
         ${item.image_url ? `<img src="${escapeAttr(item.image_url)}" alt="" loading="lazy" onerror="this.closest('.wl-img-wrap').classList.add('broken')">` : ''}
         <span class="wl-noimg">SENZA IMMAGINE</span>
@@ -74,8 +97,10 @@ function renderWishlist() {
 
     card.querySelector('.wl-title').textContent = item.title || 'Prodotto senza nome';
 
-    card.querySelector('.wl-check input').onchange = async (e) => {
-      const checked = e.target.checked;
+    const cartBtn = card.querySelector('.wl-cart-btn');
+    cartBtn.onclick = async () => {
+      const checked = !item.in_cart;
+      cartBtn.disabled = true;
       try {
         await wishlistRequest(`?id=eq.${encodeURIComponent(item.id)}`, {
           method: 'PATCH',
@@ -83,10 +108,22 @@ function renderWishlist() {
           headers: { Prefer: 'return=minimal' }
         });
         item.in_cart = checked;
-        renderWishlist();
+        cartBtn.classList.toggle('active', checked);
+        card.classList.toggle('in-cart', checked);
+        cartBtn.setAttribute('aria-pressed', String(checked));
+        cartBtn.title = checked ? 'Rimuovi dal carrello' : 'Aggiungi al carrello';
+        cartBtn.querySelector('.wl-cart-label').textContent = checked ? 'NEL CARRELLO' : 'AGGIUNGI';
+        if (checked) {
+          cartBtn.classList.remove('pop');
+          void cartBtn.offsetWidth; // riavvia l'animazione anche se era già stata giocata
+          cartBtn.classList.add('pop');
+          cartAddedBurst(cartBtn);
+        }
+        updateWishlistTotals();
       } catch (err) {
         alert('Errore nell\u2019aggiornamento: ' + err.message);
-        e.target.checked = !checked;
+      } finally {
+        cartBtn.disabled = false;
       }
     };
 
@@ -103,10 +140,7 @@ function renderWishlist() {
     wlGrid.appendChild(card);
   });
 
-  document.getElementById('wlTotalAll').textContent = fmtPrice(totalAll, 'EUR');
-  document.getElementById('wlTotalCart').textContent = fmtPrice(totalCart, 'EUR');
-  document.getElementById('wlCountAll').textContent = wishlistEntries.length;
-  document.getElementById('wlCountCart').textContent = countCart;
+  updateWishlistTotals();
 }
 
 function escapeHtml(s) {
