@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sfera Magica</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Space Mono',monospace;}
+
+body{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(139,92,246,.16), transparent 45%),
+    radial-gradient(circle at 85% 80%, rgba(232,121,249,.12), transparent 45%),
+    #0a0518;
+  overflow:hidden;position:relative;
+}
+body::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(rgba(255,255,255,.5) 1px, transparent 1px);
+  background-size:70px 70px;opacity:.25;
+}
+
+.container{
+  width:420px;max-width:100%;text-align:center;position:relative;z-index:1;
+  animation:fadeIn .6s ease;
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+
+h1{color:#f3e8ff;font-weight:700;font-size:1.4rem;letter-spacing:.06em;}
+.subtitle{color:#c4b5fd;font-size:.78rem;margin-top:8px;letter-spacing:.05em;opacity:.8;}
+
+.ball-wrap{width:250px;height:250px;margin:32px auto;position:relative;}
+.ball{
+  width:250px;height:250px;border-radius:50%;position:relative;cursor:pointer;
+  background:radial-gradient(circle at 35% 30%, #2e1065 0%, #150a2b 55%, #050208 100%);
+  box-shadow:0 0 60px rgba(139,92,246,.35), inset -14px -14px 40px rgba(0,0,0,.6), inset 10px 10px 30px rgba(168,85,247,.15);
+  display:flex;align-items:center;justify-content:center;transition:transform .3s;
+}
+.ball:hover{transform:scale(1.02);}
+.ball.shaking{animation:shakeBall .6s ease;}
+@keyframes shakeBall{
+  0%,100%{transform:translate(0,0) rotate(0);}
+  15%{transform:translate(-8px,4px) rotate(-4deg);}
+  30%{transform:translate(8px,-4px) rotate(4deg);}
+  45%{transform:translate(-8px,4px) rotate(-3deg);}
+  60%{transform:translate(8px,-2px) rotate(3deg);}
+  75%{transform:translate(-4px,2px) rotate(-2deg);}
+}
+
+.window{
+  width:130px;height:130px;border-radius:50%;background:radial-gradient(circle at 40% 35%, #1e1035, #05010a 75%);
+  display:flex;align-items:center;justify-content:center;padding:14px;
+  box-shadow:inset 0 0 24px rgba(0,0,0,.8), 0 0 20px rgba(139,92,246,.25);
+}
+.answer-text{color:#e9d5ff;font-size:.82rem;font-weight:700;line-height:1.45;text-shadow:0 0 12px rgba(232,121,249,.6);opacity:0;transition:opacity .4s;}
+.answer-text.show{opacity:1;}
+.answer-text.placeholder{color:rgba(196,181,253,.4);font-weight:400;}
+
+.hint{color:rgba(196,181,253,.5);font-size:.68rem;margin-top:18px;letter-spacing:.08em;text-transform:uppercase;}
+
+.back-link{position:fixed;top:14px;left:14px;font-size:12px;color:#e9d5ff;text-decoration:none;font-weight:700;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.35);padding:8px 14px;border-radius:20px;z-index:10;letter-spacing:.05em;backdrop-filter:blur(6px);transition:all .25s;}
+.back-link:hover{background:rgba(139,92,246,.25);border-color:#e879f9;}
+</style>
+</head>
+<body>
+<a class="back-link" href="../index.html" onclick="if(window.history.length>1){history.back();return false;}">← Indietro</a>
+<div class="container">
+  <h1>🔮 La Sfera Magica</h1>
+  <p class="subtitle">Pensa a una domanda, poi tocca la sfera</p>
+
+  <div class="ball-wrap">
+    <div class="ball" id="ball">
+      <div class="window">
+        <div class="answer-text placeholder show" id="answerText">Toccami</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hint" id="hint">clicca o tocca la sfera per una risposta</div>
+</div>
+
+<script>
+const answers = [
+  "È certo.",
+  "Senza dubbio.",
+  "Sì, decisamente.",
+  "Puoi contarci.",
+  "Le prospettive sono buone.",
+  "Sì.",
+  "I segnali indicano di sì.",
+  "Rispondi tra qualche istante.",
+  "Meglio non dirti ora.",
+  "Non posso prevederlo adesso.",
+  "Concentrati e richiedi.",
+  "Non contarci.",
+  "La mia risposta è no.",
+  "Le fonti dicono di no.",
+  "Le prospettive non sono così buone.",
+  "Molto dubbio."
+];
+
+const ball = document.getElementById('ball');
+const answerText = document.getElementById('answerText');
+const hint = document.getElementById('hint');
+let busy = false;
+
+ball.addEventListener('click', () => {
+  if (busy) return;
+  busy = true;
+
+  answerText.classList.remove('show');
+  answerText.classList.remove('placeholder');
+  ball.classList.add('shaking');
+  hint.style.opacity = '0.3';
+
+  setTimeout(() => {
+    ball.classList.remove('shaking');
+    const answer = answers[Math.floor(Math.random() * answers.length)];
+    answerText.textContent = answer;
+    answerText.classList.add('show');
+    hint.style.opacity = '1';
+    busy = false;
+  }, 650);
+});
+</script>
+</body>
+</html>
