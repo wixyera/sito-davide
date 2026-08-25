@@ -6,6 +6,7 @@ const SUPABASE_KEY = "sb_publishable_P7ov5aG3JO553Pp-YnTL5Q_YWLb92md";
 const EVENTS_ENDPOINT = `${SUPABASE_URL}/rest/v1/events`;
 const CAREER_ENDPOINT = `${SUPABASE_URL}/rest/v1/career_entries`;
 const CONTACTS_ENDPOINT = `${SUPABASE_URL}/rest/v1/contacts`;
+const WISHLIST_ENDPOINT = `${SUPABASE_URL}/rest/v1/wishlist_items`;
 const AUTH_ENDPOINT = `${SUPABASE_URL}/auth/v1`;
 let accessToken = localStorage.getItem('dv_os_access_token') || null;
 
@@ -88,6 +89,7 @@ async function tableRequest(endpoint, path = '', options = {}) {
 const supabaseRequest = (path, options) => tableRequest(EVENTS_ENDPOINT, path, options);
 const careerRequest   = (path, options) => tableRequest(CAREER_ENDPOINT, path, options);
 const contactsRequest = (path, options) => tableRequest(CONTACTS_ENDPOINT, path, options);
+const wishlistRequest = (path, options) => tableRequest(WISHLIST_ENDPOINT, path, options);
 
 /* ===================================================================
    SALUTO DINAMICO: mostra il nome dell'utente loggato ovunque

@@ -137,7 +137,8 @@
     <button class="tab-btn" data-module="calendario"><span class="n">01</span>Calendario</button>
     <button class="tab-btn" data-module="percorso"><span class="n">02</span>Percorso</button>
     <button class="tab-btn" data-module="contatti"><span class="n">03</span>Contatti</button>
-    <button class="tab-btn" data-module="esperimenti"><span class="n">04</span>Esperimenti</button>
+    <button class="tab-btn" data-module="wishlist"><span class="n">04</span>Wishlist</button>
+    <button class="tab-btn" data-module="esperimenti"><span class="n">05</span>Esperimenti</button>
   </div>
   <button class="theme-toggle-btn" id="themeToggleBtn" type="button" aria-label="Cambia tema chiaro/scuro"><span id="themeToggleIcon">🌙</span></button>
   <button class="nav-toggle" id="navToggle" aria-label="Apri menu"><span></span><span></span><span></span></button>
@@ -203,7 +204,8 @@
             <button class="orb-choice oc-cal" data-landing="calendario"><b>01</b> CALENDARIO</button>
             <button class="orb-choice oc-path" data-landing="percorso"><b>02</b> PERCORSO</button>
             <button class="orb-choice oc-contact" data-landing="contatti"><b>03</b> CONTATTI</button>
-            <button class="orb-choice oc-exp" data-landing="esperimenti"><b>04</b> ESPERIMENTI</button>
+            <button class="orb-choice oc-wishlist" data-landing="wishlist"><b>04</b> WISHLIST</button>
+            <button class="orb-choice oc-exp" data-landing="esperimenti"><b>05</b> ESPERIMENTI</button>
           </div>
           <button class="landing-orb" id="landingOrb" aria-label="Apri navigazione"><span class="orb-mark"><svg class="orb-mark-icon" viewBox="0 0 100 100" aria-hidden="true"><use href="#dvMark"/></svg></span></button>
         </div>
@@ -314,6 +316,68 @@
           <div class="ev-row" style="margin-top:4px;">
             <button type="submit" class="ev-add-btn" id="contactSubmitBtn">+ Aggiungi contatto</button>
             <button type="button" class="export-all-btn" id="contactCancelBtn" style="display:none;flex:0 0 auto;">ANNULLA</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WISHLIST ============ -->
+  <section class="module" id="mod-wishlist">
+    <span class="eyebrow">Shopping cross-sito</span>
+    <h2 class="sec-title">Wishlist</h2>
+    <p style="color:var(--text-dim); margin-top:1rem; max-width:560px;">Incolla il link di un prodotto da qualsiasi sito: provo a leggerne titolo, immagine e prezzo automaticamente. Seleziona "Nel carrello" per calcolare il totale di ciò che vuoi comprare adesso.</p>
+
+    <div class="wl-summary">
+      <div class="wl-summary-box hud">
+        <div class="corners"><span></span><span></span><span></span><span></span></div>
+        <span class="qk">Totale wishlist</span>
+        <div class="qv" id="wlTotalAll">€0,00</div>
+        <div class="qsub"><span id="wlCountAll">0</span> prodotti salvati</div>
+      </div>
+      <div class="wl-summary-box hud accent">
+        <div class="corners"><span></span><span></span><span></span><span></span></div>
+        <span class="qk">Totale carrello</span>
+        <div class="qv" id="wlTotalCart">€0,00</div>
+        <div class="qsub"><span id="wlCountCart">0</span> selezionati</div>
+      </div>
+    </div>
+
+    <div class="console">
+      <div>
+        <div class="wl-grid" id="wlGrid"></div>
+        <div class="ev-empty" id="wlEmpty" style="display:none;">Nessun prodotto in wishlist. Aggiungine uno dal modulo qui a fianco.</div>
+      </div>
+      <div class="ev-form" id="wlFormWrap" style="margin-top:0;padding-top:0;border-top:none;">
+        <h4 style="font-family:var(--font-display);color:var(--white);margin-bottom:6px;" id="wlFormTitle">Nuovo prodotto</h4>
+
+        <label for="wlUrlInput">Link del prodotto (Amazon, Zalando, qualsiasi sito...)</label>
+        <div class="ev-row" style="align-items:flex-end;">
+          <input type="url" id="wlUrlInput" placeholder="https://...">
+          <button type="button" class="export-all-btn" id="wlAnalyzeBtn" style="flex:0 0 auto;">ANALIZZA LINK</button>
+        </div>
+        <div id="wlAnalyzeMsg" class="ev-meta"></div>
+
+        <form id="wlForm" style="margin-top:14px;">
+          <label for="wlTitle">Nome prodotto</label>
+          <input type="text" id="wlTitle" placeholder="Es. Cuffie wireless XYZ" required>
+          <div class="ev-row">
+            <div><label for="wlPrice">Prezzo</label><input type="text" inputmode="decimal" id="wlPrice" placeholder="Es. 49.90"></div>
+            <div><label for="wlCurrency">Valuta</label><select id="wlCurrency"><option value="EUR">EUR €</option><option value="USD">USD $</option><option value="GBP">GBP £</option></select></div>
+          </div>
+          <label for="wlImage">URL immagine (opzionale)</label>
+          <input type="url" id="wlImage" placeholder="https://...">
+          <label for="wlProductUrl">Link al prodotto</label>
+          <input type="url" id="wlProductUrl" placeholder="https://...">
+          <div class="ev-row">
+            <div><label for="wlSite">Sito / Negozio</label><input type="text" id="wlSite" placeholder="Es. Amazon"></div>
+            <div><label for="wlCategory">Categoria</label><input type="text" id="wlCategory" placeholder="Es. Tech, Regali..."></div>
+          </div>
+          <label for="wlNotes">Note</label>
+          <textarea id="wlNotes" placeholder="Taglia, colore, per chi è..."></textarea>
+          <div class="ev-row" style="margin-top:4px;">
+            <button type="submit" class="ev-add-btn" id="wlSubmitBtn">+ Aggiungi alla wishlist</button>
+            <button type="button" class="export-all-btn" id="wlCancelBtn" style="display:none;flex:0 0 auto;">ANNULLA</button>
           </div>
         </form>
       </div>
@@ -522,6 +586,7 @@
 <script src="js/calendar.js"></script>
 <script src="js/career.js"></script>
 <script src="js/contacts.js"></script>
+<script src="js/wishlist.js"></script>
 <script src="js/ics.js"></script>
 <script src="js/init.js"></script>
 <script src="js/theme.js"></script>

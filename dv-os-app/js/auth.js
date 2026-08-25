@@ -81,6 +81,7 @@ async function startApp() {
   await loadEvents();
   await loadCareer();
   await loadContacts();
+  await loadWishlist();
 }
 
 /* Permette di impostare/aggiornare in qualunque momento la domanda di
