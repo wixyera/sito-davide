@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>(function(){try{var t=localStorage.getItem('dv-os-theme')||'dark';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<title>Davide Villano — Personal Workspace</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a0e17">
+<link rel="icon" href="assets/icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="D. Villano">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="markGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c5d1ec"/>
+      <stop offset="100%" stop-color="#93a8d6"/>
+    </linearGradient>
+  </defs>
+  <symbol id="dvMark" viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="46" fill="none" stroke="#93a8d6" stroke-width="1.4" opacity=".45"/>
+    <text x="50" y="61" text-anchor="middle" font-family="Montserrat, sans-serif" font-weight="700" font-size="38" fill="url(#markGrad)">DV</text>
+  </symbol>
+</svg>
+
+<div id="authOverlay" class="auth-overlay">
+  <div class="auth-card">
+
+    <div id="authViewLogin" class="auth-view">
+      <h2>Accesso</h2>
+      <p>Accedi al tuo spazio di lavoro personale per gestire calendario, percorso e contatti.</p>
+      <label for="authEmail">Email</label>
+
+      <div id="nameFieldWrap" style="display:none">
+        <input id="authName" type="text" placeholder="Nome" autocomplete="name" />
+      </div>
+      <input id="authEmail" type="email" autocomplete="email" placeholder="nome@email.com">
+      <label for="authPassword">Password</label>
+      <input id="authPassword" type="password" autocomplete="current-password" placeholder="Password">
+
+      <div id="secQuestionWrap" style="display:none">
+        <label for="secQuestion">Domanda di sicurezza (per il reset password)</label>
+        <select id="secQuestion">
+          <option value="Come si chiamava il tuo primo animale domestico?">Come si chiamava il tuo primo animale domestico?</option>
+          <option value="Qual è la tua città natale?">Qual è la tua città natale?</option>
+          <option value="Qual è il nome della tua scuola elementare?">Qual è il nome della tua scuola elementare?</option>
+          <option value="Qual è il tuo piatto preferito?">Qual è il tuo piatto preferito?</option>
+          <option value="Qual è il soprannome che ti davano da piccolo?">Qual è il soprannome che ti davano da piccolo?</option>
+        </select>
+        <label for="secAnswer">Risposta segreta</label>
+        <input id="secAnswer" type="text" placeholder="La tua risposta" autocomplete="off">
+      </div>
+
+      <button class="forgot-link" id="forgotLink" type="button">Password dimenticata?</button>
+      <div class="auth-actions">
+        <button id="loginBtn" type="button">Accedi</button>
+        <button id="signupBtn" type="button">Registrati</button>
+      </div>
+      <div id="authMsg" class="auth-msg"></div>
+    </div>
+
+    <div id="authViewForgot" class="auth-view hidden">
+      <button class="auth-back" id="forgotBackBtn" type="button">← Torna al login</button>
+      <h2>Recupera password</h2>
+      <p>Nessuna email in uscita: rispondi alla tua domanda di sicurezza direttamente qui per reimpostare la password.</p>
+      <label for="forgotEmail">Email</label>
+      <input id="forgotEmail" type="email" autocomplete="email" placeholder="nome@email.com">
+      <div class="auth-actions">
+        <button id="forgotSendBtn" type="button">Continua</button>
+      </div>
+      <div id="forgotMsg" class="auth-msg"></div>
+    </div>
+
+    <div id="authViewNewPass" class="auth-view hidden">
+      <button class="auth-back" id="newPassBackBtn" type="button">← Torna al login</button>
+      <h2>Nuova password</h2>
+      <p id="newPassQuestionLabel">Rispondi alla domanda di sicurezza e scegli una nuova password.</p>
+      <label for="secAnswerReset">Risposta segreta</label>
+      <input id="secAnswerReset" type="text" placeholder="La tua risposta" autocomplete="off">
+      <label for="newPassword">Nuova password</label>
+      <input id="newPassword" type="password" autocomplete="new-password" placeholder="Almeno 6 caratteri">
+      <div class="auth-actions">
+        <button id="newPasswordBtn" type="button">Salva password</button>
+      </div>
+      <div id="newPassMsg" class="auth-msg"></div>
+    </div>
+
+  </div>
+</div>
+
+<div id="loader">
+  <svg class="brand-mark" viewBox="0 0 100 100" aria-hidden="true"><use href="#dvMark"/></svg>
+  <div class="load-bar"></div>
+  <div id="loaderText">Caricamento in corso</div>
+</div>
+
+<header>
+  <div class="header-top">
+    <div class="logo-wrap">
+      <div class="logo"><svg class="logo-icon" viewBox="0 0 100 100" aria-hidden="true"><use href="#dvMark"/></svg>D. Villano<span>·</span></div>
+      <div class="logo-tag">PERSONAL WORKSPACE</div>
+    </div>
+    <div class="clock-box">
+      <div class="clock-time" id="clockTime">--:--:--</div>
+      <div class="clock-date" id="clockDate">caricamento data...</div>
+    </div>
+  </div>
+  <div class="tab-nav" id="tabNav">
+    <button class="tab-btn active" data-module="home"><span class="n">00</span>Home</button>
+    <button class="tab-btn" data-module="calendario"><span class="n">01</span>Calendario</button>
+    <button class="tab-btn" data-module="percorso"><span class="n">02</span>Percorso</button>
+    <button class="tab-btn" data-module="contatti"><span class="n">03</span>Contatti</button>
+    <button class="tab-btn" data-module="wishlist"><span class="n">04</span>Wishlist</button>
+    <button class="tab-btn" data-module="esperimenti"><span class="n">05</span>Progetti</button>
+  </div>
+  <button class="theme-toggle-btn" id="themeToggleBtn" type="button" aria-label="Cambia tema chiaro/scuro">
+    <svg id="themeIconMoon" viewBox="0 0 24 24" class="theme-ic"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+    <svg id="themeIconSun" viewBox="0 0 24 24" class="theme-ic" style="display:none;"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M4.22 4.22l1.77 1.77M18 18l1.78 1.78M2 12h2.5M19.5 12H22M4.22 19.78 6 18M18 6l1.78-1.78"/></svg>
+  </button>
+  <button class="nav-toggle" id="navToggle" aria-label="Apri menu"><span></span><span></span><span></span></button>
+</header>
+
+<main>
+
+  <!-- ============ HOME ============ -->
+  <section class="module active" id="mod-home">
+    <div class="hero">
+      <div class="home-hero">
+        <div class="core-wrap">
+          <div class="core-center"><svg class="orb-mark-icon" viewBox="0 0 100 100" style="width:60%;height:60%" aria-hidden="true"><use href="#dvMark"/></svg></div>
+        </div>
+        <div class="greeting" id="greetingText">Bentornato</div>
+        <h1>DAVIDE <span class="accent">VILLANO</span></h1>
+        <p>Spazio di lavoro personale — Bologna. Junior IT &amp; Multimedia Assistant alla Johns Hopkins University. Da qui gestisco il mio calendario, il mio percorso professionale e i miei contatti in un unico posto.</p>
+      </div>
+
+      <div class="quick-grid">
+        <div class="quick-card">
+          <span class="qk">Prossimo evento</span>
+          <div class="qv" id="nextEventTitle">Nessun evento in programma</div>
+          <div class="qsub" id="nextEventDate">&nbsp;</div>
+          <button class="go" data-goto="calendario">Apri calendario →</button>
+        </div>
+        <div class="quick-card">
+          <span class="qk">Ruolo attuale</span>
+          <div class="qv">Johns Hopkins University</div>
+          <div class="qsub">Junior IT &amp; Multimedia Assistant</div>
+          <button class="go" data-goto="percorso">Vedi percorso →</button>
+        </div>
+        <div class="quick-card">
+          <span class="qk">Eventi questo mese</span>
+          <div class="qv" id="monthEventCount">0</div>
+          <div class="qsub" id="monthLabel">&nbsp;</div>
+          <button class="go" data-goto="calendario">Gestisci →</button>
+        </div>
+      </div>
+
+      <div class="status-strip">
+        <span><span class="dot"></span>Bologna, Italia</span>
+        <span><span class="dot"></span>Disponibile per nuove opportunità</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CALENDARIO ============ -->
+  <section class="module" id="mod-calendario">
+    <span class="eyebrow">Modulo calendario</span>
+    <h2 class="sec-title">Agenda personale</h2>
+
+    <div class="cal-layout">
+      <div class="cal-panel">
+        <div class="cal-head">
+          <h3 id="calMonthLabel">—</h3>
+          <div class="cal-head-actions">
+            <input type="file" id="importICSInput" accept=".ics,text/calendar" hidden><button class="export-all-btn" id="importICSBtn" title="Importa eventi da Outlook, Apple Calendar o altri calendari">Importa .ics</button><button class="export-all-btn" id="exportAllBtn" title="Scarica tutti gli eventi come .ics">Esporta mese (.ics)</button>
+            <div class="cal-nav">
+              <button id="prevMonth">‹</button>
+              <button id="nextMonth">›</button>
+            </div>
+          </div>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+      </div>
+
+      <div class="cal-panel day-detail">
+        <span class="dd-date" id="ddDate">SELEZIONA UN GIORNO</span>
+        <h4 id="ddDay">—</h4>
+
+        <div class="ev-row" id="evPickerRow" style="margin-top:.9rem;display:none;">
+          <div>
+            <label for="evPicker">Modifica evento del giorno</label>
+            <select id="evPicker">
+              <option value="">— Nuovo evento —</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="ev-list" id="evList"></div>
+
+        <form class="ev-form" id="evForm">
+          <label for="evTitle">Titolo evento</label>
+          <input type="text" id="evTitle" placeholder="Es. Riunione, calcetto, compleanno..." required>
+          <label for="evDescription">Descrizione</label><textarea id="evDescription" placeholder="Dettagli opzionali..."></textarea>
+          <div class="ev-row"><div><label for="evTime">Ora inizio</label><div class="time-field"><span class="time-ico">⏱</span><select id="evTime"></select></div></div><div><label for="evEndTime">Ora fine</label><div class="time-field"><span class="time-ico">⏱</span><select id="evEndTime"></select></div></div></div>
+          <div class="ev-row"><div><label for="evLocation">Luogo</label><input type="text" id="evLocation" placeholder="Es. Bologna, SAIS..."></div></div>
+          <div class="ev-row"><div><label for="evCategory">Categoria</label><select id="evCategory"><option>Personale</option><option>Lavoro</option><option>Sport</option><option>Studio</option><option>Famiglia</option><option>Viaggio</option><option>Altro</option></select></div><div><label for="evColor">Colore</label><input class="ev-color" type="color" id="evColor" value="#93a8d6"></div></div>
+          <label style="display:flex;gap:8px;align-items:center;margin-top:12px"><input type="checkbox" id="evAllDay"> Tutto il giorno</label>
+          <button type="submit" class="ev-add-btn">+ Aggiungi evento</button>
+        <div id="authMessage" aria-live="polite"></div></form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PERCORSO ============ -->
+  <section class="module" id="mod-percorso">
+    <span class="eyebrow">Percorso professionale</span>
+    <h2 class="sec-title">Esperienza</h2>
+    <p style="color:var(--text-dim); margin-top:1rem; max-width:520px;">Seleziona una voce per accedere ai dettagli. Ogni utente gestisce il proprio percorso.</p>
+
+    <div class="console">
+      <div class="section-menu" id="careerMenu"></div>
+      <div class="ev-form" id="careerFormWrap" style="margin-top:0;padding-top:0;border-top:none;">
+        <h4 style="font-family:var(--font-display);color:var(--ink);margin-bottom:6px;" id="careerFormTitle">Nuova voce del percorso</h4>
+        <form id="careerForm">
+          <label for="crRole">Ruolo / Titolo</label>
+          <input type="text" id="crRole" placeholder="Es. Junior IT Assistant" required>
+          <div class="ev-row">
+            <div><label for="crOrg">Organizzazione</label><input type="text" id="crOrg" placeholder="Es. Johns Hopkins University"></div>
+            <div><label for="crPeriod">Periodo</label><input type="text" id="crPeriod" placeholder="Es. 2024 — oggi"></div>
+          </div>
+          <label for="crDescription">Descrizione</label>
+          <textarea id="crDescription" placeholder="Dettagli, mansioni, contesto..."></textarea>
+          <label for="crOrder">Ordine (opzionale, più basso = più in alto)</label>
+          <input type="number" id="crOrder" placeholder="0">
+          <div class="ev-row" style="margin-top:4px;">
+            <button type="submit" class="ev-add-btn" id="careerSubmitBtn">+ Aggiungi voce</button>
+            <button type="button" class="export-all-btn" id="careerCancelBtn" style="display:none;flex:0 0 auto;">Annulla</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CONTATTI ============ -->
+  <section class="module" id="mod-contatti">
+    <span class="eyebrow">Comunicazione</span>
+    <h2 class="sec-title">Contatti</h2>
+    <p style="color:var(--text-dim); margin-top:1rem; max-width:520px;">La tua rubrica personale: visibile e modificabile solo da te.</p>
+
+    <div class="console">
+      <div>
+        <div class="ev-list" id="contactList" style="max-height:none;"></div>
+        <div class="ev-empty" id="contactEmpty" style="display:none;">Nessun contatto salvato.</div>
+      </div>
+      <div class="ev-form" id="contactFormWrap" style="margin-top:0;padding-top:0;border-top:none;">
+        <h4 style="font-family:var(--font-display);color:var(--ink);margin-bottom:6px;" id="contactFormTitle">Nuovo contatto</h4>
+        <form id="contactForm">
+          <label for="ctEmail">Email</label>
+          <input type="email" id="ctEmail" placeholder="nome@email.com">
+          <label for="ctPhone">Telefono</label>
+          <input type="tel" id="ctPhone" placeholder="Es. 347 935 5279">
+          <div class="ev-row" style="margin-top:4px;">
+            <button type="submit" class="ev-add-btn" id="contactSubmitBtn">+ Aggiungi contatto</button>
+            <button type="button" class="export-all-btn" id="contactCancelBtn" style="display:none;flex:0 0 auto;">Annulla</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WISHLIST ============ -->
+  <section class="module" id="mod-wishlist">
+    <span class="eyebrow">Shopping cross-sito</span>
+    <h2 class="sec-title">Wishlist</h2>
+    <p style="color:var(--text-dim); margin-top:1rem; max-width:560px;">Incolla il link di un prodotto da qualsiasi sito: provo a leggerne titolo, immagine e prezzo automaticamente. Seleziona "Nel carrello" per calcolare il totale di ciò che vuoi comprare adesso.</p>
+
+    <div class="wl-summary">
+      <div class="wl-summary-box">
+        <span class="qk">Totale wishlist</span>
+        <div class="qv" id="wlTotalAll">€0,00</div>
+        <div class="qsub"><span id="wlCountAll">0</span> prodotti salvati</div>
+      </div>
+      <div class="wl-summary-box accent">
+        <span class="qk">Totale carrello</span>
+        <div class="qv" id="wlTotalCart">€0,00</div>
+        <div class="qsub"><span id="wlCountCart">0</span> selezionati</div>
+      </div>
+    </div>
+
+    <div class="console">
+      <div>
+        <div class="wl-grid" id="wlGrid"></div>
+        <div class="ev-empty" id="wlEmpty" style="display:none;">Nessun prodotto in wishlist. Aggiungine uno dal modulo qui a fianco.</div>
+      </div>
+      <div class="ev-form" id="wlFormWrap" style="margin-top:0;padding-top:0;border-top:none;">
+        <h4 style="font-family:var(--font-display);color:var(--ink);margin-bottom:6px;" id="wlFormTitle">Nuovo prodotto</h4>
+
+        <label for="wlUrlInput">Link del prodotto (Amazon, Zalando, qualsiasi sito...)</label>
+        <div class="ev-row" style="align-items:flex-end;">
+          <input type="url" id="wlUrlInput" placeholder="https://...">
+          <button type="button" class="export-all-btn" id="wlAnalyzeBtn" style="flex:0 0 auto;">Analizza link</button>
+        </div>
+        <div id="wlAnalyzeMsg" class="ev-meta"></div>
+
+        <form id="wlForm" style="margin-top:14px;">
+          <label for="wlTitle">Nome prodotto</label>
+          <input type="text" id="wlTitle" placeholder="Es. Cuffie wireless XYZ" required>
+          <div class="ev-row">
+            <div><label for="wlPrice">Prezzo</label><input type="text" inputmode="decimal" id="wlPrice" placeholder="Es. 49.90"></div>
+            <div><label for="wlCurrency">Valuta</label><select id="wlCurrency"><option value="EUR">EUR €</option><option value="USD">USD $</option><option value="GBP">GBP £</option></select></div>
+          </div>
+          <label for="wlImage">URL immagine (opzionale)</label>
+          <input type="url" id="wlImage" placeholder="https://...">
+          <label for="wlProductUrl">Link al prodotto</label>
+          <input type="url" id="wlProductUrl" placeholder="https://...">
+          <div class="ev-row">
+            <div><label for="wlSite">Sito / Negozio</label><input type="text" id="wlSite" placeholder="Es. Amazon"></div>
+            <div><label for="wlCategory">Categoria</label><input type="text" id="wlCategory" placeholder="Es. Tech, Regali..."></div>
+          </div>
+          <label for="wlNotes">Note</label>
+          <textarea id="wlNotes" placeholder="Taglia, colore, per chi è..."></textarea>
+          <div class="ev-row" style="margin-top:4px;">
+            <button type="submit" class="ev-add-btn" id="wlSubmitBtn">+ Aggiungi alla wishlist</button>
+            <button type="button" class="export-all-btn" id="wlCancelBtn" style="display:none;flex:0 0 auto;">Annulla</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PROGETTI / DEMO TECNICHE ============ -->
+  <section class="module" id="mod-esperimenti">
+    <span class="eyebrow">Laboratorio</span>
+    <h2 class="sec-title">Progetti &amp; demo tecniche</h2>
+    <p style="color:var(--text-dim); margin-top:1rem; max-width:560px;">Piccoli progetti realizzati per esercitarmi con diverse tecnologie front-end. Si aprono in una nuova scheda.</p>
+
+    <div class="quick-grid" style="margin-top:2rem;">
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Wiki Searcher</div>
+        <div class="qsub">Motore di ricerca su Wikipedia in JavaScript</div>
+        <a class="go" href="experiments/wiki-searcher.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Pass Generator</div>
+        <div class="qsub">Generatore di password personalizzabile</div>
+        <a class="go" href="experiments/pass-generator.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Flip a Coin</div>
+        <div class="qsub">Testa o croce, animato in 3D</div>
+        <a class="go" href="experiments/flip-coin.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">QR Code Generator</div>
+        <div class="qsub">Generatore di codici QR personalizzabili</div>
+        <a class="go" href="experiments/qr-generator.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Sasso Carta Forbici</div>
+        <div class="qsub">Sfida il computer, al meglio di 3</div>
+        <a class="go" href="experiments/sasso-carta-forbici.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Dado Fortunato</div>
+        <div class="qsub">Lancio del dado con statistiche in tempo reale</div>
+        <a class="go" href="experiments/dado-fortunato.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Quiz Lampo</div>
+        <div class="qsub">Mini quiz a risposta multipla</div>
+        <a class="go" href="experiments/quiz-lampo.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Sfera Magica</div>
+        <div class="qsub">Fai una domanda, tocca la sfera</div>
+        <a class="go" href="experiments/sfera-magica.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Palette Generator</div>
+        <div class="qsub">Genera e copia palette di colori</div>
+        <a class="go" href="experiments/palette-generator.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Snake</div>
+        <div class="qsub">Il classico arcade, in stile retro</div>
+        <a class="go" href="experiments/snake.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Fuochi d'Artificio</div>
+        <div class="qsub">Spettacolo pirotecnico interattivo</div>
+        <a class="go" href="experiments/fuochi-artificio.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Universo 3D</div>
+        <div class="qsub">Campo stellare esplorabile in 3D con audio ambientale</div>
+        <a class="go" href="experiments/universo.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Cosmo Explorer</div>
+        <div class="qsub">Galassie e buchi neri 3D, dalla Via Lattea al Sistema Solare</div>
+        <a class="go" href="experiments/cosmo-explorer.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Atlante delle Meraviglie</div>
+        <div class="qsub">Mappa interattiva delle 8 meraviglie del mondo</div>
+        <a class="go" href="experiments/meraviglie-mondo.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Piano Virtuale</div>
+        <div class="qsub">Suona con mouse o tastiera, tre timbri diversi</div>
+        <a class="go" href="experiments/piano-virtuale.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Generatore di Nomi Fantasy</div>
+        <div class="qsub">Nomi ed epiteti per elfi, nani, orchi e draghi</div>
+        <a class="go" href="experiments/generatore-nomi.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Serie A Live</div>
+        <div class="qsub">Classifica aggiornata e risultati/prossime partite del campionato</div>
+        <a class="go" href="experiments/serie-a.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Meteo Radar</div>
+        <div class="qsub">Cerca una città: meteo attuale e previsioni a 6 giorni</div>
+        <a class="go" href="experiments/meteo-radar.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Cosa sono le Outer Banks</div>
+        <div class="qsub">Scena 3D interattiva: oceano, boe e bussola spiegano il tema del sito</div>
+        <a class="go" href="experiments/outer-banks.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Outer Banks — la serie</div>
+        <div class="qsub">Mappa 3D di Kildare Island: The Cut, Figure Eight, ciurma e trama</div>
+        <a class="go" href="experiments/outer-banks-serie.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Oracolo IA</div>
+        <div class="qsub">Fai una domanda a una vera intelligenza artificiale</div>
+        <a class="go" href="experiments/oracolo-ai.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Scroll Infinito</div>
+        <div class="qsub">Una pagina lunga da scorrere fino in fondo, con effetti speciali</div>
+        <a class="go" href="experiments/scroll-infinito.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div style="display:flex;justify-content:flex-end;gap:10px;padding:0 5vw">
+  <button id="secQuestionBtn" class="logout-btn" type="button" style="display:none">Domanda di sicurezza</button>
+  <button id="logoutBtn" class="logout-btn" type="button" style="display:none">Esci</button>
+</div>
+<footer>
+  <span>© 2026 Davide Villano</span>
+  <span>Bologna, Italia</span>
+</footer>
+
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ui-core.js"></script>
+<script src="js/calendar.js"></script>
+<script src="js/career.js"></script>
+<script src="js/contacts.js"></script>
+<script src="js/wishlist.js"></script>
+<script src="js/ics.js"></script>
+<script src="js/init.js"></script>
+<script src="js/theme.js"></script>
+
+<script>
+// Registra il service worker per rendere l'app installabile e usabile offline.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('service-worker.js').catch(function(err){
+      console.warn('Service worker non registrato:', err);
+    });
+  });
+}
+</script>
+
+</body>
+</html>
