@@ -38,7 +38,7 @@ function renderCareer() {
     const actions = document.createElement('div');
     actions.className = 'ev-item-actions';
     actions.style.marginTop = '12px';
-    actions.innerHTML = `<button class="ev-edit" type="button">EDIT</button><button class="ev-del" type="button">DEL</button>`;
+    actions.innerHTML = `<button class="ev-edit" type="button" title="Modifica" aria-label="Modifica">${ICON_EDIT}</button><button class="ev-del" type="button" title="Elimina" aria-label="Elimina">${ICON_DEL}</button>`;
     actions.querySelector('.ev-edit').onclick = ev => { ev.stopPropagation?.(); editCareer(c); };
     actions.querySelector('.ev-del').onclick = async ev => {
       ev.preventDefault();

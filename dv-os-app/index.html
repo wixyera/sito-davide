@@ -111,7 +111,7 @@
     <div class="arc-ring r1"></div><div class="arc-ring r2"></div><div class="arc-ring r3"></div>
     <div class="arc-core"></div>
   </div>
-  <div id="loaderText">ACCENDENDO IL FALÒ...</div>
+  <div id="loaderText">INIZIALIZZAZIONE SISTEMA...</div>
 </div>
 
 <div class="reticle" id="reticle"><div class="ring"><div class="dot"></div></div></div>
@@ -140,7 +140,10 @@
     <button class="tab-btn" data-module="wishlist"><span class="n">04</span>Wishlist</button>
     <button class="tab-btn" data-module="esperimenti"><span class="n">05</span>Esperimenti</button>
   </div>
-  <button class="theme-toggle-btn" id="themeToggleBtn" type="button" aria-label="Cambia tema chiaro/scuro"><span id="themeToggleIcon">🌙</span></button>
+  <button class="theme-toggle-btn" id="themeToggleBtn" type="button" aria-label="Cambia tema chiaro/scuro">
+    <svg id="themeIconMoon" viewBox="0 0 24 24" class="theme-ic"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+    <svg id="themeIconSun" viewBox="0 0 24 24" class="theme-ic" style="display:none;"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M4.22 4.22l1.77 1.77M18 18l1.78 1.78M2 12h2.5M19.5 12H22M4.22 19.78 6 18M18 6l1.78-1.78"/></svg>
+  </button>
   <button class="nav-toggle" id="navToggle" aria-label="Apri menu"><span></span><span></span><span></span></button>
 </header>
 
@@ -412,157 +415,136 @@
         <div class="qsub">Gioco testa o croce animato in 3D</div>
         <a class="go" href="experiments/flip-coin.html" target="_blank" rel="noopener">Apri →</a>
       </div>
-      <div class="quick-card hud" style="border-color:rgba(110,245,255,.4);">
-        <div class="corners"><span></span><span></span><span></span><span></span></div>
-        <span class="qk">Esperimento 04</span>
-        <div class="qv">???</div>
-        <div class="qsub">Non te lo dico. Aprilo e basta.</div>
-        <a class="go" href="experiments/surprise.html" target="_blank" rel="noopener">Scopri →</a>
-      </div>
-      <div class="quick-card hud" style="border-color:rgba(103,232,249,.4);">
-        <div class="corners"><span></span><span></span><span></span><span></span></div>
-        <span class="qk">Esperimento 05</span>
-        <div class="qv">??</div>
-        <div class="qsub">Anche questo resta segreto. Fidati.</div>
-        <a class="go" href="experiments/surprise2.html" target="_blank" rel="noopener">Scopri →</a>
-      </div>
-      <div class="quick-card hud" style="border-color:rgba(110,255,178,.4);">
-        <div class="corners"><span></span><span></span><span></span><span></span></div>
-        <span class="qk">Esperimento 06</span>
-        <div class="qv">?</div>
-        <div class="qsub">Il più bello dei tre. Non chiedere altro.</div>
-        <a class="go" href="experiments/surprise3.html" target="_blank" rel="noopener">Scopri →</a>
-      </div>
       <div class="quick-card hud">
         <div class="corners"><span></span><span></span><span></span><span></span></div>
-        <span class="qk">Esperimento 07</span>
+        <span class="qk">Esperimento 04</span>
         <div class="qv">QR Code Generator</div>
         <div class="qsub">Generatore di codici QR personalizzabili</div>
         <a class="go" href="experiments/qr-generator.html" target="_blank" rel="noopener">Apri →</a>
       </div>
       <div class="quick-card hud">
         <div class="corners"><span></span><span></span><span></span><span></span></div>
-        <span class="qk">Esperimento 08</span>
+        <span class="qk">Esperimento 05</span>
         <div class="qv">Sasso Carta Forbici</div>
         <div class="qsub">Sfida il computer, meglio di 3</div>
         <a class="go" href="experiments/sasso-carta-forbici.html" target="_blank" rel="noopener">Gioca →</a>
       </div>
       <div class="quick-card hud">
         <div class="corners"><span></span><span></span><span></span><span></span></div>
-        <span class="qk">Esperimento 09</span>
+        <span class="qk">Esperimento 06</span>
         <div class="qv">Dado Fortunato</div>
         <div class="qsub">Lancia il dado, statistiche in tempo reale</div>
         <a class="go" href="experiments/dado-fortunato.html" target="_blank" rel="noopener">Gioca →</a>
       </div>
       <div class="quick-card hud">
         <div class="corners"><span></span><span></span><span></span><span></span></div>
-        <span class="qk">Esperimento 10</span>
+        <span class="qk">Esperimento 07</span>
         <div class="qv">Quiz Lampo</div>
         <div class="qsub">Mini quiz a risposta multipla</div>
         <a class="go" href="experiments/quiz-lampo.html" target="_blank" rel="noopener">Gioca →</a>
       </div>
       <div class="quick-card hud">
         <div class="corners"><span></span><span></span><span></span><span></span></div>
-        <span class="qk">Esperimento 11</span>
+        <span class="qk">Esperimento 08</span>
         <div class="qv">Sfera Magica</div>
         <div class="qsub">Fai una domanda, tocca la sfera</div>
         <a class="go" href="experiments/sfera-magica.html" target="_blank" rel="noopener">Apri →</a>
       </div>
       <div class="quick-card hud">
         <div class="corners"><span></span><span></span><span></span><span></span></div>
-        <span class="qk">Esperimento 12</span>
+        <span class="qk">Esperimento 09</span>
         <div class="qv">Palette Generator</div>
         <div class="qsub">Genera e copia palette di colori</div>
         <a class="go" href="experiments/palette-generator.html" target="_blank" rel="noopener">Apri →</a>
       </div>
       <div class="quick-card hud">
         <div class="corners"><span></span><span></span><span></span><span></span></div>
-        <span class="qk">Esperimento 13</span>
+        <span class="qk">Esperimento 10</span>
         <div class="qv">Snake</div>
         <div class="qsub">Il classico arcade, in stile retro CRT</div>
         <a class="go" href="experiments/snake.html" target="_blank" rel="noopener">Gioca →</a>
       </div>
       <div class="quick-card hud">
         <div class="corners"><span></span><span></span><span></span><span></span></div>
-        <span class="qk">Esperimento 14</span>
+        <span class="qk">Esperimento 11</span>
         <div class="qv">Fuochi d'Artificio</div>
         <div class="qsub">Spettacolo pirotecnico interattivo</div>
         <a class="go" href="experiments/fuochi-artificio.html" target="_blank" rel="noopener">Apri →</a>
       </div>
       <div class="quick-card hud" style="border-color:rgba(110,245,255,.5);">
         <div class="corners"><span></span><span></span><span></span><span></span></div>
-        <span class="qk">Esperimento 15</span>
-        <div class="qv">✦</div>
-        <div class="qsub">Il migliore di tutti. Non aggiungo altro.</div>
-        <a class="go" href="experiments/universo.html" target="_blank" rel="noopener">Scopri →</a>
+        <span class="qk">Esperimento 12</span>
+        <div class="qv">Universo 3D</div>
+        <div class="qsub">Campo stellare esplorabile in 3D con audio ambientale</div>
+        <a class="go" href="experiments/universo.html" target="_blank" rel="noopener">Esplora →</a>
       </div>
       <div class="quick-card hud" style="border-color:rgba(110,245,255,.4);">
         <div class="corners"><span></span><span></span><span></span><span></span></div>
-        <span class="qk">Esperimento 16</span>
+        <span class="qk">Esperimento 13</span>
         <div class="qv">Cosmo Explorer</div>
         <div class="qsub">Galassie e buchi neri 3D, dalla Via Lattea al Sistema Solare</div>
         <a class="go" href="experiments/cosmo-explorer.html" target="_blank" rel="noopener">Esplora →</a>
       </div>
       <div class="quick-card hud" style="border-color:rgba(110,245,255,.5);">
         <div class="corners"><span></span><span></span><span></span><span></span></div>
-        <span class="qk">Esperimento 17</span>
+        <span class="qk">Esperimento 14</span>
         <div class="qv">Atlante delle Meraviglie</div>
         <div class="qsub">Mappa interattiva delle 8 meraviglie del mondo</div>
         <a class="go" href="experiments/meraviglie-mondo.html" target="_blank" rel="noopener">Apri →</a>
       </div>
       <div class="quick-card hud" style="border-color:rgba(110,245,255,.4);">
         <div class="corners"><span></span><span></span><span></span><span></span></div>
-        <span class="qk">Esperimento 18</span>
+        <span class="qk">Esperimento 15</span>
         <div class="qv">Piano Virtuale</div>
         <div class="qsub">Suona con mouse o tastiera, tre timbri diversi</div>
         <a class="go" href="experiments/piano-virtuale.html" target="_blank" rel="noopener">Suona →</a>
       </div>
       <div class="quick-card hud" style="border-color:rgba(0,238,255,.5);">
         <div class="corners"><span></span><span></span><span></span><span></span></div>
-        <span class="qk">Esperimento 19</span>
+        <span class="qk">Esperimento 16</span>
         <div class="qv">Generatore di Nomi Fantasy</div>
         <div class="qsub">Nomi ed epiteti per elfi, nani, orchi e draghi</div>
         <a class="go" href="experiments/generatore-nomi.html" target="_blank" rel="noopener">Apri →</a>
       </div>
       <div class="quick-card hud" style="border-color:rgba(110,231,183,.5);">
         <div class="corners"><span></span><span></span><span></span><span></span></div>
-        <span class="qk">Esperimento 20</span>
-        <div class="qv">⚽ Serie A Live</div>
+        <span class="qk">Esperimento 17</span>
+        <div class="qv">Serie A Live</div>
         <div class="qsub">Classifica aggiornata e risultati/prossime partite del campionato</div>
         <a class="go" href="experiments/serie-a.html" target="_blank" rel="noopener">Apri →</a>
       </div>
       <div class="quick-card hud" style="border-color:rgba(45,212,191,.5);">
         <div class="corners"><span></span><span></span><span></span><span></span></div>
-        <span class="qk">Esperimento 21</span>
-        <div class="qv">🛰️ Meteo Radar</div>
+        <span class="qk">Esperimento 18</span>
+        <div class="qv">Meteo Radar</div>
         <div class="qsub">Cerca una città: meteo attuale e previsioni a 6 giorni in stile HUD</div>
         <a class="go" href="experiments/meteo-radar.html" target="_blank" rel="noopener">Apri →</a>
       </div>
       <div class="quick-card hud" style="border-color:rgba(45,212,191,.5);">
         <div class="corners"><span></span><span></span><span></span><span></span></div>
-        <span class="qk">Esperimento 22</span>
-        <div class="qv">🧭 Cosa sono le Outer Banks</div>
+        <span class="qk">Esperimento 19</span>
+        <div class="qv">Cosa sono le Outer Banks</div>
         <div class="qsub">Scena 3D interattiva: oceano, boe e bussola ti spiegano il tema del sito</div>
         <a class="go" href="experiments/outer-banks.html" target="_blank" rel="noopener">Salpa →</a>
       </div>
       <div class="quick-card hud" style="border-color:rgba(45,212,191,.5);">
         <div class="corners"><span></span><span></span><span></span><span></span></div>
-        <span class="qk">Esperimento 23</span>
-        <div class="qv">⛵ Outer Banks — la serie</div>
+        <span class="qk">Esperimento 20</span>
+        <div class="qv">Outer Banks — la serie</div>
         <div class="qsub">Mappa 3D di Kildare Island: The Cut, Figure Eight, ciurma e trama</div>
         <a class="go" href="experiments/outer-banks-serie.html" target="_blank" rel="noopener">Esplora →</a>
       </div>
       <div class="quick-card hud" style="border-color:rgba(0,238,255,.5);">
         <div class="corners"><span></span><span></span><span></span><span></span></div>
-        <span class="qk">Esperimento 24</span>
-        <div class="qv">🔮 Oracolo IA</div>
+        <span class="qk">Esperimento 21</span>
+        <div class="qv">Oracolo IA</div>
         <div class="qsub">Fai una domanda a una vera intelligenza artificiale</div>
         <a class="go" href="experiments/oracolo-ai.html" target="_blank" rel="noopener">Chiedi →</a>
       </div>
       <div class="quick-card hud" style="border-color:rgba(232,121,249,.5);">
         <div class="corners"><span></span><span></span><span></span><span></span></div>
-        <span class="qk">Esperimento 25</span>
-        <div class="qv">🌀 Scroll Infinito</div>
+        <span class="qk">Esperimento 22</span>
+        <div class="qv">Scroll Infinito</div>
         <div class="qsub">Una pagina lunghissima da scorrere fino in fondo, con effetti speciali</div>
         <a class="go" href="experiments/scroll-infinito.html" target="_blank" rel="noopener">Scendi →</a>
       </div>
@@ -572,7 +554,7 @@
 </main>
 
 <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 5vw">
-  <button id="secQuestionBtn" class="logout-btn" type="button" style="display:none">🔐 DOMANDA DI SICUREZZA</button>
+  <button id="secQuestionBtn" class="logout-btn" type="button" style="display:none">DOMANDA DI SICUREZZA</button>
   <button id="logoutBtn" class="logout-btn" type="button" style="display:none">ESCI</button>
 </div>
 <footer>

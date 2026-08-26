@@ -55,27 +55,6 @@ self.addEventListener('fetch', event => {
   // (API Supabase, font esterni, ecc.) va diretto in rete.
   if (url.origin !== self.location.origin) return;
 
-  const isCode = /\.(js|css)$/.test(url.pathname) || url.pathname.endsWith('/') || url.pathname.endsWith('index.html');
-
-  if (isCode) {
-    // Network-first per HTML/JS/CSS: così una modifica al codice arriva
-    // subito, anche se ci si dimentica di alzare CACHE_NAME. Si usa la
-    // cache solo come fallback offline.
-    event.respondWith(
-      fetch(req)
-        .then(res => {
-          if (res && res.ok) {
-            const clone = res.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(req, clone));
-          }
-          return res;
-        })
-        .catch(() => caches.match(req).then(cached => cached || caches.match('./index.html')))
-    );
-    return;
-  }
-
-  // Tutto il resto (immagini, icone...) resta stale-while-revalidate.
   event.respondWith(
     caches.match(req).then(cached => {
       const network = fetch(req)

@@ -22,7 +22,7 @@ function renderContacts() {
   contactEntries.forEach(c => {
     const item = document.createElement('div');
     item.className = 'ev-item';
-    item.innerHTML = `<div class="ev-info"><div class="ev-title"></div><div class="ev-details"></div></div><div class="ev-item-actions"><button class="ev-edit" type="button">EDIT</button><button class="ev-del" type="button">DEL</button></div>`;
+    item.innerHTML = `<div class="ev-info"><div class="ev-title"></div><div class="ev-details"></div></div><div class="ev-item-actions"><button class="ev-edit" type="button" title="Modifica" aria-label="Modifica">${ICON_EDIT}</button><button class="ev-del" type="button" title="Elimina" aria-label="Elimina">${ICON_DEL}</button></div>`;
     item.querySelector('.ev-title').textContent = c.email || c.phone || 'Contatto';
     const details = [];
     if (c.email) details.push('EMAIL: ' + c.email);

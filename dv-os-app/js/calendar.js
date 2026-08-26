@@ -153,7 +153,7 @@ function renderEventList() {
     const item = document.createElement('details');
     item.className = 'ev-item';
     item.style.borderLeft = `3px solid ${ev.color || '#00eeff'}`;
-    item.innerHTML = `<summary><div class="ev-info">${ev.time ? `<div class="ev-time">${ev.time}${ev.endTime ? ' - ' + ev.endTime : ''}</div>` : ''}<div class="ev-title"></div></div></summary><div class="ev-body"><div class="ev-details"></div><div class="ev-item-actions"><button class="ev-edit" type="button">EDIT</button><button class="ev-ics" title="Esporta .ics" type="button">ICS</button><button class="ev-del" title="Elimina" type="button">DEL</button></div></div>`;
+    item.innerHTML = `<summary><div class="ev-info">${ev.time ? `<div class="ev-time">${ev.time}${ev.endTime ? ' - ' + ev.endTime : ''}</div>` : ''}<div class="ev-title"></div></div></summary><div class="ev-body"><div class="ev-details"></div><div class="ev-item-actions"><button class="ev-edit" type="button" title="Modifica" aria-label="Modifica">${ICON_EDIT}</button><button class="ev-ics" title="Esporta .ics" aria-label="Esporta .ics" type="button">${ICON_ICS}</button><button class="ev-del" title="Elimina" aria-label="Elimina" type="button">${ICON_DEL}</button></div></div>`;
     item.querySelector('.ev-title').textContent = ev.title;
     const details = [];
     if (ev.location) details.push('LUOGO: ' + ev.location);
