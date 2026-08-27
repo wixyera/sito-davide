@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flip a coin game</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&family=Fira+Code:wght@500&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Rubik',sans-serif;}
+
+body{
+  height:100%;min-height:100vh;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255,255,255,.10), transparent 45%),
+    linear-gradient(120deg,#4a4fe0 0%,#575ce5 45%,#7378ef 100%);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;position:relative;
+}
+body::before{
+  content:'';position:absolute;inset:0;
+  background-image:radial-gradient(rgba(255,255,255,.08) 1px, transparent 1px);
+  background-size:26px 26px;pointer-events:none;
+}
+
+.container{
+  background:rgba(255,255,255,.97);width:400px;max-width:88vw;padding:46px 44px 40px;
+  border-radius:22px;box-shadow:0 40px 80px -20px rgba(30,20,90,.5), 0 0 0 1px rgba(255,255,255,.4);
+  -webkit-perspective:300px;perspective:300px;position:relative;z-index:1;
+  animation:floatIn .55s cubic-bezier(.2,.8,.2,1);
+}
+@keyframes floatIn{from{opacity:0;transform:translateY(18px) scale(.96);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+.title{text-align:center;color:#33356b;font-weight:700;font-size:1.1rem;letter-spacing:.02em;margin-bottom:6px;}
+.stats{display:flex;justify-content:center;gap:10px;margin-bottom:6px;}
+.stat-pill{background:#f1f1fb;border-radius:20px;padding:6px 16px;font-size:.85rem;font-weight:600;color:#4a4fe0;font-family:'Fira Code',monospace;}
+.stat-pill.tails-pill{color:#7378ef;}
+
+.coin-stage{position:relative;margin:38px auto 30px;width:170px;height:170px;}
+.coin-shadow{position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);width:110px;height:18px;border-radius:50%;background:radial-gradient(ellipse,rgba(70,60,150,.28),transparent 70%);filter:blur(2px);transition:all .3s;}
+.coin{height:170px;width:170px;position:relative;-webkit-transform-style:preserve-3d;transform-style:preserve-3d;filter:drop-shadow(0 14px 22px rgba(70,60,150,.28));}
+.tails{transform:rotateX(180deg);}
+.buttons{display:flex;justify-content:center;gap:14px;}
+.coin img{width:164px;}
+.heads,.tails{position:absolute;width:100%;height:100%;backface-visibility:hidden;-webkit-backface-visibility:hidden;}
+button{
+  width:140px;padding:13px 0;border:2.5px solid #4a4fe0;border-radius:10px;cursor:pointer;
+  font-weight:600;font-size:.95rem;letter-spacing:.01em;transition:all .22s;
+}
+#flip-button{background:linear-gradient(135deg,#4a4fe0,#575ce5);color:#fff;box-shadow:0 10px 22px -8px rgba(74,79,224,.55);}
+#flip-button:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 14px 26px -8px rgba(74,79,224,.65);}
+#flip-button:disabled{background:#e6e6f5;color:#a3a3c2;border-color:#e6e6f5;cursor:default;box-shadow:none;}
+#reset-button{background:#fff;color:#4a4fe0;}
+#reset-button:hover{background:#f1f1fb;transform:translateY(-2px);}
+
+@keyframes spin-tails{0%{transform:rotateX(0);}100%{transform:rotateX(1980deg);}}
+@keyframes spin-heads{0%{transform:rotateX(0);}100%{transform:rotateX(2160deg);}}
+@keyframes shrinkShadow{0%{transform:translateX(-50%) scale(1);opacity:.55;}50%{transform:translateX(-50%) scale(.55);opacity:.25;}100%{transform:translateX(-50%) scale(1);opacity:.55;}}
+.coin-shadow.animating{animation:shrinkShadow 3s ease;}
+
+.back-link{position:fixed;top:14px;left:14px;font-size:13px;color:#fff;text-decoration:none;font-weight:600;background:rgba(0,0,0,.2);padding:9px 15px;border-radius:20px;z-index:5;transition:all .25s;backdrop-filter:blur(4px);}
+.back-link:hover{background:rgba(0,0,0,.32);}
+</style>
+</head>
+<body>
+<a class="back-link" href="../index.html" onclick="if(window.history.length>1){history.back();return false;}">← Indietro</a>
+<div class="container">
+  <div class="title">Flip a Coin</div>
+  <div class="stats">
+    <span class="stat-pill" id="heads-count">Heads: 0</span>
+    <span class="stat-pill tails-pill" id="tails-count">Tails: 0</span>
+  </div>
+  <div class="coin-stage">
+    <div class="coin-shadow" id="coinShadow"></div>
+    <div class="coin" id="coin">
+      <div class="heads">
+        <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120"><title>heads</title><g><path d="M114.6,60a54.61206,54.61206,0,0,1-102,27.108,53.80039,53.80039,0,0,1-5.988-15.612A54.94484,54.94484,0,0,1,5.4,60,54.63072,54.63072,0,0,1,73.284,7.032a53.6595,53.6595,0,0,1,15.384,6.504A54.62611,54.62611,0,0,1,114.6,60Z" style="fill:#ffde50"/><path d="M105,60a44.98374,44.98374,0,0,1-42.684,44.94H62.28c-.756.036-1.512.06-2.28.06a45.00313,45.00313,0,0,1-7.716-89.34h.036A44.98939,44.98939,0,0,1,105,60Z" style="fill:#f68e00"/><path d="M99.6,60.6a44.99555,44.99555,0,0,1-37.284,44.34H62.28c-.756.036-1.512.06-2.28.06a45.00313,45.00313,0,0,1-7.716-89.34h.036c.756-.036,1.512-.06,2.28-.06a44.98562,44.98562,0,0,1,45,45Z" style="fill:#faa300"/><path d="M99.804,22.59595l-6.78,6.78-3.096,3.096L29.376,93.024l-6.78,6.78A54.42023,54.42023,0,0,1,13.8,88.308,53.80039,53.80039,0,0,1,7.812,72.696,54.94484,54.94484,0,0,1,6.6,61.2,54.63072,54.63072,0,0,1,74.484,8.232a53.6595,53.6595,0,0,1,15.384,6.504A54.36778,54.36778,0,0,1,99.804,22.59595Z" style="fill:#fff;opacity:.14"/><g><text transform="translate(23.29687 67.95869)" style="font-size:21.072948455810547px;fill:#b96b00;font-family:Roboto-Bold,Roboto;font-weight:700;letter-spacing:.04397855451710463em">HEADS</text><text transform="translate(24.49658 69.1584)" style="font-size:21.072948455810547px;fill:#ffea94;font-family:Roboto-Bold,Roboto;font-weight:700;letter-spacing:.04397855451710463em">HEADS</text></g></g></svg>
+      </div>
+      <div class="tails">
+        <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120"><title>tails</title><g><path d="M114.6,60a54.61206,54.61206,0,0,1-102,27.108,53.80039,53.80039,0,0,1-5.988-15.612A54.94484,54.94484,0,0,1,5.4,60,54.63072,54.63072,0,0,1,73.284,7.032a53.6595,53.6595,0,0,1,15.384,6.504A54.62611,54.62611,0,0,1,114.6,60Z" style="fill:#ffde50"/><path d="M105,60a44.98374,44.98374,0,0,1-42.684,44.94H62.28c-.756.036-1.512.06-2.28.06a45.00313,45.00313,0,0,1-7.716-89.34h.036A44.98939,44.98939,0,0,1,105,60Z" style="fill:#f68e00"/><path d="M99.6,60.6a44.99555,44.99555,0,0,1-37.284,44.34H62.28c-.756.036-1.512.06-2.28.06a45.00313,45.00313,0,0,1-7.716-89.34h.036c.756-.036,1.512-.06,2.28-.06a44.98562,44.98562,0,0,1,45,45Z" style="fill:#faa300"/><path d="M99.804,22.59595l-6.78,6.78-3.096,3.096L29.376,93.024l-6.78,6.78A54.42023,54.42023,0,0,1,13.8,88.308,53.80039,53.80039,0,0,1,7.812,72.696,54.94484,54.94484,0,0,1,6.6,61.2,54.63072,54.63072,0,0,1,74.484,8.232a53.6595,53.6595,0,0,1,15.384,6.504A54.36778,54.36778,0,0,1,99.804,22.59595Z" style="fill:#fff;opacity:.14"/><g><text transform="translate(28.09668 67.95879)" style="font-size:21.072948455810547px;fill:#b96b00;font-family:Roboto-Bold,Roboto;font-weight:700;letter-spacing:-.014574557845763338em">T<tspan x="12.72949" y="0" style="letter-spacing:.04397855451710463em">AILS</tspan></text><text transform="translate(29.29687 69.15898)" style="font-size:21.072948455810547px;fill:#ffea94;font-family:Roboto-Bold,Roboto;font-weight:700;letter-spacing:-.014574557845763338em">T<tspan x="12.72949" y="0" style="letter-spacing:.04397855451710463em">AILS</tspan></text></g></g></svg>
+      </div>
+    </div>
+  </div>
+  <div class="buttons">
+    <button id="flip-button">Flip Coin</button>
+    <button id="reset-button">Reset</button>
+  </div>
+</div>
+<script>
+let heads = 0;
+let tails = 0;
+let coin = document.querySelector(".coin");
+let shadow = document.querySelector("#coinShadow");
+let flipBtn = document.querySelector("#flip-button");
+let resetBtn = document.querySelector("#reset-button");
+
+flipBtn.addEventListener("click", () => {
+  let i = Math.floor(Math.random() * 2);
+  coin.style.animation = "none";
+  shadow.classList.remove('animating'); void shadow.offsetWidth; shadow.classList.add('animating');
+  if (i) {
+    setTimeout(function () { coin.style.animation = "spin-heads 3s forwards"; }, 100);
+    heads++;
+  } else {
+    setTimeout(function () { coin.style.animation = "spin-tails 3s forwards"; }, 100);
+    tails++;
+  }
+  setTimeout(updateStats, 3000);
+  disableButton();
+});
+
+function updateStats() {
+  document.querySelector("#heads-count").textContent = `Heads: ${heads}`;
+  document.querySelector("#tails-count").textContent = `Tails: ${tails}`;
+}
+
+function disableButton() {
+  flipBtn.disabled = true;
+  setTimeout(function () { flipBtn.disabled = false; }, 3000);
+}
+
+resetBtn.addEventListener("click", () => {
+  coin.style.animation = "none";
+  heads = 0;
+  tails = 0;
+  updateStats();
+});
+</script>
+</body>
+</html>
