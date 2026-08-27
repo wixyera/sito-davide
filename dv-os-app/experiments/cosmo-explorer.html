@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cosmo Explorer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Space+Mono:wght@400;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;background:#030512;font-family:'Space Mono',monospace;}
+#webgl{position:fixed;inset:0;display:block;cursor:grab;}
+#webgl:active{cursor:grabbing;}
+
+::selection{background:#5eead4;color:#03151a;}
+
+/* ---------- loader ---------- */
+#loading{
+  position:fixed;inset:0;z-index:60;background:radial-gradient(ellipse at 50% 40%,#0a0f24,#030512);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .7s ease;
+}
+#loading.hide{opacity:0;pointer-events:none;}
+.load-ring{width:48px;height:48px;border-radius:50%;border:2px solid rgba(94,234,212,.15);border-top-color:#5eead4;animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+#loading p{color:rgba(94,234,212,.6);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;}
+#loading.err p{color:#f43f5e;letter-spacing:.05em;text-transform:none;max-width:340px;text-align:center;line-height:1.5;}
+
+/* ---------- top chrome ---------- */
+.back-link{position:fixed;top:14px;left:14px;font-size:12px;color:#a8f8ec;text-decoration:none;font-weight:700;background:rgba(94,234,212,.08);border:1px solid rgba(94,234,212,.3);padding:8px 14px;border-radius:20px;z-index:20;letter-spacing:.05em;backdrop-filter:blur(6px);transition:all .25s;}
+.back-link:hover{background:rgba(94,234,212,.18);border-color:#5eead4;}
+
+.title-badge{
+  position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:20;text-align:center;
+  font-family:'Orbitron',sans-serif;font-weight:800;font-size:.82rem;letter-spacing:.16em;color:#eafffa;
+  background:rgba(6,12,26,.55);border:1px solid rgba(94,234,212,.28);padding:9px 20px;border-radius:20px;
+  backdrop-filter:blur(8px);text-transform:uppercase;
+}
+.title-badge span{display:block;font-family:'Space Mono',monospace;font-weight:400;font-size:.6rem;letter-spacing:.1em;color:#7fb8ae;margin-top:2px;text-transform:none;}
+
+.hud{position:fixed;top:14px;right:14px;color:rgba(168,248,236,.6);font-size:10.5px;letter-spacing:.08em;z-index:20;text-align:right;line-height:1.7;background:rgba(6,12,26,.4);padding:9px 13px;border-radius:10px;border:1px solid rgba(94,234,212,.18);backdrop-filter:blur(6px);}
+.hud b{color:#5eead4;}
+
+.hint{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);color:rgba(168,248,236,.4);
+  font-size:11px;letter-spacing:.1em;text-transform:uppercase;z-index:12;text-align:center;
+  pointer-events:none;transition:opacity 1s ease;max-width:88vw;
+}
+
+/* ---------- mode switch buttons ---------- */
+.mode-btn{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:22;
+  background:linear-gradient(135deg,rgba(94,234,212,.18),rgba(251,191,36,.14));
+  border:1px solid #5eead4;color:#eafffa;font-family:'Orbitron',sans-serif;font-weight:700;font-size:.72rem;
+  letter-spacing:.1em;padding:12px 26px;border-radius:30px;cursor:pointer;display:none;
+  backdrop-filter:blur(6px);transition:all .25s;text-transform:uppercase;box-shadow:0 0 30px rgba(94,234,212,.15);
+}
+.mode-btn:hover{background:rgba(94,234,212,.28);box-shadow:0 0 34px rgba(94,234,212,.35);transform:translateX(-50%) translateY(-2px);}
+.mode-btn.show{display:block;}
+
+/* ---------- info panel ---------- */
+#panel{
+  position:fixed;top:0;right:0;height:100%;width:min(360px,88vw);z-index:30;
+  background:rgba(6,10,22,.82);backdrop-filter:blur(16px);border-left:1px solid rgba(94,234,212,.25);
+  padding:90px 26px 26px;transform:translateX(100%);transition:transform .45s cubic-bezier(.2,.8,.2,1);
+  overflow-y:auto;box-shadow:-20px 0 50px rgba(0,0,0,.4);
+}
+#panel.open{transform:translateX(0);}
+#panel .p-close{position:absolute;top:16px;right:16px;background:none;border:1px solid rgba(94,234,212,.3);color:#a8f8ec;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:14px;transition:all .2s;}
+#panel .p-close:hover{background:rgba(94,234,212,.15);}
+#panel .p-kicker{font-size:.66rem;color:#fbbf24;letter-spacing:.18em;text-transform:uppercase;font-weight:700;}
+#panel .p-title{font-family:'Orbitron',sans-serif;font-weight:800;font-size:1.5rem;color:#eafffa;margin-top:8px;line-height:1.25;}
+#panel .p-sub{color:#7fb8ae;font-size:.78rem;margin-top:6px;letter-spacing:.03em;}
+#panel .p-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0;}
+#panel .p-stat{background:rgba(94,234,212,.06);border:1px solid rgba(94,234,212,.15);border-radius:10px;padding:10px 12px;}
+#panel .p-stat b{display:block;color:#5eead4;font-size:.92rem;font-family:'Space Mono',monospace;}
+#panel .p-stat span{display:block;color:#7fb8ae;font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;margin-top:3px;}
+#panel .p-desc{color:#cdeee6;font-size:.86rem;line-height:1.65;margin-top:6px;}
+#panel .p-explore{
+  margin-top:22px;width:100%;background:linear-gradient(135deg,#5eead4,#fbbf24);border:none;color:#04141a;
+  font-family:'Orbitron',sans-serif;font-weight:800;font-size:.78rem;letter-spacing:.08em;padding:13px 0;
+  border-radius:10px;cursor:pointer;text-transform:uppercase;transition:all .2s;display:none;
+}
+#panel .p-explore.show{display:block;}
+#panel .p-explore:hover{transform:translateY(-2px);box-shadow:0 10px 26px -6px rgba(94,234,212,.5);}
+
+@media(max-width:640px){
+  .title-badge{font-size:.68rem;padding:7px 14px;}
+  .title-badge span{font-size:.54rem;}
+  .hud{font-size:9.5px;}
+}
+</style>
+</head>
+<body>
+<a class="back-link" href="../index.html" onclick="if(window.history.length>1){history.back();return false;}">← Indietro</a>
+<div class="title-badge" id="titleBadge">UNIVERSO OSSERVABILE<span id="titleSub">clicca una galassia o un buco nero</span></div>
+<div class="hud">MODALITÀ: <b id="modeLabel">UNIVERSO</b><br>SCOPERTI: <b id="foundCount">0</b>/<b id="foundTotal">7</b></div>
+
+<canvas id="webgl"></canvas>
+<div id="loading"><div class="load-ring"></div><p>Calibrazione del telescopio...</p></div>
+<div class="hint" id="hint">trascina per ruotare · scorri per zoomare · clicca un corpo celeste</div>
+
+<button class="mode-btn" id="backUniverseBtn">← Torna all'universo</button>
+
+<div id="panel">
+  <button class="p-close" id="panelClose">✕</button>
+  <div class="p-kicker" id="pKicker">OGGETTO CELESTE</div>
+  <div class="p-title" id="pTitle">—</div>
+  <div class="p-sub" id="pSub">—</div>
+  <div class="p-stats" id="pStats"></div>
+  <div class="p-desc" id="pDesc"></div>
+  <button class="p-explore" id="pExplore">🔭 Esplora il Sistema Solare</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(function () {
+  const canvas = document.getElementById('webgl');
+  const loading = document.getElementById('loading');
+  const hint = document.getElementById('hint');
+  const hudMode = document.getElementById('modeLabel');
+  const foundCountEl = document.getElementById('foundCount');
+  const backBtn = document.getElementById('backUniverseBtn');
+  const titleBadge = document.getElementById('titleBadge');
+  const titleSub = document.getElementById('titleSub');
+
+  const panel = document.getElementById('panel');
+  const pKicker = document.getElementById('pKicker');
+  const pTitle = document.getElementById('pTitle');
+  const pSub = document.getElementById('pSub');
+  const pStats = document.getElementById('pStats');
+  const pDesc = document.getElementById('pDesc');
+  const pExplore = document.getElementById('pExplore');
+  const panelClose = document.getElementById('panelClose');
+
+  if (typeof THREE === 'undefined') {
+    loading.classList.add('err');
+    loading.innerHTML = '<p>Impossibile caricare il motore 3D. Controlla la connessione e ricarica la pagina.</p>';
+    return;
+  }
+
+  let W = innerWidth, H = innerHeight;
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(55, W / H, 0.1, 4000);
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+  renderer.setClearColor(0x030512, 1);
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(W, H);
+
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.06;
+  controls.minDistance = 1.5;
+  controls.maxDistance = 260;
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 0.18;
+
+  function onResize() {
+    W = innerWidth; H = innerHeight;
+    camera.aspect = W / H;
+    camera.updateProjectionMatrix();
+    renderer.setSize(W, H);
+  }
+  addEventListener('resize', onResize);
+
+  /* -------------------------------------------------------------
+     STELLE DI SFONDO
+  ------------------------------------------------------------- */
+  function makeStarfield(count, spread, size) {
+    const geo = new THREE.BufferGeometry();
+    const pos = new Float32Array(count * 3);
+    for (let i = 0; i < count * 3; i++) pos[i] = (Math.random() - 0.5) * spread;
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    const mat = new THREE.PointsMaterial({ size, color: 0xffffff, transparent: true, opacity: 0.65, depthWrite: false });
+    return new THREE.Points(geo, mat);
+  }
+  scene.add(makeStarfield(5000, 900, 0.7));
+  scene.add(makeStarfield(2000, 400, 1.1));
+
+  /* -------------------------------------------------------------
+     ETICHETTE DI TESTO (sprite su canvas)
+  ------------------------------------------------------------- */
+  function makeLabel(text, color) {
+    const c = document.createElement('canvas');
+    const ctx = c.getContext('2d');
+    const fontSize = 46;
+    c.width = 512; c.height = 128;
+    ctx.font = `700 ${fontSize}px Orbitron, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = color; ctx.shadowBlur = 18;
+    ctx.fillStyle = '#eafffa';
+    ctx.fillText(text, 256, 60);
+    const tex = new THREE.CanvasTexture(c);
+    const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, opacity: 0.92 });
+    const sprite = new THREE.Sprite(mat);
+    sprite.scale.set(9, 2.25, 1);
+    return sprite;
+  }
+
+  function makeGlowSprite(color, size) {
+    const c = document.createElement('canvas');
+    c.width = c.height = 256;
+    const ctx = c.getContext('2d');
+    const g = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
+    g.addColorStop(0, color); g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, 256, 256);
+    const tex = new THREE.CanvasTexture(c);
+    const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
+    const sprite = new THREE.Sprite(mat);
+    sprite.scale.set(size, size, 1);
+    return sprite;
+  }
+
+  /* -------------------------------------------------------------
+     GENERATORE DI GALASSIA A SPIRALE
+  ------------------------------------------------------------- */
+  function buildGalaxyPoints(opts) {
+    const count = opts.count || 4500;
+    const geo = new THREE.BufferGeometry();
+    const positions = new Float32Array(count * 3);
+    const colors = new Float32Array(count * 3);
+    const inside = new THREE.Color(opts.inside);
+    const outside = new THREE.Color(opts.outside);
+
+    for (let i = 0; i < count; i++) {
+      const i3 = i * 3;
+      const r = Math.random() * opts.radius;
+      const branchAngle = ((i % opts.branches) / opts.branches) * Math.PI * 2;
+      const spinAngle = r * opts.spin;
+      const rand = () => Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * opts.randomness * r;
+      const x = Math.cos(branchAngle + spinAngle) * r + rand();
+      const y = rand() * 0.35;
+      const z = Math.sin(branchAngle + spinAngle) * r + rand();
+      positions[i3] = x; positions[i3 + 1] = y; positions[i3 + 2] = z;
+      const mixed = inside.clone().lerp(outside, r / opts.radius);
+      colors[i3] = mixed.r; colors[i3 + 1] = mixed.g; colors[i3 + 2] = mixed.b;
+    }
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    const mat = new THREE.PointsMaterial({ size: opts.size || 0.045, sizeAttenuation: true, depthWrite: false, blending: THREE.AdditiveBlending, vertexColors: true, transparent: true, opacity: 0.95 });
+    return new THREE.Points(geo, mat);
+  }
+
+  const clickables = []; // {proxy, data}
+
+  function addGalaxy(data) {
+    const group = new THREE.Group();
+    group.position.set(data.pos[0], data.pos[1], data.pos[2]);
+    group.rotation.x = data.tilt || 0.4;
+    const pts = buildGalaxyPoints(data.gen);
+    group.add(pts);
+    group.add(makeGlowSprite(data.glow, data.gen.radius * 1.7));
+    const label = makeLabel(data.name, data.glow);
+    label.position.set(0, data.gen.radius * 0.55 + 1.6, 0);
+    group.add(label);
+
+    const proxy = new THREE.Mesh(
+      new THREE.SphereGeometry(data.gen.radius * 0.75, 16, 16),
+      new THREE.MeshBasicMaterial({ visible: false })
+    );
+    group.add(proxy);
+
+    scene.add(group);
+    clickables.push({ proxy, data, group, spinSpeed: data.spinSpeed || 0.01 });
+    return group;
+  }
+
+  function addBlackHole(data) {
+    const group = new THREE.Group();
+    group.position.set(data.pos[0], data.pos[1], data.pos[2]);
+
+    const core = new THREE.Mesh(new THREE.SphereGeometry(data.radius, 32, 32), new THREE.MeshBasicMaterial({ color: 0x000000 }));
+    group.add(core);
+    group.add(makeGlowSprite(data.glow, data.radius * 9));
+
+    const diskGeo = new THREE.RingGeometry(data.radius * 1.3, data.radius * 3.2, 64);
+    const diskMat = new THREE.MeshBasicMaterial({ color: data.diskColor, side: THREE.DoubleSide, transparent: true, opacity: 0.75, blending: THREE.AdditiveBlending });
+    const disk = new THREE.Mesh(diskGeo, diskMat);
+    disk.rotation.x = Math.PI / 2.4;
+    group.add(disk);
+
+    const disk2Geo = new THREE.RingGeometry(data.radius * 1.15, data.radius * 1.9, 64);
+    const disk2Mat = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending });
+    const disk2 = new THREE.Mesh(disk2Geo, disk2Mat);
+    disk2.rotation.x = Math.PI / 2.4;
+    disk2.rotation.z = 0.4;
+    group.add(disk2);
+
+    const label = makeLabel(data.name, data.glow);
+    label.position.set(0, data.radius * 4.4, 0);
+    group.add(label);
+
+    const proxy = new THREE.Mesh(new THREE.SphereGeometry(data.radius * 3.4, 16, 16), new THREE.MeshBasicMaterial({ visible: false }));
+    group.add(proxy);
+
+    scene.add(group);
+    clickables.push({ proxy, data, group, disk, disk2 });
+    return group;
+  }
+
+  /* -------------------------------------------------------------
+     DATI: GALASSIE E BUCHI NERI DELL'UNIVERSO OSSERVABILE
+  ------------------------------------------------------------- */
+  addGalaxy({
+    name: 'VIA LATTEA', pos: [0, 0, 0], tilt: 0.5, glow: '#5eead4', spinSpeed: 0.012,
+    gen: { count: 6000, radius: 6.5, branches: 4, spin: 1.1, randomness: 0.4, inside: '#fff3c4', outside: '#5eead4', size: 0.05 },
+    kicker: 'GALASSIA A SPIRALE BARRATA — CASA', sub: '~100.000 anni luce di diametro',
+    stats: [['⭐ Stelle', '100-400 miliardi'], ['📏 Diametro', '~105.000 al'], ['🌌 Tipo', 'Spirale barrata'], ['🕐 Età', '~13,6 miliardi di anni']],
+    desc: 'La nostra galassia: un disco a spirale con un rigonfiamento centrale barrato, ospita il Sistema Solare in uno dei bracci esterni, a circa 26.000 anni luce dal centro. Clicca "Esplora" per visitare il nostro angolo di universo.',
+    isMilkyWay: true
+  });
+
+  addGalaxy({
+    name: 'ANDROMEDA', pos: [15, 3, -8], tilt: 0.7, glow: '#c084fc', spinSpeed: 0.009,
+    gen: { count: 5200, radius: 5.6, branches: 5, spin: 1.4, randomness: 0.35, inside: '#ffe4b8', outside: '#c084fc', size: 0.045 },
+    kicker: 'GALASSIA A SPIRALE — LA PIÙ VICINA', sub: '2,5 milioni di anni luce da noi',
+    stats: [['⭐ Stelle', '~1000 miliardi'], ['📏 Diametro', '~220.000 al'], ['🌌 Tipo', 'Spirale'], ['⚠️ Rotta', 'Collisione in ~4 mld anni']],
+    desc: 'La galassia più vicina alla Via Lattea, visibile a occhio nudo nelle notti serene. È in rotta di collisione con noi: tra circa 4 miliardi di anni le due galassie si fonderanno in una nuova galassia ellittica.'
+  });
+
+  addGalaxy({
+    name: 'VORTICE (M51)', pos: [-13, -2, 9], tilt: 0.15, glow: '#60a5fa', spinSpeed: 0.014,
+    gen: { count: 4600, radius: 4.6, branches: 2, spin: 1.8, randomness: 0.3, inside: '#fff', outside: '#60a5fa', size: 0.045 },
+    kicker: 'GALASSIA A SPIRALE — COPPIA INTERAGENTE', sub: 'Costellazione dei Cani da Caccia',
+    stats: [['📏 Distanza', '~23 milioni di al'], ['🌌 Tipo', 'Spirale a grande disegno'], ['👥 Compagna', 'NGC 5195'], ['🔭 Scoperta', '1773, Charles Messier']],
+    desc: 'Conosciuta anche come M51, è una delle spirali più fotogeniche del cielo: i suoi bracci ben definiti sono accentuati dall\'interazione gravitazionale con la piccola galassia compagna NGC 5195.'
+  });
+
+  addGalaxy({
+    name: 'SOMBRERO (M104)', pos: [7, -7, -15], tilt: 1.35, glow: '#fbbf24', spinSpeed: 0.008,
+    gen: { count: 4200, radius: 4.2, branches: 6, spin: 0.9, randomness: 0.22, inside: '#fff8dc', outside: '#fbbf24', size: 0.045 },
+    kicker: 'GALASSIA LENTICOLARE — DISCO SOTTILE', sub: 'Vista quasi di taglio dalla Terra',
+    stats: [['📏 Distanza', '~29 milioni di al'], ['🌌 Tipo', 'Lenticolare'], ['🕳️ Nucleo', 'Buco nero da 1 mld masse solari'], ['💫 Alone', 'Ricco di ammassi globulari']],
+    desc: 'Il suo grande rigonfiamento centrale e la sottile fascia di polvere scura le danno l\'aspetto di un sombrero. Al centro ospita uno dei buchi neri supermassicci più grandi mai misurati.'
+  });
+
+  addGalaxy({
+    name: 'GRANDE NUBE DI MAGELLANO', pos: [-6, 4, -3], tilt: 0.9, glow: '#f472b6', spinSpeed: 0.02,
+    gen: { count: 2600, radius: 2.4, branches: 8, spin: 0.3, randomness: 0.75, inside: '#fff', outside: '#f472b6', size: 0.04 },
+    kicker: 'GALASSIA NANA IRREGOLARE — SATELLITE', sub: 'Visibile dall\'emisfero australe',
+    stats: [['📏 Distanza', '~160.000 al'], ['🌌 Tipo', 'Nana irregolare'], ['⭐ Stelle', '~30 miliardi'], ['🔗 Legata a', 'Via Lattea (satellite)']],
+    desc: 'Una piccola galassia satellite della Via Lattea, priva della classica struttura a spirale ordinata. È abbastanza vicina e luminosa da essere visibile a occhio nudo dall\'emisfero sud.'
+  });
+
+  addBlackHole({
+    name: 'SAGITTARIUS A*', pos: [1.5, 0.4, 2.2], radius: 0.42, glow: 'rgba(244,63,94,0.9)', diskColor: 0xff7a45,
+    kicker: 'BUCO NERO SUPERMASSICCIO — CENTRO GALATTICO', sub: 'Nel cuore della Via Lattea',
+    stats: [['⚖️ Massa', '~4,3 milioni di soli'], ['📏 Distanza', '~26.000 al dalla Terra'], ['📸 Immagine', 'Ripresa da EHT nel 2022'], ['🌀 Orizzonte', '~24 milioni di km']],
+    desc: 'Il buco nero supermassiccio al centro della nostra galassia. Non emette luce propria: lo si osserva grazie al bagliore del gas e delle stelle che orbitano vorticosamente attorno a lui a velocità estreme.'
+  });
+
+  addBlackHole({
+    name: 'M87*', pos: [18, -6, 11], radius: 0.55, glow: 'rgba(251,191,36,0.9)', diskColor: 0xffce7a,
+    kicker: 'BUCO NERO SUPERMASSICCIO — PRIMA FOTO AL MONDO', sub: 'Nella galassia ellittica M87',
+    stats: [['⚖️ Massa', '~6,5 miliardi di soli'], ['📏 Distanza', '~55 milioni di al'], ['📸 Storico', 'Prima immagine diretta, 2019'], ['🚀 Getto', 'Lungo migliaia di anni luce']],
+    desc: 'Reso celebre nel 2019 come primo buco nero mai fotografato direttamente, grazie alla rete di telescopi Event Horizon Telescope. Emette un potente getto di particelle lungo migliaia di anni luce.'
+  });
+
+  const totalDiscoverable = clickables.length;
+  document.getElementById('foundTotal').textContent = totalDiscoverable;
+  const discovered = new Set();
+
+  /* -------------------------------------------------------------
+     SISTEMA SOLARE (costruito on-demand)
+  ------------------------------------------------------------- */
+  let solarGroup = null;
+  let solarPlanets = [];
+  let inSolarSystem = false;
+
+  const planetData = [
+    { name: 'SOLE', color: 0xffd76b, size: 1.5, dist: 0, speed: 0, isSun: true,
+      kicker: 'STELLA — NANA GIALLA', sub: 'Il cuore del Sistema Solare',
+      stats: [['🌡️ Temp. superficie', '~5.500 °C'], ['📏 Diametro', '~1.392.000 km'], ['🕐 Età', '~4,6 miliardi di anni'], ['⚖️ Massa', '99,8% del sistema']],
+      desc: 'Una stella nana gialla che da sola costituisce oltre il 99% della massa del Sistema Solare. La sua energia, generata per fusione nucleare, rende possibile la vita sulla Terra.' },
+    { name: 'MERCURIO', color: 0x9c9c9c, size: 0.22, dist: 3, speed: 0.9,
+      kicker: 'PIANETA ROCCIOSO — IL PIÙ VICINO AL SOLE', sub: 'Nessuna atmosfera significativa',
+      stats: [['🌙 Lune', '0'], ['📏 Diametro', '4.879 km'], ['🕐 Giorno', '176 giorni terrestri'], ['🌡️ Escursione', 'da -180°C a 430°C']],
+      desc: 'Il pianeta più vicino al Sole e il più piccolo del sistema. Privo di un\'atmosfera sostanziale, subisce sbalzi di temperatura estremi tra il giorno e la notte.' },
+    { name: 'VENERE', color: 0xe8c27a, size: 0.34, dist: 4.2, speed: 0.7,
+      kicker: 'PIANETA ROCCIOSO — IL PIÙ CALDO', sub: 'Ruota in senso retrogrado',
+      stats: [['🌙 Lune', '0'], ['🌡️ Superficie', '~465 °C'], ['🕐 Giorno', '243 giorni terrestri'], ['☁️ Atmosfera', 'CO₂ densissima']],
+      desc: 'Avvolto da una spessa atmosfera di anidride carbonica che intrappola il calore, è il pianeta più caldo del sistema solare, più di Mercurio pur essendo più lontano dal Sole.' },
+    { name: 'TERRA', color: 0x4ea1ff, size: 0.36, dist: 5.4, speed: 0.55,
+      kicker: 'PIANETA ROCCIOSO — CASA', sub: 'L\'unico con vita conosciuta',
+      stats: [['🌙 Lune', '1 (la Luna)'], ['💧 Superficie', '71% acqua'], ['🕐 Giorno', '24 ore'], ['🕐 Anno', '365,25 giorni']],
+      desc: 'L\'unico pianeta conosciuto a ospitare vita, grazie a un\'atmosfera respirabile, acqua liquida in abbondanza e un campo magnetico che ci protegge dal vento solare.' },
+    { name: 'MARTE', color: 0xff6a4d, size: 0.28, dist: 6.6, speed: 0.44,
+      kicker: 'PIANETA ROCCIOSO — IL PIANETA ROSSO', sub: 'Ospita il vulcano più alto conosciuto',
+      stats: [['🌙 Lune', '2 (Phobos, Deimos)'], ['🌋 Olympus Mons', '~22 km di altezza'], ['🕐 Giorno', '24h 37m'], ['🎨 Colore', 'Ossido di ferro (ruggine)']],
+      desc: 'Il "pianeta rosso" deve il suo colore all\'ossido di ferro sulla superficie. Ospita Olympus Mons, il vulcano più alto conosciuto del Sistema Solare, ed è il principale obiettivo dell\'esplorazione umana futura.' },
+    { name: 'GIOVE', color: 0xe0b98a, size: 0.95, dist: 9, speed: 0.28,
+      kicker: 'GIGANTE GASSOSO — IL PIÙ GRANDE', sub: 'Famoso per la Grande Macchia Rossa',
+      stats: [['🌙 Lune', '95+ conosciute'], ['📏 Diametro', '~139.800 km'], ['🕐 Giorno', '~10 ore'], ['🌀 Tempesta', 'Grande Macchia Rossa']],
+      desc: 'Il pianeta più grande del sistema solare, un gigante gassoso con una tempesta anticiclonica, la Grande Macchia Rossa, attiva da secoli e grande quanto più volte la Terra.' },
+    { name: 'SATURNO', color: 0xf4dca0, size: 0.82, dist: 11.6, speed: 0.21, hasRing: true,
+      kicker: 'GIGANTE GASSOSO — GLI ANELLI', sub: 'Meno denso dell\'acqua',
+      stats: [['🌙 Lune', '140+ conosciute'], ['💍 Anelli', 'Ghiaccio e roccia'], ['🕐 Giorno', '~10,7 ore'], ['⚖️ Densità', 'Galleggerebbe in acqua']],
+      desc: 'Celebre per il suo spettacolare sistema di anelli, composti principalmente da particelle di ghiaccio e roccia. È così poco denso che, ipoteticamente, galleggerebbe in una vasca d\'acqua abbastanza grande.' },
+    { name: 'URANO', color: 0x9be7e0, size: 0.5, dist: 13.8, speed: 0.15,
+      kicker: 'GIGANTE GHIACCIATO — RUOTA SU UN FIANCO', sub: 'Asse inclinato di ~98°',
+      stats: [['🌙 Lune', '27 conosciute'], ['🎨 Colore', 'Metano in atmosfera'], ['🌡️ Temp.', 'La più fredda del sistema'], ['💍 Anelli', 'Sottili e scuri']],
+      desc: 'Un gigante ghiacciato dal colore blu-verde dovuto al metano atmosferico. Il suo asse di rotazione è inclinato di quasi 98°: ruota praticamente "sdraiato" rispetto al piano orbitale.' },
+    { name: 'NETTUNO', color: 0x4f6fe0, size: 0.48, dist: 15.6, speed: 0.12,
+      kicker: 'GIGANTE GHIACCIATO — IL PIÙ VENTOSO', sub: 'Venti fino a 2.100 km/h',
+      stats: [['🌙 Lune', '16 conosciute'], ['💨 Venti', 'Fino a 2.100 km/h'], ['🌙 Luna princ.', 'Tritone (orbita retrograda)'], ['📏 Distanza dal Sole', '~4,5 miliardi di km']],
+      desc: 'Il pianeta più lontano dal Sole, di un intenso blu cobalto, ospita i venti più forti mai registrati nel Sistema Solare. La sua luna Tritone orbita in senso contrario alla rotazione del pianeta.' }
+  ];
+
+  function buildSolarSystem() {
+    solarGroup = new THREE.Group();
+    solarGroup.visible = false;
+
+    const sunLight = new THREE.PointLight(0xffe6b8, 2.2, 60);
+    solarGroup.add(sunLight);
+
+    planetData.forEach(p => {
+      if (p.isSun) {
+        const mesh = new THREE.Mesh(new THREE.SphereGeometry(p.size, 32, 32), new THREE.MeshBasicMaterial({ color: p.color }));
+        solarGroup.add(mesh);
+        solarGroup.add(makeGlowSprite('rgba(255,230,180,0.9)', p.size * 6));
+        const label = makeLabel(p.name, '#fbbf24');
+        label.position.set(0, p.size + 1, 0);
+        solarGroup.add(label);
+        const proxy = new THREE.Mesh(new THREE.SphereGeometry(p.size * 1.6, 16, 16), new THREE.MeshBasicMaterial({ visible: false }));
+        solarGroup.add(proxy);
+        solarPlanets.push({ mesh, proxy, data: p, angle: 0 });
+        return;
+      }
+      const orbitCurve = new THREE.EllipseCurve(0, 0, p.dist, p.dist, 0, Math.PI * 2, false, 0);
+      const orbitPts = orbitCurve.getPoints(96).map(pt => new THREE.Vector3(pt.x, 0, pt.y));
+      const orbitGeo = new THREE.BufferGeometry().setFromPoints(orbitPts);
+      const orbitLine = new THREE.LineLoop(orbitGeo, new THREE.LineBasicMaterial({ color: 0x2a5c56, transparent: true, opacity: 0.5 }));
+      solarGroup.add(orbitLine);
+
+      const planetGroup = new THREE.Group();
+      const mesh = new THREE.Mesh(new THREE.SphereGeometry(p.size, 24, 24), new THREE.MeshStandardMaterial({ color: p.color, roughness: 0.85, emissive: 0x0b0f1e, emissiveIntensity: 0.3 }));
+      planetGroup.add(mesh);
+
+      if (p.hasRing) {
+        const ring = new THREE.Mesh(new THREE.RingGeometry(p.size * 1.4, p.size * 2.3, 48), new THREE.MeshBasicMaterial({ color: 0xd8c79a, side: THREE.DoubleSide, transparent: true, opacity: 0.65 }));
+        ring.rotation.x = Math.PI / 2.3;
+        planetGroup.add(ring);
+      }
+
+      const label = makeLabel(p.name, '#5eead4');
+      label.position.set(0, p.size + 0.6, 0);
+      label.scale.set(4.2, 1.05, 1);
+      planetGroup.add(label);
+
+      const proxy = new THREE.Mesh(new THREE.SphereGeometry(p.size * 2.2, 12, 12), new THREE.MeshBasicMaterial({ visible: false }));
+      planetGroup.add(proxy);
+
+      solarGroup.add(planetGroup);
+      solarPlanets.push({ mesh: planetGroup, proxy, data: p, angle: Math.random() * Math.PI * 2, dist: p.dist, speed: p.speed * 0.25 });
+    });
+
+    scene.add(solarGroup);
+  }
+  buildSolarSystem();
+
+  /* -------------------------------------------------------------
+     PANNELLO INFORMATIVO
+  ------------------------------------------------------------- */
+  function markDiscovered(name) {
+    if (!discovered.has(name)) {
+      discovered.add(name);
+      foundCountEl.textContent = discovered.size;
+    }
+  }
+
+  function openPanel(d) {
+    pKicker.textContent = d.kicker;
+    pTitle.textContent = d.name;
+    pSub.textContent = d.sub;
+    pDesc.textContent = d.desc;
+    pStats.innerHTML = '';
+    d.stats.forEach(([label, val]) => {
+      const el = document.createElement('div');
+      el.className = 'p-stat';
+      el.innerHTML = `<b>${val}</b><span>${label}</span>`;
+      pStats.appendChild(el);
+    });
+    pExplore.classList.toggle('show', !!d.isMilkyWay && !inSolarSystem);
+    panel.classList.add('open');
+    markDiscovered(d.name);
+    hint.style.opacity = '0';
+  }
+  panelClose.addEventListener('click', () => panel.classList.remove('open'));
+
+  pExplore.addEventListener('click', () => {
+    panel.classList.remove('open');
+    enterSolarSystem();
+  });
+
+  /* -------------------------------------------------------------
+     TRANSIZIONE UNIVERSO <-> SISTEMA SOLARE
+  ------------------------------------------------------------- */
+  const universeGroups = clickables.map(c => c.group);
+
+  function enterSolarSystem() {
+    inSolarSystem = true;
+    universeGroups.forEach(g => g.visible = false);
+    solarGroup.visible = true;
+    controls.autoRotate = false;
+    controls.minDistance = 1;
+    controls.maxDistance = 60;
+    backBtn.classList.add('show');
+    hudMode.textContent = 'SISTEMA SOLARE';
+    titleBadge.firstChild.textContent = 'SISTEMA SOLARE';
+    titleSub.textContent = 'clicca un pianeta o il Sole';
+    animateCamera(new THREE.Vector3(0, 8, 20), new THREE.Vector3(0, 0, 0));
+  }
+
+  function exitSolarSystem() {
+    inSolarSystem = false;
+    universeGroups.forEach(g => g.visible = true);
+    solarGroup.visible = false;
+    controls.autoRotate = true;
+    controls.minDistance = 1.5;
+    controls.maxDistance = 260;
+    backBtn.classList.remove('show');
+    hudMode.textContent = 'UNIVERSO';
+    titleBadge.firstChild.textContent = 'UNIVERSO OSSERVABILE';
+    titleSub.textContent = 'clicca una galassia o un buco nero';
+    panel.classList.remove('open');
+    animateCamera(new THREE.Vector3(0, 10, 32), new THREE.Vector3(0, 0, 0));
+  }
+  backBtn.addEventListener('click', exitSolarSystem);
+
+  let camAnim = null;
+  function animateCamera(pos, target) {
+    camAnim = { from: camera.position.clone(), to: pos, tFrom: controls.target.clone(), tTo: target, t: 0 };
+  }
+
+  /* -------------------------------------------------------------
+     RAYCAST / CLICK
+  ------------------------------------------------------------- */
+  const raycaster = new THREE.Raycaster();
+  const pointer = new THREE.Vector2();
+  let downX = 0, downY = 0;
+
+  function getPointer(e) {
+    const cx = e.clientX ?? (e.changedTouches && e.changedTouches[0].clientX);
+    const cy = e.clientY ?? (e.changedTouches && e.changedTouches[0].clientY);
+    pointer.x = (cx / W) * 2 - 1;
+    pointer.y = -(cy / H) * 2 + 1;
+    return { cx, cy };
+  }
+
+  function handleDown(e) { const p = getPointer(e); downX = p.cx; downY = p.cy; }
+  function handleUp(e) {
+    const p = getPointer(e);
+    if (Math.hypot(p.cx - downX, p.cy - downY) > 6) return;
+    raycaster.setFromCamera(pointer, camera);
+
+    if (inSolarSystem) {
+      const targets = solarPlanets.map(sp => sp.proxy);
+      const hits = raycaster.intersectObjects(targets, false);
+      if (hits.length) {
+        const hitProxy = hits[0].object;
+        const found = solarPlanets.find(sp => sp.proxy === hitProxy);
+        if (found) openPanel(found.data);
+      }
+    } else {
+      const targets = clickables.map(c => c.proxy);
+      const hits = raycaster.intersectObjects(targets, false);
+      if (hits.length) {
+        const hitProxy = hits[0].object;
+        const found = clickables.find(c => c.proxy === hitProxy);
+        if (found) openPanel(found.data);
+      }
+    }
+  }
+  canvas.addEventListener('pointerdown', handleDown);
+  canvas.addEventListener('pointerup', handleUp);
+
+  /* -------------------------------------------------------------
+     LOOP DI RENDER
+  ------------------------------------------------------------- */
+  const clock = new THREE.Clock();
+  function animate() {
+    requestAnimationFrame(animate);
+    const delta = clock.getDelta();
+
+    clickables.forEach(c => {
+      if (c.group.visible) c.group.rotation.y += delta * (c.spinSpeed || 0);
+      if (c.disk) { c.disk.rotation.z += delta * 0.6; c.disk2.rotation.z -= delta * 0.9; }
+    });
+
+    if (inSolarSystem) {
+      solarPlanets.forEach(sp => {
+        if (sp.data.isSun) return;
+        sp.angle += delta * sp.speed;
+        sp.mesh.position.set(Math.cos(sp.angle) * sp.dist, 0, Math.sin(sp.angle) * sp.dist);
+        sp.mesh.rotation.y += delta * 0.5;
+      });
+    }
+
+    if (camAnim) {
+      camAnim.t += delta / 1.3;
+      const t = Math.min(camAnim.t, 1);
+      const ease = 1 - Math.pow(1 - t, 3);
+      camera.position.lerpVectors(camAnim.from, camAnim.to, ease);
+      controls.target.lerpVectors(camAnim.tFrom, camAnim.tTo, ease);
+      if (t >= 1) camAnim = null;
+    }
+
+    controls.update();
+    renderer.render(scene, camera);
+  }
+
+  onResize();
+  camera.position.set(0, 10, 32);
+  controls.target.set(0, 0, 0);
+  loading.classList.add('hide');
+  animate();
+
+  setTimeout(() => { hint.style.opacity = '1'; }, 400);
+  setTimeout(() => { if (!panel.classList.contains('open')) hint.style.opacity = '0'; }, 8000);
+})();
+</script>
+</body>
+</html>
