@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fuochi d'Artificio</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;background:#000308;font-family:'Space Mono',monospace;}
+canvas{display:block;position:fixed;inset:0;cursor:crosshair;}
+
+.back-link{position:fixed;top:14px;left:14px;font-size:12px;color:#ffe9c4;text-decoration:none;font-weight:700;background:rgba(255,180,60,.1);border:1px solid rgba(255,180,60,.35);padding:8px 14px;border-radius:20px;z-index:10;letter-spacing:.05em;backdrop-filter:blur(6px);transition:all .25s;}
+.back-link:hover{background:rgba(255,180,60,.22);border-color:#ffcf7d;}
+
+.hud{position:fixed;top:14px;right:14px;color:rgba(255,220,170,.55);font-size:11px;letter-spacing:.08em;z-index:10;text-align:right;line-height:1.7;}
+.hud b{color:#ffcf7d;}
+
+.controls{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:10;
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center;padding:0 16px;
+}
+.ctrl-btn{
+  background:rgba(255,180,60,.1);border:1px solid rgba(255,180,60,.4);color:#ffe9c4;
+  font-family:'Space Mono',monospace;font-weight:700;font-size:.78rem;letter-spacing:.04em;
+  padding:11px 20px;border-radius:30px;cursor:pointer;transition:all .25s;backdrop-filter:blur(6px);
+}
+.ctrl-btn:hover{background:rgba(255,180,60,.24);box-shadow:0 0 24px rgba(255,180,60,.35);transform:translateY(-2px);}
+.ctrl-btn.finale{background:linear-gradient(135deg,rgba(236,72,153,.25),rgba(255,180,60,.25));border-color:#ffcf7d;}
+
+.hint{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);color:rgba(255,220,170,.32);
+  font-size:12px;letter-spacing:.14em;text-transform:uppercase;z-index:5;text-align:center;
+  pointer-events:none;transition:opacity 1.2s;
+}
+</style>
+</head>
+<body>
+<a class="back-link" href="../index.html" onclick="if(window.history.length>1){history.back();return false;}">← Indietro</a>
+<div class="hud">RAZZI LANCIATI: <b id="rCount">0</b><br>MODALITÀ: <b id="modeLabel">MANUALE</b></div>
+<canvas id="c"></canvas>
+<div class="hint" id="hint">clicca ovunque per lanciare un razzo</div>
+
+<div class="controls">
+  <button class="ctrl-btn finale" id="finaleBtn">🎆 GRAN FINALE</button>
+  <button class="ctrl-btn" id="autoBtn">✨ Spettacolo Automatico</button>
+  <button class="ctrl-btn" id="muteBtn">🔊 Suono: ON</button>
+</div>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let W, H;
+function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
+resize();
+addEventListener('resize', resize);
+
+const rCountEl = document.getElementById('rCount');
+const modeLabel = document.getElementById('modeLabel');
+const hint = document.getElementById('hint');
+let rocketCount = 0;
+let soundOn = true;
+
+const palettes = [
+  ['#ff6b6b', '#ffd93d', '#ff9f43'],
+  ['#4ecdc4', '#6bffb0', '#3ee6d6'],
+  ['#a855f7', '#e879f9', '#c084fc'],
+  ['#fff', '#ffd93d', '#fff8dc'],
+  ['#ff6fae', '#ff9ec4', '#ffd1e6'],
+  ['#5b8def', '#7cc4ff', '#a8dcff']
+];
+
+/* ---------- AUDIO (sintesi semplice via WebAudio, nessun file esterno) ---------- */
+let actx = null;
+function ensureAudio() { if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} } }
+function playLaunch() {
+  if (!soundOn || !actx) return;
+  const o = actx.createOscillator(), g = actx.createGain();
+  o.type = 'sine'; o.frequency.setValueAtTime(180, actx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(650, actx.currentTime + 0.35);
+  g.gain.setValueAtTime(0.06, actx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + 0.4);
+  o.connect(g); g.connect(actx.destination);
+  o.start(); o.stop(actx.currentTime + 0.4);
+}
+function playBurst() {
+  if (!soundOn || !actx) return;
+  const bufferSize = actx.sampleRate * 0.35;
+  const buffer = actx.createBuffer(1, bufferSize, actx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 2.2);
+  const src = actx.createBufferSource();
+  src.buffer = buffer;
+  const filt = actx.createBiquadFilter();
+  filt.type = 'lowpass'; filt.frequency.value = 1800;
+  const g = actx.createGain(); g.gain.value = 0.28;
+  src.connect(filt); filt.connect(g); g.connect(actx.destination);
+  src.start();
+}
+
+/* ---------- RAZZO (fase di salita) ---------- */
+class Rocket {
+  constructor(x, targetY, colorSet, big) {
+    this.x = x; this.y = H + 10;
+    this.targetY = targetY;
+    this.vy = -(9 + Math.random() * 3.4) * (big ? 1.08 : 1);
+    this.vx = (Math.random() - 0.5) * 0.6;
+    this.colorSet = colorSet;
+    this.trail = [];
+    this.big = big;
+    this.dead = false;
+    playLaunch();
+  }
+  update() {
+    this.trail.push({ x: this.x, y: this.y });
+    if (this.trail.length > 10) this.trail.shift();
+    this.x += this.vx;
+    this.y += this.vy;
+    this.vy += 0.06;
+    if (this.vy >= -1.4 || this.y <= this.targetY) {
+      this.dead = true;
+      spawnBurst(this.x, this.y, this.colorSet, this.big);
+    }
+  }
+  draw() {
+    for (let i = 0; i < this.trail.length; i++) {
+      const p = this.trail[i];
+      ctx.globalAlpha = (i / this.trail.length) * 0.7;
+      ctx.fillStyle = '#fff8dc';
+      ctx.beginPath(); ctx.arc(p.x, p.y, 1.8, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = '#fffef0';
+    ctx.beginPath(); ctx.arc(this.x, this.y, 2.4, 0, Math.PI * 2); ctx.fill();
+  }
+}
+
+/* ---------- PARTICELLA DI ESPLOSIONE ---------- */
+class Spark {
+  constructor(x, y, angle, speed, color, big, type) {
+    this.x = x; this.y = y;
+    this.vx = Math.cos(angle) * speed;
+    this.vy = Math.sin(angle) * speed;
+    this.color = color;
+    this.life = 1;
+    this.decay = 0.008 + Math.random() * (big ? 0.006 : 0.012);
+    this.gravity = 0.045;
+    this.trail = [];
+    this.type = type || 'normal';
+    this.flicker = Math.random() > 0.7;
+  }
+  update() {
+    this.trail.push({ x: this.x, y: this.y });
+    if (this.trail.length > 5) this.trail.shift();
+    this.vx *= 0.985;
+    this.vy *= 0.985;
+    this.vy += this.gravity;
+    this.x += this.vx;
+    this.y += this.vy;
+    this.life -= this.decay;
+  }
+  draw() {
+    const alpha = Math.max(this.life, 0);
+    if (this.flicker && Math.random() > 0.5) return;
+    for (let i = 0; i < this.trail.length - 1; i++) {
+      const p = this.trail[i];
+      ctx.globalAlpha = alpha * (i / this.trail.length) * 0.5;
+      ctx.strokeStyle = this.color;
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      ctx.lineTo(this.trail[i + 1].x, this.trail[i + 1].y);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.type === 'big' ? 2.2 : 1.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+let rockets = [];
+let sparks = [];
+
+function spawnBurst(x, y, colorSet, big) {
+  playBurst();
+  const count = big ? 130 : 75;
+  const speedBase = big ? 5.2 : 3.6;
+  const shapeType = Math.floor(Math.random() * 3);
+
+  for (let i = 0; i < count; i++) {
+    let angle, speed;
+    if (shapeType === 0) {
+      angle = (Math.PI * 2 * i) / count + Math.random() * 0.06;
+      speed = speedBase * (0.7 + Math.random() * 0.5);
+    } else if (shapeType === 1) {
+      angle = Math.random() * Math.PI * 2;
+      speed = speedBase * Math.pow(Math.random(), 0.5);
+    } else {
+      const petals = 6;
+      const base = (Math.PI * 2 * i) / count;
+      angle = base + Math.sin(base * petals) * 0.35;
+      speed = speedBase * (0.55 + 0.5 * Math.abs(Math.sin(base * petals)));
+    }
+    const color = colorSet[Math.floor(Math.random() * colorSet.length)];
+    sparks.push(new Spark(x, y, angle, speed, color, big, big && i % 6 === 0 ? 'big' : 'normal'));
+  }
+
+  if (big && Math.random() > 0.4) {
+    setTimeout(() => {
+      for (let i = 0; i < 40; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 1.5 + Math.random() * 2;
+        sparks.push(new Spark(x, y, angle, speed, '#ffe9a8', false, 'normal'));
+      }
+    }, 220);
+  }
+}
+
+function launch(x, targetY, big) {
+  ensureAudio();
+  const colorSet = palettes[Math.floor(Math.random() * palettes.length)];
+  rockets.push(new Rocket(x, targetY, colorSet, big));
+  rocketCount++;
+  rCountEl.textContent = rocketCount;
+  hint.style.opacity = '0';
+}
+
+canvas.addEventListener('click', e => {
+  const targetY = H * (0.15 + Math.random() * 0.35);
+  launch(e.clientX, targetY, Math.random() > 0.75);
+});
+canvas.addEventListener('touchstart', e => {
+  const t = e.touches[0];
+  const targetY = H * (0.15 + Math.random() * 0.35);
+  launch(t.clientX, targetY, Math.random() > 0.75);
+}, { passive: true });
+
+/* ---------- SPETTACOLO AUTOMATICO ---------- */
+let autoMode = false;
+let autoTimer = null;
+function autoLaunchLoop() {
+  if (!autoMode) return;
+  const x = W * (0.15 + Math.random() * 0.7);
+  const targetY = H * (0.12 + Math.random() * 0.4);
+  launch(x, targetY, Math.random() > 0.6);
+  autoTimer = setTimeout(autoLaunchLoop, 500 + Math.random() * 700);
+}
+
+document.getElementById('autoBtn').addEventListener('click', () => {
+  ensureAudio();
+  autoMode = !autoMode;
+  modeLabel.textContent = autoMode ? 'AUTOMATICA' : 'MANUALE';
+  document.getElementById('autoBtn').textContent = autoMode ? '⏸ Ferma Spettacolo' : '✨ Spettacolo Automatico';
+  if (autoMode) autoLaunchLoop(); else clearTimeout(autoTimer);
+});
+
+document.getElementById('finaleBtn').addEventListener('click', () => {
+  ensureAudio();
+  hint.style.opacity = '0';
+  let n = 0;
+  const finale = setInterval(() => {
+    const x = W * (0.1 + Math.random() * 0.8);
+    const targetY = H * (0.1 + Math.random() * 0.35);
+    launch(x, targetY, true);
+    n++;
+    if (n > 16) clearInterval(finale);
+  }, 130);
+});
+
+document.getElementById('muteBtn').addEventListener('click', () => {
+  soundOn = !soundOn;
+  document.getElementById('muteBtn').textContent = soundOn ? '🔊 Suono: ON' : '🔇 Suono: OFF';
+  ensureAudio();
+});
+
+/* ---------- LOOP DI RENDER ---------- */
+function loop() {
+  ctx.fillStyle = 'rgba(0,3,8,0.22)';
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.globalCompositeOperation = 'lighter';
+  rockets.forEach(r => { r.update(); r.draw(); });
+  rockets = rockets.filter(r => !r.dead);
+
+  sparks.forEach(s => { s.update(); s.draw(); });
+  sparks = sparks.filter(s => s.life > 0 && s.y < H + 50);
+  ctx.globalCompositeOperation = 'source-over';
+
+  requestAnimationFrame(loop);
+}
+loop();
+
+/* piccolo lancio di benvenuto */
+setTimeout(() => { launch(W * 0.3, H * 0.28, false); }, 500);
+setTimeout(() => { launch(W * 0.68, H * 0.22, true); }, 1100);
+</script>
+</body>
+</html>
