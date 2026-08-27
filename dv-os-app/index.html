@@ -109,6 +109,7 @@
 </div>
 
 <div id="scrollProgress" aria-hidden="true"></div>
+<div id="ambientGlow" aria-hidden="true"></div>
 
 <div id="loader">
   <div class="loader-ring-wrap">
@@ -153,37 +154,77 @@
     <div class="hero">
       <div class="home-hero">
         <div class="hero-visual" id="heroVisual">
-          <svg class="hero-water" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <svg class="hero-water" viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
             <defs>
-              <radialGradient id="heroBg" cx="50%" cy="42%" r="70%">
-                <stop offset="0%" stop-color="#1b2740"/>
-                <stop offset="100%" stop-color="#070a12"/>
+              <radialGradient id="heroBg" cx="38%" cy="30%" r="95%">
+                <stop offset="0%" stop-color="#d9622b"/>
+                <stop offset="38%" stop-color="#8a2f2c"/>
+                <stop offset="68%" stop-color="#241a3a"/>
+                <stop offset="100%" stop-color="#05070c"/>
+              </radialGradient>
+              <radialGradient id="heroBg2" cx="78%" cy="62%" r="60%">
+                <stop offset="0%" stop-color="#2fb8c4" stop-opacity=".55"/>
+                <stop offset="100%" stop-color="#2fb8c4" stop-opacity="0"/>
               </radialGradient>
               <linearGradient id="heroRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#c5d1ec"/>
+                <stop offset="0%" stop-color="#ffd9b8"/>
                 <stop offset="100%" stop-color="#c7a468"/>
               </linearGradient>
             </defs>
-            <rect width="400" height="400" fill="url(#heroBg)"/>
-            <g fill="none" stroke="url(#heroRingGrad)" stroke-width="1" opacity=".55">
-              <circle cx="200" cy="200" r="70"/>
-              <circle cx="200" cy="200" r="110"/>
-              <circle cx="200" cy="200" r="150"/>
-              <circle cx="200" cy="200" r="188"/>
+            <rect width="1600" height="900" fill="url(#heroBg)"/>
+            <rect width="1600" height="900" fill="url(#heroBg2)"/>
+            <g fill="none" stroke="url(#heroRingGrad)" stroke-width="1" opacity=".3">
+              <circle cx="620" cy="380" r="140"/>
+              <circle cx="620" cy="380" r="240"/>
+              <circle cx="620" cy="380" r="350"/>
+              <circle cx="620" cy="380" r="470"/>
             </g>
-            <g stroke="#93a8d6" stroke-width="1" opacity=".35">
-              <path d="M20 260 Q 200 220 380 260" fill="none"/>
-              <path d="M10 300 Q 200 340 390 300" fill="none"/>
-              <path d="M30 130 Q 200 90 370 130" fill="none"/>
+            <g stroke="#ffe3c4" stroke-width="1" opacity=".22">
+              <path d="M-40 520 Q 400 440 800 520 T 1640 520" fill="none"/>
+              <path d="M-40 620 Q 400 700 800 620 T 1640 620" fill="none"/>
+              <path d="M-40 260 Q 400 190 800 260 T 1640 260" fill="none"/>
             </g>
-            <use href="#dvMark" x="150" y="150" width="100" height="100"/>
+            <use href="#dvMark" x="540" y="280" width="180" height="180" opacity=".85"/>
           </svg>
           <div class="hero-caustics" aria-hidden="true"></div>
+          <div class="hero-vignette" aria-hidden="true"></div>
+
+          <span class="hero-cross" style="top:34%;left:56%;"></span>
+          <span class="hero-cross" style="top:57%;left:84%;"></span>
+          <span class="hero-cross" style="top:52%;left:18%;"></span>
+
+          <div class="hero-topline" data-reveal>
+            <p>Gestisco calendario, percorso e contatti in un unico spazio, <b>costruito da me</b>, pronto in ogni momento.</p>
+            <button class="hero-explore magnetic" type="button" data-goto="calendario">Explore Now <span class="arrow">↗</span></button>
+          </div>
+
+          <div class="hero-card" data-reveal>
+            <div class="hero-card-avatar"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#dvMark"/></svg></div>
+            <div class="hero-card-txt">
+              <span class="hero-card-eyebrow" id="greetingText">Bentornato</span>
+              <div class="hero-card-title">Davide Villano</div>
+              <div class="hero-card-sub">Junior IT &amp; Multimedia Assistant</div>
+            </div>
+          </div>
+
+          <div class="hero-caption" data-reveal>
+            <span class="hero-caption-num">01/</span>
+            <span>JavaScript</span>
+            <span>Cloudflare Pages</span>
+            <span>Supabase</span>
+          </div>
+
+          <div class="hero-corner">
+            <span>© 2026</span>
+            <span class="ticks" aria-hidden="true"></span>
+            <span id="heroTimer">00'</span>
+          </div>
+
+          <h1 class="hero-wordmark" aria-hidden="true"><span class="line"><b>DAVIDE</b></span><span class="line"><b><span class="accent">VILLANO</span></b></span></h1>
         </div>
-        <div class="greeting" id="greetingText" data-reveal>Bentornato</div>
-        <h1><span class="line"><b>DAVIDE</b></span><span class="line"><b><span class="accent">VILLANO</span></b></span></h1>
-        <p data-reveal>Spazio di lavoro personale — Bologna. Junior IT &amp; Multimedia Assistant alla Johns Hopkins University. Da qui gestisco il mio calendario, il mio percorso professionale e i miei contatti in un unico posto.</p>
       </div>
+
+      <p class="home-lead" data-reveal>Spazio di lavoro personale — Bologna. Da qui gestisco il mio calendario, il mio percorso professionale, i miei contatti e la mia wishlist in un unico posto.</p>
 
       <div class="quick-grid">
         <div class="quick-card" data-reveal>

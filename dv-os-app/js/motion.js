@@ -60,6 +60,17 @@
       requestAnimationFrame(loop);
     })();
 
+    // bagliore "sott'acqua" che segue il cursore su tutta la pagina
+    const glow = document.getElementById('ambientGlow');
+    if (glow) {
+      let gx = mx, gy = my;
+      (function glowLoop(){
+        gx += (mx - gx) * 0.06; gy += (my - gy) * 0.06;
+        glow.style.left = gx + 'px'; glow.style.top = gy + 'px';
+        requestAnimationFrame(glowLoop);
+      })();
+    }
+
     const growSelector = 'a, button, .quick-card, input, select, textarea, [data-goto]';
     document.addEventListener('mouseover', e => {
       if (e.target.closest && e.target.closest(growSelector)) ring.classList.add('big');
@@ -71,7 +82,7 @@
 
   /* ---------------- BOTTONI MAGNETICI ---------------- */
   /* selettore generico: copre anche i bottoni creati dinamicamente dai vari moduli */
-  const MAGNETIC_SELECTOR = '.tab-btn, .theme-toggle-btn, .go, .ev-add-btn, .export-all-btn, .nav-toggle, .quick-card .go';
+  const MAGNETIC_SELECTOR = '.tab-btn, .theme-toggle-btn, .go, .ev-add-btn, .export-all-btn, .nav-toggle, .quick-card .go, .hero-explore, .go-btn, .carousel-arrow';
   if (!reducedMotion && isFinePointer) {
     document.addEventListener('mousemove', e => {
       document.querySelectorAll(MAGNETIC_SELECTOR).forEach(el => {
@@ -126,12 +137,12 @@
         const px = (e.clientX - r.left) / r.width;
         const py = (e.clientY - r.top) / r.height;
         const distFromCenter = Math.hypot(px - 0.5, py - 0.5);
-        targetScale = Math.max(0, (0.5 - distFromCenter) * 90);
+        targetScale = Math.max(0, (0.5 - distFromCenter) * 130);
       });
-      heroVisual.addEventListener('mouseleave', () => { targetScale = 6; });
-      targetScale = 6;
+      heroVisual.addEventListener('mouseleave', () => { targetScale = 10; });
+      targetScale = 10;
     } else {
-      targetScale = 6;
+      targetScale = 10;
     }
   }
 
@@ -174,6 +185,32 @@
       track.scrollLeft = startScroll - (e.pageX - startX);
     });
   });
+
+  /* ---------------- HEADER TRASPARENTE SU HOME + SOLIDO ALLO SCROLL ---------------- */
+  const bodyEl = document.body;
+  const headerEl2 = document.querySelector('header');
+  function syncHomeActive(){
+    const homeMod = document.getElementById('mod-home');
+    bodyEl.classList.toggle('home-active', !!(homeMod && homeMod.classList.contains('active')));
+  }
+  function syncHeaderSolid(){
+    if (headerEl2) headerEl2.classList.toggle('solid', window.scrollY > 40);
+  }
+  window.addEventListener('scroll', syncHeaderSolid, { passive: true });
+  syncHeaderSolid();
+  syncHomeActive();
+  const bodyObs = new MutationObserver(syncHomeActive);
+  document.querySelectorAll('.module').forEach(m => bodyObs.observe(m, { attributes: true, attributeFilter: ['class'] }));
+
+  /* ---------------- TIMER NELL'ANGOLO DELL'HERO (minuti sulla pagina) ---------------- */
+  const heroTimer = document.getElementById('heroTimer');
+  if (heroTimer) {
+    const startedAt = Date.now();
+    setInterval(() => {
+      const mins = Math.floor((Date.now() - startedAt) / 60000);
+      heroTimer.textContent = String(mins).padStart(2, '0') + "'";
+    }, 5000);
+  }
 
   /* ---------------- INDICATORE TAB FLUIDO ---------------- */
   const tabNav = document.getElementById('tabNav');
