@@ -30,6 +30,17 @@
     <circle cx="50" cy="50" r="46" fill="none" stroke="#93a8d6" stroke-width="1.4" opacity=".45"/>
     <text x="50" y="61" text-anchor="middle" font-family="Montserrat, sans-serif" font-weight="700" font-size="38" fill="url(#markGrad)">DV</text>
   </symbol>
+  <filter id="waterFilter" x="-30%" y="-30%" width="160%" height="160%">
+    <feTurbulence id="waterTurb" type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="2" seed="7" result="turb"/>
+    <feDisplacementMap id="waterDisp" in="SourceGraphic" in2="turb" scale="6" xChannelSelector="R" yChannelSelector="G" result="disp"/>
+    <feOffset id="waterOffR" in="disp" dx="0" dy="0" result="rShift"/>
+    <feColorMatrix in="rShift" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="rOnly"/>
+    <feOffset id="waterOffB" in="disp" dx="0" dy="0" result="bShift"/>
+    <feColorMatrix in="bShift" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="bOnly"/>
+    <feColorMatrix in="disp" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="gOnly"/>
+    <feBlend in="rOnly" in2="gOnly" mode="screen" result="rg"/>
+    <feBlend in="rg" in2="bOnly" mode="screen"/>
+  </filter>
 </svg>
 
 <div id="authOverlay" class="auth-overlay">
@@ -97,8 +108,13 @@
   </div>
 </div>
 
+<div id="scrollProgress" aria-hidden="true"></div>
+
 <div id="loader">
-  <svg class="brand-mark" viewBox="0 0 100 100" aria-hidden="true"><use href="#dvMark"/></svg>
+  <div class="loader-ring-wrap">
+    <svg class="brand-mark" viewBox="0 0 100 100" aria-hidden="true"><use href="#dvMark"/></svg>
+    <svg class="loader-ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="47"/></svg>
+  </div>
   <div class="load-bar"></div>
   <div id="loaderText">Caricamento in corso</div>
 </div>
@@ -115,6 +131,7 @@
     </div>
   </div>
   <div class="tab-nav" id="tabNav">
+    <div class="tab-indicator" id="tabIndicator" aria-hidden="true"></div>
     <button class="tab-btn active" data-module="home"><span class="n">00</span>Home</button>
     <button class="tab-btn" data-module="calendario"><span class="n">01</span>Calendario</button>
     <button class="tab-btn" data-module="percorso"><span class="n">02</span>Percorso</button>
@@ -135,28 +152,53 @@
   <section class="module active" id="mod-home">
     <div class="hero">
       <div class="home-hero">
-        <div class="core-wrap">
-          <div class="core-center"><svg class="orb-mark-icon" viewBox="0 0 100 100" style="width:60%;height:60%" aria-hidden="true"><use href="#dvMark"/></svg></div>
+        <div class="hero-visual" id="heroVisual">
+          <svg class="hero-water" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <radialGradient id="heroBg" cx="50%" cy="42%" r="70%">
+                <stop offset="0%" stop-color="#1b2740"/>
+                <stop offset="100%" stop-color="#070a12"/>
+              </radialGradient>
+              <linearGradient id="heroRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#c5d1ec"/>
+                <stop offset="100%" stop-color="#c7a468"/>
+              </linearGradient>
+            </defs>
+            <rect width="400" height="400" fill="url(#heroBg)"/>
+            <g fill="none" stroke="url(#heroRingGrad)" stroke-width="1" opacity=".55">
+              <circle cx="200" cy="200" r="70"/>
+              <circle cx="200" cy="200" r="110"/>
+              <circle cx="200" cy="200" r="150"/>
+              <circle cx="200" cy="200" r="188"/>
+            </g>
+            <g stroke="#93a8d6" stroke-width="1" opacity=".35">
+              <path d="M20 260 Q 200 220 380 260" fill="none"/>
+              <path d="M10 300 Q 200 340 390 300" fill="none"/>
+              <path d="M30 130 Q 200 90 370 130" fill="none"/>
+            </g>
+            <use href="#dvMark" x="150" y="150" width="100" height="100"/>
+          </svg>
+          <div class="hero-caustics" aria-hidden="true"></div>
         </div>
-        <div class="greeting" id="greetingText">Bentornato</div>
-        <h1>DAVIDE <span class="accent">VILLANO</span></h1>
-        <p>Spazio di lavoro personale — Bologna. Junior IT &amp; Multimedia Assistant alla Johns Hopkins University. Da qui gestisco il mio calendario, il mio percorso professionale e i miei contatti in un unico posto.</p>
+        <div class="greeting" id="greetingText" data-reveal>Bentornato</div>
+        <h1><span class="line"><b>DAVIDE</b></span><span class="line"><b><span class="accent">VILLANO</span></b></span></h1>
+        <p data-reveal>Spazio di lavoro personale — Bologna. Junior IT &amp; Multimedia Assistant alla Johns Hopkins University. Da qui gestisco il mio calendario, il mio percorso professionale e i miei contatti in un unico posto.</p>
       </div>
 
       <div class="quick-grid">
-        <div class="quick-card">
+        <div class="quick-card" data-reveal>
           <span class="qk">Prossimo evento</span>
           <div class="qv" id="nextEventTitle">Nessun evento in programma</div>
           <div class="qsub" id="nextEventDate">&nbsp;</div>
           <button class="go" data-goto="calendario">Apri calendario →</button>
         </div>
-        <div class="quick-card">
+        <div class="quick-card" data-reveal>
           <span class="qk">Ruolo attuale</span>
           <div class="qv">Johns Hopkins University</div>
           <div class="qsub">Junior IT &amp; Multimedia Assistant</div>
           <button class="go" data-goto="percorso">Vedi percorso →</button>
         </div>
-        <div class="quick-card">
+        <div class="quick-card" data-reveal>
           <span class="qk">Eventi questo mese</span>
           <div class="qv" id="monthEventCount">0</div>
           <div class="qsub" id="monthLabel">&nbsp;</div>
@@ -164,17 +206,44 @@
         </div>
       </div>
 
-      <div class="status-strip">
+      <div class="marquee" data-reveal>
+        <div class="marquee-track">
+          <span>JavaScript</span><span>Cloudflare Pages</span><span>Supabase</span><span>UI / UX</span><span>Automazione</span><span>Front-end</span>
+          <span>JavaScript</span><span>Cloudflare Pages</span><span>Supabase</span><span>UI / UX</span><span>Automazione</span><span>Front-end</span>
+        </div>
+      </div>
+
+      <div class="status-strip" data-reveal>
         <span><span class="dot"></span>Bologna, Italia</span>
         <span><span class="dot"></span>Disponibile per nuove opportunità</span>
+      </div>
+
+      <div class="stats-strip" data-reveal>
+        <div class="stat-box">
+          <div class="stat-num" id="statExperiments">00<span class="accent">+</span></div>
+          <div class="stat-label">Progetti &amp; demo</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">05</div>
+          <div class="stat-label">Moduli attivi</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="statCareer">00</div>
+          <div class="stat-label">Tappe del percorso</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">100<span class="accent">%</span></div>
+          <div class="stat-label">Front-end fatto a mano</div>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- ============ CALENDARIO ============ -->
   <section class="module" id="mod-calendario">
-    <span class="eyebrow">Modulo calendario</span>
-    <h2 class="sec-title">Agenda personale</h2>
+    <div class="mod-tag"><b>01</b> / Calendario</div>
+    <span class="eyebrow"><span class="eb-num">01</span>Modulo calendario</span>
+    <h2 class="sec-title" data-reveal>Agenda personale</h2>
 
     <div class="cal-layout">
       <div class="cal-panel">
@@ -222,8 +291,9 @@
 
   <!-- ============ PERCORSO ============ -->
   <section class="module" id="mod-percorso">
-    <span class="eyebrow">Percorso professionale</span>
-    <h2 class="sec-title">Esperienza</h2>
+    <div class="mod-tag"><b>02</b> / Percorso</div>
+    <span class="eyebrow"><span class="eb-num">02</span>Percorso professionale</span>
+    <h2 class="sec-title" data-reveal>Esperienza</h2>
     <p style="color:var(--text-dim); margin-top:1rem; max-width:520px;">Seleziona una voce per accedere ai dettagli. Ogni utente gestisce il proprio percorso.</p>
 
     <div class="console">
@@ -252,8 +322,9 @@
 
   <!-- ============ CONTATTI ============ -->
   <section class="module" id="mod-contatti">
-    <span class="eyebrow">Comunicazione</span>
-    <h2 class="sec-title">Contatti</h2>
+    <div class="mod-tag"><b>03</b> / Contatti</div>
+    <span class="eyebrow"><span class="eb-num">03</span>Comunicazione</span>
+    <h2 class="sec-title" data-reveal>Contatti</h2>
     <p style="color:var(--text-dim); margin-top:1rem; max-width:520px;">La tua rubrica personale: visibile e modificabile solo da te.</p>
 
     <div class="console">
@@ -279,8 +350,9 @@
 
   <!-- ============ WISHLIST ============ -->
   <section class="module" id="mod-wishlist">
-    <span class="eyebrow">Shopping cross-sito</span>
-    <h2 class="sec-title">Wishlist</h2>
+    <div class="mod-tag"><b>04</b> / Wishlist</div>
+    <span class="eyebrow"><span class="eb-num">04</span>Shopping cross-sito</span>
+    <h2 class="sec-title" data-reveal>Wishlist</h2>
     <p style="color:var(--text-dim); margin-top:1rem; max-width:560px;">Incolla il link di un prodotto da qualsiasi sito: provo a leggerne titolo, immagine e prezzo automaticamente. Seleziona "Nel carrello" per calcolare il totale di ciò che vuoi comprare adesso.</p>
 
     <div class="wl-summary">
@@ -339,11 +411,13 @@
 
   <!-- ============ PROGETTI / DEMO TECNICHE ============ -->
   <section class="module" id="mod-esperimenti">
-    <span class="eyebrow">Laboratorio</span>
-    <h2 class="sec-title">Progetti &amp; demo tecniche</h2>
+    <div class="mod-tag"><b>05</b> / Progetti</div>
+    <span class="eyebrow"><span class="eb-num">05</span>Laboratorio</span>
+    <h2 class="sec-title" data-reveal>Progetti &amp; demo tecniche</h2>
     <p style="color:var(--text-dim); margin-top:1rem; max-width:560px;">Piccoli progetti realizzati per esercitarmi con diverse tecnologie front-end. Si aprono in una nuova scheda.</p>
 
-    <div class="quick-grid" style="margin-top:2rem;">
+    <div class="carousel-wrap">
+    <div class="carousel-track" data-reveal>
       <div class="quick-card">
         <span class="qk">Demo</span>
         <div class="qv">Wiki Searcher</div>
@@ -477,6 +551,12 @@
         <a class="go" href="experiments/scroll-infinito.html" target="_blank" rel="noopener">Apri →</a>
       </div>
     </div>
+    <div class="carousel-nav">
+      <div class="carousel-dots" id="carouselDots"></div>
+      <button class="carousel-arrow prev" type="button" aria-label="Precedente"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <button class="carousel-arrow next" type="button" aria-label="Successivo"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+    </div>
+    </div>
   </section>
 
 </main>
@@ -486,8 +566,15 @@
   <button id="logoutBtn" class="logout-btn" type="button" style="display:none">Esci</button>
 </div>
 <footer>
-  <span>© 2026 Davide Villano</span>
-  <span>Bologna, Italia</span>
+  <div class="footer-cta">
+    <span class="eyebrow"><span class="eb-num">06</span>Contatti</span>
+    <h2>Parliamo<br>del prossimo passo</h2>
+    <button class="go-btn" type="button" data-goto="contatti">Apri i miei contatti →</button>
+  </div>
+  <div class="footer-fine">
+    <span>© 2026 Davide Villano</span>
+    <span>Bologna, Italia</span>
+  </div>
 </footer>
 
 <script src="js/config.js"></script>
@@ -500,6 +587,7 @@
 <script src="js/ics.js"></script>
 <script src="js/init.js"></script>
 <script src="js/theme.js"></script>
+<script src="js/motion.js"></script>
 
 <script>
 // Registra il service worker per rendere l'app installabile e usabile offline.
