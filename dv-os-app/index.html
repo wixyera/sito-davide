@@ -111,6 +111,47 @@
 <div id="scrollProgress" aria-hidden="true"></div>
 <div id="ambientGlow" aria-hidden="true"></div>
 
+<div id="musicWidget" class="music-widget">
+  <button id="musicToggle" class="music-toggle" type="button" aria-label="Musica di sottofondo" aria-expanded="false">
+    <svg viewBox="0 0 24 24" class="music-ic"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+    <span class="music-eq" aria-hidden="true"><i></i><i></i><i></i></span>
+  </button>
+
+  <div id="musicPanel" class="music-panel">
+    <div class="music-panel-head">
+      <span>Musica per esplorare il sito</span>
+      <button id="musicClose" type="button" aria-label="Chiudi">✕</button>
+    </div>
+
+    <div class="music-search">
+      <input type="text" id="musicSearchInput" placeholder="Cerca un brano, un artista...">
+      <button id="musicSearchBtn" type="button" aria-label="Cerca">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      </button>
+    </div>
+    <div class="music-results" id="musicResults"></div>
+
+    <p class="music-subhead">Playlist pronte</p>
+    <div class="music-presets" id="musicPresets">
+      <button type="button" data-type="playlist" data-id="37i9dQZF1DWZeKCadgRdKQ">Deep Focus</button>
+      <button type="button" data-type="playlist" data-id="37i9dQZF1DX4WYpdgoIcn6">Chill Hits</button>
+      <button type="button" data-type="playlist" data-id="37i9dQZF1DX76Wlfdnj7AP">Beast Mode</button>
+      <button type="button" data-type="playlist" data-id="37i9dQZF1DWTl4y3vgJOXW">Brain Food</button>
+    </div>
+
+    <div class="music-custom">
+      <input type="url" id="musicCustomUrl" placeholder="...oppure incolla un link Spotify (playlist / brano / album)">
+      <button id="musicLoadCustom" type="button">Carica</button>
+    </div>
+    <div class="music-custom-msg" id="musicCustomMsg"></div>
+
+    <div class="music-embed-wrap">
+      <iframe id="musicEmbed" title="Player Spotify" src="https://open.spotify.com/embed/playlist/37i9dQZF1DWZeKCadgRdKQ?utm_source=generator&theme=0" width="100%" height="152" style="border-radius:12px" frameborder="0" allowfullscreen loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+    </div>
+    <p class="music-note">Riproduzione gestita da Spotify: con un account collegato nel browser senti i brani interi, altrimenti le anteprime da 30”.</p>
+  </div>
+</div>
+
 <div id="loader">
   <div class="loader-ring-wrap">
     <svg class="brand-mark" viewBox="0 0 100 100" aria-hidden="true"><use href="#dvMark"/></svg>
@@ -154,6 +195,7 @@
     <div class="hero">
       <div class="home-hero">
         <div class="hero-visual" id="heroVisual">
+          <img class="hero-photo" src="assets/backgrounds/statue-cosmic.jpg" alt="" aria-hidden="true">
           <svg class="hero-water" viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
             <defs>
               <radialGradient id="heroBg" cx="38%" cy="30%" r="95%">
@@ -282,6 +324,16 @@
 
   <!-- ============ CALENDARIO ============ -->
   <section class="module" id="mod-calendario">
+    <div class="page-hero tint-teal" aria-hidden="true">
+      <div class="page-hero-media"><img class="hero-water" src="assets/backgrounds/chrome-liquid.jpg" alt=""></div>
+      <div class="page-hero-tint"></div>
+      <div class="page-hero-grain"></div>
+      <div class="page-hero-vignette"></div>
+      <span class="hero-cross" style="top:28%;left:14%;"></span>
+      <span class="hero-cross" style="top:62%;left:82%;"></span>
+      <span class="page-hero-eyebrow">01 / Modulo</span>
+      <div class="page-hero-word">AGE<span>NDA</span></div>
+    </div>
     <div class="mod-tag"><b>01</b> / Calendario</div>
     <span class="eyebrow"><span class="eb-num">01</span>Modulo calendario</span>
     <h2 class="sec-title" data-reveal>Agenda personale</h2>
@@ -332,6 +384,16 @@
 
   <!-- ============ PERCORSO ============ -->
   <section class="module" id="mod-percorso">
+    <div class="page-hero tint-gold" aria-hidden="true">
+      <div class="page-hero-media"><img class="hero-water" src="assets/backgrounds/focus.jpg" alt=""></div>
+      <div class="page-hero-tint"></div>
+      <div class="page-hero-grain"></div>
+      <div class="page-hero-vignette"></div>
+      <span class="hero-cross" style="top:24%;left:20%;"></span>
+      <span class="hero-cross" style="top:58%;left:78%;"></span>
+      <span class="page-hero-eyebrow">02 / Modulo</span>
+      <div class="page-hero-word">FO<span>CUS</span></div>
+    </div>
     <div class="mod-tag"><b>02</b> / Percorso</div>
     <span class="eyebrow"><span class="eb-num">02</span>Percorso professionale</span>
     <h2 class="sec-title" data-reveal>Esperienza</h2>
@@ -363,6 +425,16 @@
 
   <!-- ============ CONTATTI ============ -->
   <section class="module" id="mod-contatti">
+    <div class="page-hero tint-crimson" aria-hidden="true">
+      <div class="page-hero-media"><img class="hero-water" src="assets/backgrounds/chrome-figure.jpg" alt=""></div>
+      <div class="page-hero-tint"></div>
+      <div class="page-hero-grain"></div>
+      <div class="page-hero-vignette"></div>
+      <span class="hero-cross" style="top:30%;left:16%;"></span>
+      <span class="hero-cross" style="top:60%;left:80%;"></span>
+      <span class="page-hero-eyebrow">03 / Modulo</span>
+      <div class="page-hero-word">CONTA<span>TTI</span></div>
+    </div>
     <div class="mod-tag"><b>03</b> / Contatti</div>
     <span class="eyebrow"><span class="eb-num">03</span>Comunicazione</span>
     <h2 class="sec-title" data-reveal>Contatti</h2>
@@ -391,6 +463,16 @@
 
   <!-- ============ WISHLIST ============ -->
   <section class="module" id="mod-wishlist">
+    <div class="page-hero tint-sunset" aria-hidden="true">
+      <div class="page-hero-media"><img class="hero-water" src="assets/backgrounds/statue-cosmic.jpg" alt=""></div>
+      <div class="page-hero-tint"></div>
+      <div class="page-hero-grain"></div>
+      <div class="page-hero-vignette"></div>
+      <span class="hero-cross" style="top:26%;left:18%;"></span>
+      <span class="hero-cross" style="top:64%;left:76%;"></span>
+      <span class="page-hero-eyebrow">04 / Modulo</span>
+      <div class="page-hero-word">WISH<span>LIST</span></div>
+    </div>
     <div class="mod-tag"><b>04</b> / Wishlist</div>
     <span class="eyebrow"><span class="eb-num">04</span>Shopping cross-sito</span>
     <h2 class="sec-title" data-reveal>Wishlist</h2>
@@ -452,6 +534,16 @@
 
   <!-- ============ PROGETTI / DEMO TECNICHE ============ -->
   <section class="module" id="mod-esperimenti">
+    <div class="page-hero tint-slate" aria-hidden="true">
+      <div class="page-hero-media"><img class="hero-water" src="assets/backgrounds/chrome-figure.jpg" alt=""></div>
+      <div class="page-hero-tint"></div>
+      <div class="page-hero-grain"></div>
+      <div class="page-hero-vignette"></div>
+      <span class="hero-cross" style="top:32%;left:22%;"></span>
+      <span class="hero-cross" style="top:56%;left:74%;"></span>
+      <span class="page-hero-eyebrow">05 / Modulo</span>
+      <div class="page-hero-word">PROGE<span>TTI</span></div>
+    </div>
     <div class="mod-tag"><b>05</b> / Progetti</div>
     <span class="eyebrow"><span class="eb-num">05</span>Laboratorio</span>
     <h2 class="sec-title" data-reveal>Progetti &amp; demo tecniche</h2>
@@ -629,6 +721,7 @@
 <script src="js/init.js"></script>
 <script src="js/theme.js"></script>
 <script src="js/motion.js"></script>
+<script src="js/music.js"></script>
 
 <script>
 // Registra il service worker per rendere l'app installabile e usabile offline.
