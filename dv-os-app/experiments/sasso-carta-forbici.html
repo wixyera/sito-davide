@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sasso Carta Forbici</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Fira+Code:wght@500&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Baloo 2',sans-serif;}
+
+body{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
+  background:
+    radial-gradient(circle at 15% 15%, rgba(255,255,255,.12), transparent 45%),
+    linear-gradient(135deg,#ff6a3d,#ff8a5c 45%,#ffb26b);
+  overflow:hidden;position:relative;
+}
+body::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(rgba(255,255,255,.10) 1.5px, transparent 1.5px);
+  background-size:28px 28px;
+}
+
+.container{
+  width:460px;max-width:100%;background:rgba(255,255,255,.97);border-radius:22px;
+  box-shadow:0 30px 70px -18px rgba(120,40,0,.45);padding:32px 34px 28px;position:relative;z-index:1;
+  animation:pop .5s cubic-bezier(.2,.8,.2,1);
+}
+@keyframes pop{from{opacity:0;transform:translateY(18px) scale(.96);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+h1{text-align:center;color:#7c2d12;font-weight:800;font-size:1.5rem;letter-spacing:.01em;}
+.subtitle{text-align:center;color:#c2410c;font-weight:600;font-size:.85rem;margin-top:4px;}
+
+.score-row{display:flex;justify-content:center;align-items:center;gap:18px;margin:22px 0;}
+.score-pill{background:#fff1e6;border-radius:16px;padding:10px 20px;text-align:center;min-width:78px;}
+.score-pill .lbl{font-size:.68rem;font-weight:700;color:#c2410c;text-transform:uppercase;letter-spacing:.05em;}
+.score-pill .val{font-family:'Fira Code',monospace;font-size:1.4rem;font-weight:700;color:#7c2d12;margin-top:2px;}
+.vs{font-weight:800;color:#ff6a3d;font-size:1.1rem;}
+
+.arena{display:flex;align-items:center;justify-content:space-between;margin:24px 0;min-height:120px;}
+.player-box, .cpu-box{width:120px;height:120px;border-radius:20px;background:#fff1e6;display:flex;align-items:center;justify-content:center;font-size:56px;transition:transform .25s;}
+.player-box.shake, .cpu-box.shake{animation:shake .5s ease infinite;}
+@keyframes shake{0%,100%{transform:rotate(0);}25%{transform:rotate(-8deg);}75%{transform:rotate(8deg);}}
+.player-box.reveal, .cpu-box.reveal{animation:reveal .4s cubic-bezier(.2,.8,.2,1);}
+@keyframes reveal{from{transform:scale(.5);opacity:.3;}to{transform:scale(1);opacity:1;}}
+.mid-label{font-family:'Fira Code',monospace;font-weight:700;color:#c2410c;font-size:.85rem;text-align:center;}
+
+.result-msg{text-align:center;font-weight:700;font-size:1.15rem;min-height:1.6em;margin-bottom:16px;transition:color .2s;}
+.result-msg.win{color:#16a34a;}
+.result-msg.lose{color:#dc2626;}
+.result-msg.draw{color:#c2410c;}
+
+.choices{display:flex;justify-content:center;gap:14px;}
+.choice-btn{
+  width:74px;height:74px;border-radius:50%;border:none;cursor:pointer;font-size:32px;
+  background:linear-gradient(135deg,#ff6a3d,#ff8a5c);color:#fff;box-shadow:0 10px 22px -6px rgba(255,106,61,.55);
+  transition:all .2s;
+}
+.choice-btn:hover{transform:translateY(-4px) scale(1.06);box-shadow:0 14px 28px -6px rgba(255,106,61,.65);}
+.choice-btn:active{transform:translateY(0) scale(.97);}
+.choice-btn:disabled{opacity:.5;cursor:default;transform:none;}
+
+.reset-row{text-align:center;margin-top:20px;}
+.reset-btn{background:none;border:none;color:#c2410c;font-weight:700;font-size:.85rem;cursor:pointer;text-decoration:underline;font-family:'Baloo 2',sans-serif;}
+
+.back-link{position:fixed;top:14px;left:14px;font-size:13px;color:#fff;text-decoration:none;font-weight:700;background:rgba(0,0,0,.2);padding:9px 15px;border-radius:20px;transition:all .25s;backdrop-filter:blur(4px);z-index:2;}
+.back-link:hover{background:rgba(0,0,0,.32);}
+</style>
+</head>
+<body>
+<a class="back-link" href="../index.html" onclick="if(window.history.length>1){history.back();return false;}">← Indietro</a>
+<div class="container">
+  <h1>🪨 Sasso Carta Forbici ✂️</h1>
+  <p class="subtitle">Sfida il computer, meglio di 3?</p>
+
+  <div class="score-row">
+    <div class="score-pill"><div class="lbl">Tu</div><div class="val" id="playerScore">0</div></div>
+    <div class="vs">VS</div>
+    <div class="score-pill"><div class="lbl">CPU</div><div class="val" id="cpuScore">0</div></div>
+  </div>
+
+  <div class="arena">
+    <div class="player-box" id="playerBox">❔</div>
+    <div class="mid-label">FIGHT!</div>
+    <div class="cpu-box" id="cpuBox">❔</div>
+  </div>
+
+  <div class="result-msg" id="resultMsg">Scegli la tua mossa</div>
+
+  <div class="choices">
+    <button class="choice-btn" data-choice="rock" title="Sasso">🪨</button>
+    <button class="choice-btn" data-choice="paper" title="Carta">📄</button>
+    <button class="choice-btn" data-choice="scissors" title="Forbici">✂️</button>
+  </div>
+
+  <div class="reset-row">
+    <button class="reset-btn" id="resetBtn">Azzera punteggio</button>
+  </div>
+</div>
+
+<script>
+const emojis = { rock: '🪨', paper: '📄', scissors: '✂️' };
+const names = { rock: 'Sasso', paper: 'Carta', scissors: 'Forbici' };
+const beats = { rock: 'scissors', paper: 'rock', scissors: 'paper' };
+
+let playerScore = 0, cpuScore = 0, locked = false;
+
+const playerBox = document.getElementById('playerBox');
+const cpuBox = document.getElementById('cpuBox');
+const resultMsg = document.getElementById('resultMsg');
+const playerScoreEl = document.getElementById('playerScore');
+const cpuScoreEl = document.getElementById('cpuScore');
+const buttons = document.querySelectorAll('.choice-btn');
+const resetBtn = document.getElementById('resetBtn');
+
+function play(playerChoice) {
+  if (locked) return;
+  locked = true;
+  buttons.forEach(b => b.disabled = true);
+
+  playerBox.classList.add('shake');
+  cpuBox.classList.add('shake');
+  resultMsg.textContent = 'Pietra... carta... forbici...';
+  resultMsg.className = 'result-msg';
+
+  setTimeout(() => {
+    const cpuChoice = ['rock', 'paper', 'scissors'][Math.floor(Math.random() * 3)];
+
+    playerBox.classList.remove('shake');
+    cpuBox.classList.remove('shake');
+    playerBox.textContent = emojis[playerChoice];
+    cpuBox.textContent = emojis[cpuChoice];
+    playerBox.classList.add('reveal');
+    cpuBox.classList.add('reveal');
+    setTimeout(() => {
+      playerBox.classList.remove('reveal');
+      cpuBox.classList.remove('reveal');
+    }, 400);
+
+    if (playerChoice === cpuChoice) {
+      resultMsg.textContent = `Pareggio! Entrambi: ${names[playerChoice]}`;
+      resultMsg.classList.add('draw');
+    } else if (beats[playerChoice] === cpuChoice) {
+      playerScore++;
+      playerScoreEl.textContent = playerScore;
+      resultMsg.textContent = `Hai vinto! ${names[playerChoice]} batte ${names[cpuChoice]}`;
+      resultMsg.classList.add('win');
+    } else {
+      cpuScore++;
+      cpuScoreEl.textContent = cpuScore;
+      resultMsg.textContent = `Hai perso! ${names[cpuChoice]} batte ${names[playerChoice]}`;
+      resultMsg.classList.add('lose');
+    }
+
+    locked = false;
+    buttons.forEach(b => b.disabled = false);
+  }, 700);
+}
+
+buttons.forEach(b => b.addEventListener('click', () => play(b.dataset.choice)));
+
+resetBtn.addEventListener('click', () => {
+  playerScore = 0; cpuScore = 0;
+  playerScoreEl.textContent = 0; cpuScoreEl.textContent = 0;
+  playerBox.textContent = '❔'; cpuBox.textContent = '❔';
+  resultMsg.textContent = 'Scegli la tua mossa';
+  resultMsg.className = 'result-msg';
+});
+</script>
+</body>
+</html>
