@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>???</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=VT323&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;background:#000;font-family:'Space Mono',monospace;}
+canvas{display:block;position:fixed;inset:0;}
+
+.crt::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:6;
+  background:repeating-linear-gradient(rgba(0,0,0,0) 0,rgba(0,0,0,0) 2px,rgba(0,0,0,.18) 3px);
+  mix-blend-mode:multiply;
+}
+.crt::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:7;
+  background:radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.55) 100%);
+}
+
+.back-link{position:fixed;top:14px;left:14px;font-size:12px;color:#6bffb0;text-decoration:none;font-weight:700;background:rgba(0,255,140,.08);border:1px solid rgba(0,255,140,.3);padding:8px 14px;border-radius:4px;z-index:10;letter-spacing:.05em;backdrop-filter:blur(4px);transition:all .25s;}
+.back-link:hover{background:rgba(0,255,140,.18);border-color:#6bffb0;}
+
+.term-wrap{
+  position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+  padding:20px; z-index:5;
+}
+.term{
+  width:min(720px,92vw); height:min(78vh,560px); background:rgba(3,10,6,.86);
+  border:1px solid rgba(0,255,140,.35); border-radius:8px;
+  box-shadow:0 0 60px rgba(0,255,140,.15), inset 0 0 40px rgba(0,255,140,.04);
+  display:flex; flex-direction:column; overflow:hidden; backdrop-filter:blur(2px);
+}
+.term-bar{
+  display:flex; align-items:center; gap:7px; padding:9px 12px;
+  background:rgba(0,255,140,.06); border-bottom:1px solid rgba(0,255,140,.2);
+  font-size:11px; color:#6bffb0; letter-spacing:.08em;
+}
+.term-bar .dot{width:9px;height:9px;border-radius:50%;}
+.term-bar .d1{background:#ff5f56;} .term-bar .d2{background:#ffbd2e;} .term-bar .d3{background:#27c93f;}
+.term-bar .label{margin-left:auto;opacity:.7;}
+
+.term-body{
+  flex:1; overflow-y:auto; padding:16px 18px; color:#8affc1; font-size:14.5px; line-height:1.65;
+  text-shadow:0 0 6px rgba(0,255,140,.35);
+}
+.term-body::-webkit-scrollbar{width:6px;}
+.term-body::-webkit-scrollbar-thumb{background:rgba(0,255,140,.25);border-radius:3px;}
+.line{white-space:pre-wrap;word-break:break-word;margin-bottom:2px;}
+.line.cmd::before{content:'davide@dv-os:~$ ';color:#4ee8ff;}
+.line.err{color:#ff8a8a;}
+.line.ok{color:#c6ffe0;}
+.line.dim{color:rgba(138,255,193,.5);}
+
+.term-input-row{display:flex;align-items:center;padding:10px 18px 14px;border-top:1px solid rgba(0,255,140,.15);}
+.prompt{color:#4ee8ff;margin-right:8px;font-size:14.5px;}
+#cmdInput{
+  flex:1; background:transparent; border:none; outline:none; color:#eafff2;
+  font-family:inherit; font-size:14.5px; caret-color:#6bffb0;
+}
+.cursor{display:inline-block;width:8px;height:16px;background:#6bffb0;margin-left:2px;vertical-align:middle;animation:blink 1s step-end infinite;}
+@keyframes blink{50%{opacity:0;}}
+</style>
+</head>
+<body class="crt">
+<a class="back-link" href="../index.html" onclick="if(window.history.length>1){history.back();return false;}">← Indietro</a>
+<canvas id="rain"></canvas>
+<div class="term-wrap">
+  <div class="term">
+    <div class="term-bar">
+      <span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span>
+      <span class="label">DV_OS // shell sicura — sessione locale</span>
+    </div>
+    <div class="term-body" id="termBody"></div>
+    <div class="term-input-row">
+      <span class="prompt">davide@dv-os:~$</span>
+      <input id="cmdInput" autocomplete="off" spellcheck="false" autofocus>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- MATRIX RAIN ---------- */
+const canvas = document.getElementById('rain');
+const ctx = canvas.getContext('2d');
+let W, H, cols, drops;
+const glyphs = 'アイウエオカキクケコサシスセソ01234567890<>[]{}#$%&/=+*';
+
+function setup() {
+  W = canvas.width = innerWidth;
+  H = canvas.height = innerHeight;
+  cols = Math.floor(W / 16);
+  drops = Array.from({ length: cols }, () => Math.random() * -50);
+}
+setup();
+addEventListener('resize', setup);
+
+function rain() {
+  ctx.fillStyle = 'rgba(0,0,0,.09)';
+  ctx.fillRect(0, 0, W, H);
+  ctx.font = '15px monospace';
+  for (let i = 0; i < cols; i++) {
+    const ch = glyphs[Math.floor(Math.random() * glyphs.length)];
+    const y = drops[i] * 16;
+    ctx.fillStyle = Math.random() < 0.04 ? '#e8fff5' : 'rgba(0,255,140,0.55)';
+    ctx.fillText(ch, i * 16, y);
+    if (y > H && Math.random() > 0.975) drops[i] = 0;
+    drops[i]++;
+  }
+  requestAnimationFrame(rain);
+}
+rain();
+
+/* ---------- TERMINAL ---------- */
+const body = document.getElementById('termBody');
+const input = document.getElementById('cmdInput');
+const wrap = document.querySelector('.term-wrap');
+
+function print(text, cls) {
+  const l = document.createElement('div');
+  l.className = 'line' + (cls ? ' ' + cls : '');
+  l.textContent = text;
+  body.appendChild(l);
+  body.scrollTop = body.scrollHeight;
+}
+function printHTML(html, cls) {
+  const l = document.createElement('div');
+  l.className = 'line' + (cls ? ' ' + cls : '');
+  l.innerHTML = html;
+  body.appendChild(l);
+  body.scrollTop = body.scrollHeight;
+}
+
+async function typeLine(text, cls, speed) {
+  const l = document.createElement('div');
+  l.className = 'line' + (cls ? ' ' + cls : '');
+  body.appendChild(l);
+  for (let i = 0; i < text.length; i++) {
+    l.textContent += text[i];
+    body.scrollTop = body.scrollHeight;
+    await new Promise(r => setTimeout(r, speed || 10));
+  }
+}
+function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+const commands = {
+  help: () => {
+    print('Comandi disponibili:', 'dim');
+    print('  whoami        chi sono io, davvero', '');
+    print('  progetti      cosa sto costruendo', '');
+    print('  segreto       ??? ', '');
+    print('  sudo <cosa>   prova pure', '');
+    print('  clear         pulisce lo schermo', '');
+    print('  exit          chiude la sessione', '');
+  },
+  whoami: async () => {
+    await typeLine('Davide Villano — 20 anni, Bologna.', 'ok', 12);
+    await typeLine('Junior IT & Multimedia Assistant, Johns Hopkins University.', '', 12);
+    await typeLine('Questo terminale è uno dei miei esperimenti preferiti.', 'dim', 12);
+  },
+  progetti: async () => {
+    await typeLine('Attualmente: calendario, percorso e contatti nel mio OS personale.', '', 12);
+    await typeLine('E questa piccola shell, ovviamente.', 'dim', 12);
+  },
+  segreto: async () => {
+    await typeLine('Stai cercando qualcosa che non c\u2019è ancora.', 'ok', 18);
+    await wait(400);
+    await typeLine('...oppure sì, ma non te lo dico così facilmente.', 'dim', 18);
+  },
+  clear: () => { body.innerHTML = ''; },
+  exit: async () => {
+    await typeLine('Sessione terminata. Puoi chiudere questa scheda.', 'err', 14);
+    input.disabled = true;
+  }
+};
+
+async function handleCommand(raw) {
+  const trimmed = raw.trim();
+  if (!trimmed) return;
+  printHTML(`<span style="color:#4ee8ff">davide@dv-os:~$</span> ${escapeHTML(trimmed)}`);
+  const [cmd, ...rest] = trimmed.split(' ');
+  const lc = cmd.toLowerCase();
+
+  if (lc === 'sudo') {
+    await typeLine(`[sudo] password per davide: `, '', 8);
+    await wait(500);
+    print('Permesso negato: non serve essere root per essere sé stessi.', 'err');
+    return;
+  }
+  if (commands[lc]) {
+    await commands[lc](rest.join(' '));
+  } else {
+    print(`comando non trovato: ${cmd} — scrivi "help" per la lista.`, 'err');
+  }
+}
+
+function escapeHTML(s) {
+  return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+input.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const val = input.value;
+    input.value = '';
+    handleCommand(val);
+  }
+});
+wrap.addEventListener('click', () => input.focus());
+
+(async function boot() {
+  const bootLines = [
+    'Inizializzazione DV_OS shell...',
+    'Connessione al nucleo personale... OK',
+    'Caricamento moduli: calendario, percorso, contatti... OK',
+    ' '
+  ];
+  for (const l of bootLines) { print(l, 'dim'); await wait(220); }
+  await typeLine('Benvenuto. Scrivi "help" per iniziare.', 'ok', 14);
+})();
+</script>
+</body>
+</html>
