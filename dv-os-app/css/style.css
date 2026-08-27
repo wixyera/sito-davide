@@ -386,12 +386,14 @@ a:focus-visible, button:focus-visible, input:focus-visible{outline:2px solid var
   .clock-date{font-size:.48rem; line-height:1.35; word-break:break-word;}
   .nav-toggle{display:none !important;}
   .tab-nav{
-    display:flex !important; flex-direction:column; align-items:center; justify-content:center;
-    flex:1; width:100%; gap:10px; padding:0; border-top:none; margin-top:20px; overflow:visible; min-height:0;
+    display:flex !important; flex-direction:column; align-items:center; justify-content:flex-start;
+    flex:1; width:100%; gap:8px; padding:6px 0; border-top:none; margin-top:14px; overflow-y:auto; overflow-x:visible; min-height:0;
+    scrollbar-width:none;
   }
+  .tab-nav::-webkit-scrollbar{display:none;}
   .tab-btn{
-    writing-mode:vertical-lr; transform:rotate(180deg);
-    padding:18px 8px; font-size:.72rem; letter-spacing:.1em;
+    writing-mode:vertical-lr; transform:rotate(180deg); flex-shrink:0;
+    padding:14px 8px; font-size:.7rem; letter-spacing:.1em;
   }
   .tab-btn .n{display:none;}
   .tab-btn::after{
@@ -837,14 +839,18 @@ body.home-active header:not(.solid) .theme-toggle-btn{ border-color:rgba(255,255
 }
 .hero-card-avatar{width:42px; height:42px; border-radius:50%; overflow:hidden; background:var(--panel-solid); flex-shrink:0; border:1px solid rgba(255,255,255,.2);}
 .hero-card-avatar svg{width:100%; height:100%;}
-.hero-card-txt{display:flex; flex-direction:column; gap:1px;}
+.hero-card-txt{display:flex; flex-direction:column; gap:1px; min-width:0;}
 .hero-card-eyebrow{font-family:var(--font-label); font-size:.62rem; color:rgba(255,255,255,.6); text-transform:uppercase; letter-spacing:.08em;}
 .hero-card-title{font-family:var(--font-display); font-size:.92rem; font-weight:700; color:#fff;}
 .hero-card-sub{font-family:var(--font-label); font-size:.7rem; color:rgba(255,255,255,.65);}
 
+/* variabile condivisa: altezza del blocco wordmark, cosi' caption/corner
+   possono restare sempre sopra di esso senza sovrapporsi (vedi ROUND 6) */
+.hero-visual{ --wm-font:clamp(2.6rem,9vw,7.4rem); --wm-block:calc(var(--wm-font) * 1.68); }
+
 /* caption in basso a sinistra */
 .hero-caption{
-  position:absolute; z-index:4; left:clamp(20px,5vw,64px); bottom:clamp(120px,18vh,200px);
+  position:absolute; z-index:4; left:clamp(20px,5vw,64px); bottom:calc(var(--wm-block) + 46px);
   display:flex; flex-direction:column; gap:4px; font-family:var(--font-body); font-size:.82rem;
   color:rgba(255,255,255,.88); text-shadow:0 2px 10px rgba(0,0,0,.4);
 }
@@ -852,7 +858,7 @@ body.home-active header:not(.solid) .theme-toggle-btn{ border-color:rgba(255,255
 
 /* angolo in basso a sinistra: anno + tacche + timer */
 .hero-corner{
-  position:absolute; z-index:4; left:clamp(20px,5vw,64px); bottom:22px;
+  position:absolute; z-index:4; left:clamp(20px,5vw,64px); bottom:calc(var(--wm-block) + 14px);
   display:flex; align-items:center; gap:14px; font-family:var(--font-clock); font-size:.72rem;
   color:rgba(255,255,255,.7);
 }
@@ -864,9 +870,9 @@ body.home-active header:not(.solid) .theme-toggle-btn{ border-color:rgba(255,255
 
 /* wordmark enorme che taglia il bordo inferiore dell'hero */
 .home-hero h1.hero-wordmark{
-  position:absolute; z-index:4; left:clamp(16px,4vw,56px); right:clamp(16px,4vw,56px); bottom:-2.4vw;
+  position:absolute; z-index:4; left:clamp(16px,4vw,56px); right:clamp(16px,4vw,56px); bottom:calc(var(--wm-font) * -0.1);
   font-family:var(--font-display); font-weight:800; letter-spacing:-.04em; line-height:.82;
-  font-size:clamp(3.6rem,13vw,10.5rem); color:#f5f2ea; pointer-events:none; text-align:left;
+  font-size:var(--wm-font); color:#f5f2ea; pointer-events:none; text-align:left;
   display:flex; flex-wrap:wrap; gap:0 clamp(14px,2.4vw,40px); text-shadow:0 10px 50px rgba(0,0,0,.35);
 }
 .home-hero h1.hero-wordmark .accent{color:var(--gold-soft); -webkit-text-stroke:0; }
@@ -880,17 +886,37 @@ body.home-active header:not(.solid) .theme-toggle-btn{ border-color:rgba(255,255
 
 @media (max-width:940px){
   .hero-card{top:96px;}
-  .hero-topline{top:110px;}
+  .hero-topline{top:110px; max-width:38vw;}
 }
 @media (max-width:700px){
-  .hero-visual{height:82vh; min-height:520px;}
-  .hero-topline{max-width:220px; top:96px; gap:12px;}
-  .hero-topline p{font-size:.82rem;}
-  .hero-card{top:90px; right:14px; left:auto; padding:10px 14px 10px 10px; gap:10px;}
-  .hero-card-avatar{width:34px; height:34px;}
-  .hero-card-title{font-size:.8rem;}
-  .hero-caption{bottom:150px; font-size:.72rem;}
-  .home-hero h1.hero-wordmark{font-size:clamp(2.6rem,15vw,4.5rem); bottom:-1.6vw; gap:0 14px;}
-  .hero-corner{bottom:14px; gap:8px; font-size:.62rem;}
-  .hero-corner .ticks{width:60px;}
+  .hero-visual{height:86vh; min-height:560px;}
+  .hero-topline{max-width:150px; top:98px; left:16px; gap:10px;}
+  .hero-topline p{font-size:.74rem; line-height:1.5;}
+  .hero-explore{font-size:.76rem;}
+  .hero-card{top:98px; right:12px; left:auto; width:150px; max-width:150px; padding:8px 10px 8px 8px; gap:8px;}
+  .hero-card-avatar{width:28px; height:28px;}
+  .hero-card-eyebrow{display:none;}
+  .hero-card-title{font-size:.72rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .hero-card-sub{font-size:.6rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .hero-caption{bottom:190px; font-size:.7rem; left:16px;}
+  .home-hero h1.hero-wordmark{font-size:clamp(2.2rem,13.5vw,3.6rem); bottom:56px; left:16px; right:16px; gap:0 12px; line-height:.86;}
+  .hero-corner{bottom:16px; left:16px; gap:8px; font-size:.62rem;}
+  .hero-corner .ticks{width:56px;}
+}
+@media (max-width:340px){
+  .hero-topline{max-width:128px;}
+  .hero-card{width:128px; max-width:128px;}
+}
+
+/* ==================================================================
+   ROUND 6 — fix sovrapposizioni: la sidebar verticale (104px, desktop)
+   copriva testo/CTA dell'hero; la card di saluto e il testo in alto a
+   sinistra si accavallavano su mobile; il wordmark in basso copriva
+   la riga di copyright/timer.
+   ================================================================== */
+@media (min-width:941px){
+  .hero-topline,
+  .hero-caption,
+  .hero-corner{ left:calc(104px + clamp(20px,5vw,64px)); }
+  .home-hero h1.hero-wordmark{ left:calc(104px + clamp(16px,4vw,56px)); }
 }
