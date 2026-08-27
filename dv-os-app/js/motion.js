@@ -52,11 +52,16 @@
     document.body.appendChild(ring);
 
     let mx = window.innerWidth / 2, my = window.innerHeight / 2;
-    let rx = mx, ry = my;
-    window.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; dot.style.left = mx + 'px'; dot.style.top = my + 'px'; });
+    let dx2 = mx, dy2 = my; // posizione interpolata del puntino
+    let rx = mx, ry = my;   // posizione interpolata dell'anello
+    window.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; }, { passive: true });
     (function loop(){
-      rx += (mx - rx) * 0.18; ry += (my - ry) * 0.18;
-      ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+      // il puntino segue quasi 1:1 (leggero smoothing per eliminare il micro-jitter),
+      // l'anello resta piu' morbido/ritardato per l'effetto "scia" fluido
+      dx2 += (mx - dx2) * 0.55; dy2 += (my - dy2) * 0.55;
+      rx += (mx - rx) * 0.16; ry += (my - ry) * 0.16;
+      dot.style.transform = `translate3d(${dx2}px, ${dy2}px, 0) translate(-50%,-50%)`;
+      ring.style.transform = `translate3d(${rx}px, ${ry}px, 0) translate(-50%,-50%)`;
       requestAnimationFrame(loop);
     })();
 
@@ -66,7 +71,7 @@
       let gx = mx, gy = my;
       (function glowLoop(){
         gx += (mx - gx) * 0.06; gy += (my - gy) * 0.06;
-        glow.style.left = gx + 'px'; glow.style.top = gy + 'px';
+        glow.style.transform = `translate3d(${gx}px, ${gy}px, 0) translate(-50%,-50%)`;
         requestAnimationFrame(glowLoop);
       })();
     }
@@ -186,18 +191,12 @@
     });
   });
 
-  /* ---------------- HEADER TRASPARENTE SU HOME + SOLIDO ALLO SCROLL ---------------- */
+  /* ---------------- STATO HOME (navbar resta sempre trasparente su tutte le pagine) ---------------- */
   const bodyEl = document.body;
-  const headerEl2 = document.querySelector('header');
   function syncHomeActive(){
     const homeMod = document.getElementById('mod-home');
     bodyEl.classList.toggle('home-active', !!(homeMod && homeMod.classList.contains('active')));
   }
-  function syncHeaderSolid(){
-    if (headerEl2) headerEl2.classList.toggle('solid', window.scrollY > 40);
-  }
-  window.addEventListener('scroll', syncHeaderSolid, { passive: true });
-  syncHeaderSolid();
   syncHomeActive();
   const bodyObs = new MutationObserver(syncHomeActive);
   document.querySelectorAll('.module').forEach(m => bodyObs.observe(m, { attributes: true, attributeFilter: ['class'] }));
