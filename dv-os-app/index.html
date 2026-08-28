@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>(function(){try{var t=localStorage.getItem('dv-os-theme')||'dark';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<title>Davide Villano — Personal Workspace</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Spazio di lavoro personale di Davide Villano: calendario, percorso professionale, contatti, wishlist e spese in un unico posto.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Davide Villano — Personal Workspace">
+<meta property="og:description" content="Calendario, percorso professionale, contatti, wishlist e spese in un unico spazio di lavoro personale.">
+<meta property="og:image" content="assets/icons/icon-512.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Davide Villano — Personal Workspace">
+<meta name="twitter:description" content="Calendario, percorso professionale, contatti, wishlist e spese in un unico spazio di lavoro personale.">
+<meta name="twitter:image" content="assets/icons/icon-512.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a0e17">
+<link rel="icon" href="assets/icons/icon-192.png" type="image/png">
+<link rel="icon" href="assets/icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="assets/icons/favicon-16.png" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="D. Villano">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="markGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c5d1ec"/>
+      <stop offset="100%" stop-color="#93a8d6"/>
+    </linearGradient>
+  </defs>
+  <symbol id="dvMark" viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="46" fill="none" stroke="#93a8d6" stroke-width="1.4" opacity=".45"/>
+    <text x="50" y="61" text-anchor="middle" font-family="Montserrat, sans-serif" font-weight="700" font-size="38" fill="url(#markGrad)">DV</text>
+  </symbol>
+  <filter id="waterFilter" x="-30%" y="-30%" width="160%" height="160%">
+    <feTurbulence id="waterTurb" type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="2" seed="7" result="turb"/>
+    <feDisplacementMap id="waterDisp" in="SourceGraphic" in2="turb" scale="6" xChannelSelector="R" yChannelSelector="G" result="disp"/>
+    <feOffset id="waterOffR" in="disp" dx="0" dy="0" result="rShift"/>
+    <feColorMatrix in="rShift" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="rOnly"/>
+    <feOffset id="waterOffB" in="disp" dx="0" dy="0" result="bShift"/>
+    <feColorMatrix in="bShift" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="bOnly"/>
+    <feColorMatrix in="disp" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="gOnly"/>
+    <feBlend in="rOnly" in2="gOnly" mode="screen" result="rg"/>
+    <feBlend in="rg" in2="bOnly" mode="screen"/>
+  </filter>
+</svg>
+
+<div id="authOverlay" class="auth-overlay">
+  <div class="auth-card">
+
+    <div id="authViewLogin" class="auth-view">
+      <h2>Accesso</h2>
+      <p>Accedi al tuo spazio di lavoro personale per gestire calendario, percorso e contatti.</p>
+      <label for="authEmail">Email</label>
+
+      <div id="nameFieldWrap" style="display:none">
+        <input id="authName" type="text" placeholder="Nome" autocomplete="name" />
+      </div>
+      <input id="authEmail" type="email" autocomplete="email" placeholder="nome@email.com">
+      <label for="authPassword">Password</label>
+      <input id="authPassword" type="password" autocomplete="current-password" placeholder="Password">
+
+      <button class="forgot-link" id="forgotLink" type="button">Password dimenticata?</button>
+      <div class="auth-actions">
+        <button id="loginBtn" type="button">Accedi</button>
+        <button id="signupBtn" type="button">Registrati</button>
+      </div>
+      <div id="authMsg" class="auth-msg"></div>
+    </div>
+
+    <div id="authViewForgot" class="auth-view hidden">
+      <button class="auth-back" id="forgotBackBtn" type="button">← Torna al login</button>
+      <h2>Recupera password</h2>
+      <p>Nessuna email in uscita: usa il codice di recupero che hai salvato in fase di registrazione.</p>
+      <label for="forgotEmail">Email</label>
+      <input id="forgotEmail" type="email" autocomplete="email" placeholder="nome@email.com">
+      <label for="recoveryCodeInput">Codice di recupero</label>
+      <input id="recoveryCodeInput" type="text" placeholder="XXXX-XXXX-XXXX-XXXX" autocomplete="off" style="font-family:var(--font-clock); letter-spacing:.04em;">
+      <label for="newPassword">Nuova password</label>
+      <input id="newPassword" type="password" autocomplete="new-password" placeholder="Almeno 6 caratteri">
+      <div class="auth-actions">
+        <button id="forgotSendBtn" type="button">Reimposta password</button>
+      </div>
+      <div id="forgotMsg" class="auth-msg"></div>
+    </div>
+
+    <div id="authViewRecoveryCode" class="auth-view hidden">
+      <h2>Salva il tuo codice di recupero</h2>
+      <p>Ti servirà per reimpostare la password se la dimentichi — <b>non possiamo mostrartelo di nuovo</b>. Copialo e conservalo in un posto sicuro (note del telefono, password manager...).</p>
+      <div class="recovery-code-box" id="recoveryCodeBox">----</div>
+      <button class="forgot-link" id="copyRecoveryCodeBtn" type="button" style="text-align:center; width:100%; margin-top:8px;">Copia codice</button>
+      <div class="auth-actions">
+        <button id="recoveryCodeContinueBtn" type="button">Ho salvato il codice, continua</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="scrollProgress" aria-hidden="true"></div>
+<div id="ambientGlow" aria-hidden="true"></div>
+
+<div id="musicWidget" class="music-widget">
+  <button id="musicToggle" class="music-toggle" type="button" aria-label="Musica di sottofondo" aria-expanded="false">
+    <svg viewBox="0 0 24 24" class="music-ic"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+    <span class="music-eq" aria-hidden="true"><i></i><i></i><i></i></span>
+  </button>
+
+  <div id="musicPanel" class="music-panel">
+    <div class="music-panel-head">
+      <span>Musica per esplorare il sito</span>
+      <button id="musicClose" type="button" aria-label="Chiudi">✕</button>
+    </div>
+
+    <div class="music-search">
+      <input type="text" id="musicSearchInput" placeholder="Cerca un brano, un artista...">
+      <button id="musicSearchBtn" type="button" aria-label="Cerca">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      </button>
+    </div>
+    <div class="music-results" id="musicResults"></div>
+
+    <p class="music-subhead">Playlist pronte</p>
+    <div class="music-presets" id="musicPresets">
+      <button type="button" data-type="playlist" data-id="37i9dQZF1DWZeKCadgRdKQ">Deep Focus</button>
+      <button type="button" data-type="playlist" data-id="37i9dQZF1DX4WYpdgoIcn6">Chill Hits</button>
+      <button type="button" data-type="playlist" data-id="37i9dQZF1DX76Wlfdnj7AP">Beast Mode</button>
+      <button type="button" data-type="playlist" data-id="37i9dQZF1DWTl4y3vgJOXW">Brain Food</button>
+    </div>
+
+    <div class="music-custom">
+      <input type="url" id="musicCustomUrl" placeholder="...oppure incolla un link Spotify (playlist / brano / album)">
+      <button id="musicLoadCustom" type="button">Carica</button>
+    </div>
+    <div class="music-custom-msg" id="musicCustomMsg"></div>
+
+    <div class="music-embed-wrap">
+      <iframe id="musicEmbed" title="Player Spotify" src="https://open.spotify.com/embed/playlist/37i9dQZF1DWZeKCadgRdKQ?utm_source=generator&theme=0" width="100%" height="152" style="border-radius:12px" frameborder="0" allowfullscreen loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+      <a id="musicOpenSpotify" class="music-open-spotify" href="https://open.spotify.com/playlist/37i9dQZF1DWZeKCadgRdKQ" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 15c2.5-1.2 5.5-1.2 8 0M7.5 12c3-1.4 6-1.4 9 0M7 9c3.5-1.6 7-1.6 10.5 0" stroke="currentColor" fill="none" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Ascolta il brano intero in Spotify
+      </a>
+    </div>
+    <p class="music-note">Riproduzione gestita da Spotify: con un account collegato nel browser senti i brani interi, altrimenti le anteprime da 30”. Su telefono i browser bloccano spesso il login dentro l'anteprima incorporata: usa "Ascolta il brano intero in Spotify" per aprirlo nell'app o sul sito.</p>
+  </div>
+</div>
+
+<div id="loader">
+  <div class="loader-ring-wrap">
+    <svg class="brand-mark" viewBox="0 0 100 100" aria-hidden="true"><use href="#dvMark"/></svg>
+    <svg class="loader-ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="47"/></svg>
+  </div>
+  <div class="load-bar"></div>
+  <div id="loaderText">Caricamento in corso</div>
+</div>
+
+<div id="offlineBanner" role="status">Sei offline — stai vedendo l'ultima versione salvata dei tuoi dati.</div>
+
+<button type="button" id="backToTop" class="back-to-top" aria-label="Torna in cima">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+
+<div id="searchOverlay" role="dialog" aria-modal="true" aria-label="Ricerca">
+  <div class="search-panel">
+    <div class="search-input-row">
+      <svg viewBox="0 0 24 24" class="search-ic"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input type="text" id="searchInput" placeholder="Cerca eventi, contatti, spese, wishlist, percorso..." autocomplete="off" aria-label="Cerca in tutto il sito">
+      <button type="button" id="searchCloseBtn" aria-label="Chiudi ricerca">Esc</button>
+    </div>
+    <div id="searchResults" aria-label="Risultati di ricerca"></div>
+    <div id="searchStatus" class="sr-only" aria-live="polite"></div>
+    <div id="searchEmpty" style="display:none;" role="status">Nessun risultato per la tua ricerca.</div>
+    <div id="searchHint">Scrivi per cercare in tutti i moduli — <b>Ctrl</b>/<b>⌘</b> + <b>K</b> per aprire da ovunque.</div>
+  </div>
+</div>
+
+<header>
+  <div class="header-top">
+    <div class="logo-wrap">
+      <div class="logo"><svg class="logo-icon" viewBox="0 0 100 100" aria-hidden="true"><use href="#dvMark"/></svg>D. Villano<span>·</span></div>
+      <div class="logo-tag">PERSONAL WORKSPACE</div>
+    </div>
+    <div class="clock-box">
+      <div class="clock-time" id="clockTime">--:--:--</div>
+      <div class="clock-date" id="clockDate">caricamento data...</div>
+    </div>
+  </div>
+  <div class="tab-nav" id="tabNav" role="tablist" aria-label="Sezioni dell'app">
+    <div class="tab-indicator" id="tabIndicator" aria-hidden="true"></div>
+    <button class="tab-btn active" data-module="home" role="tab" aria-selected="true" aria-controls="mod-home" id="tab-home" tabindex="0"><span class="n">00</span>Home</button>
+    <button class="tab-btn" data-module="calendario" role="tab" aria-selected="false" aria-controls="mod-calendario" id="tab-calendario" tabindex="-1"><span class="n">01</span>Calendario</button>
+    <button class="tab-btn" data-module="percorso" role="tab" aria-selected="false" aria-controls="mod-percorso" id="tab-percorso" tabindex="-1"><span class="n">02</span>Percorso</button>
+    <button class="tab-btn" data-module="contatti" role="tab" aria-selected="false" aria-controls="mod-contatti" id="tab-contatti" tabindex="-1"><span class="n">03</span>Contatti</button>
+    <button class="tab-btn" data-module="wishlist" role="tab" aria-selected="false" aria-controls="mod-wishlist" id="tab-wishlist" tabindex="-1"><span class="n">04</span>Wishlist</button>
+    <button class="tab-btn" data-module="spese" role="tab" aria-selected="false" aria-controls="mod-spese" id="tab-spese" tabindex="-1"><span class="n">05</span>Spese</button>
+    <button class="tab-btn" data-module="esperimenti" role="tab" aria-selected="false" aria-controls="mod-esperimenti" id="tab-esperimenti" tabindex="-1"><span class="n">06</span>Progetti</button>
+  </div>
+  <button class="theme-toggle-btn" id="searchTriggerBtn" type="button" aria-label="Cerca in tutto il sito (Ctrl+K)">
+    <svg viewBox="0 0 24 24" class="theme-ic"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+  </button>
+  <button class="theme-toggle-btn" id="themeToggleBtn" type="button" aria-label="Cambia tema chiaro/scuro">
+    <svg id="themeIconMoon" viewBox="0 0 24 24" class="theme-ic"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+    <svg id="themeIconSun" viewBox="0 0 24 24" class="theme-ic" style="display:none;"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M4.22 4.22l1.77 1.77M18 18l1.78 1.78M2 12h2.5M19.5 12H22M4.22 19.78 6 18M18 6l1.78-1.78"/></svg>
+  </button>
+  <button class="nav-toggle" id="navToggle" aria-label="Apri menu"><span></span><span></span><span></span></button>
+</header>
+
+<main id="main-content">
+
+  <!-- ============ HOME ============ -->
+  <section class="module active" id="mod-home" role="tabpanel" aria-labelledby="tab-home" tabindex="-1">
+    <div class="hero">
+      <div class="home-hero">
+        <div class="hero-visual" id="heroVisual">
+          <img class="hero-photo" src="assets/backgrounds/statue-cosmic.jpg" alt="" aria-hidden="true">
+          <div class="hero-caustics" aria-hidden="true"></div>
+          <div class="hero-vignette" aria-hidden="true"></div>
+
+          <span class="hero-cross" style="top:34%;left:56%;"></span>
+          <span class="hero-cross" style="top:57%;left:84%;"></span>
+          <span class="hero-cross" style="top:52%;left:18%;"></span>
+
+          <div class="hero-topline" data-reveal>
+            <p>Gestisco calendario, percorso e contatti in un unico spazio, <b>costruito da me</b>, pronto in ogni momento.</p>
+            <button class="hero-explore magnetic" type="button" data-goto="calendario">Explore Now <span class="arrow">↗</span></button>
+          </div>
+
+          <div class="hero-card" data-reveal>
+            <div class="hero-card-avatar"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#dvMark"/></svg></div>
+            <div class="hero-card-txt">
+              <span class="hero-card-eyebrow" id="greetingText">Bentornato</span>
+              <div class="hero-card-title">Davide Villano</div>
+              <div class="hero-card-sub">Junior IT &amp; Multimedia Assistant</div>
+            </div>
+          </div>
+
+          <div class="hero-caption" data-reveal>
+            <span class="hero-caption-num">01/</span>
+            <span>JavaScript</span>
+            <span>Cloudflare Pages</span>
+            <span>Supabase</span>
+          </div>
+
+          <div class="hero-corner">
+            <span>© 2026</span>
+            <span class="ticks" aria-hidden="true"></span>
+            <span id="heroTimer">00'</span>
+          </div>
+
+          <h1 class="hero-wordmark" aria-hidden="true"><span class="line"><b>DAVIDE</b></span><span class="line"><b><span class="accent">VILLANO</span></b></span></h1>
+        </div>
+      </div>
+
+      <p class="home-lead" data-reveal>Spazio di lavoro personale — Bologna. Da qui gestisco il mio calendario, il mio percorso professionale, i miei contatti e la mia wishlist in un unico posto.</p>
+
+      <div class="quick-grid">
+        <div class="quick-card" data-reveal>
+          <span class="qk">Prossimo evento</span>
+          <div class="qv" id="nextEventTitle">Nessun evento in programma</div>
+          <div class="qsub" id="nextEventDate">&nbsp;</div>
+          <button class="go" data-goto="calendario">Apri calendario →</button>
+        </div>
+        <div class="quick-card" data-reveal>
+          <span class="qk">Ruolo attuale</span>
+          <div class="qv">Johns Hopkins University</div>
+          <div class="qsub">Junior IT &amp; Multimedia Assistant</div>
+          <button class="go" data-goto="percorso">Vedi percorso →</button>
+        </div>
+        <div class="quick-card" data-reveal>
+          <span class="qk">Eventi questo mese</span>
+          <div class="qv" id="monthEventCount">0</div>
+          <div class="qsub" id="monthLabel">&nbsp;</div>
+          <button class="go" data-goto="calendario">Gestisci →</button>
+        </div>
+      </div>
+
+      <div class="marquee" data-reveal>
+        <div class="marquee-track">
+          <span>JavaScript</span><span>Cloudflare Pages</span><span>Supabase</span><span>UI / UX</span><span>Automazione</span><span>Front-end</span>
+          <span>JavaScript</span><span>Cloudflare Pages</span><span>Supabase</span><span>UI / UX</span><span>Automazione</span><span>Front-end</span>
+        </div>
+      </div>
+
+      <div class="status-strip" data-reveal>
+        <span><span class="dot"></span>Bologna, Italia</span>
+        <span><span class="dot"></span>Disponibile per nuove opportunità</span>
+      </div>
+
+      <div class="stats-strip" data-reveal>
+        <div class="stat-box">
+          <div class="stat-num" id="statExperiments">00<span class="accent">+</span></div>
+          <div class="stat-label">Progetti &amp; demo</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">05</div>
+          <div class="stat-label">Moduli attivi</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="statCareer">00</div>
+          <div class="stat-label">Tappe del percorso</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">100<span class="accent">%</span></div>
+          <div class="stat-label">Front-end fatto a mano</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CALENDARIO ============ -->
+  <section class="module" id="mod-calendario" role="tabpanel" aria-labelledby="tab-calendario" tabindex="-1">
+    <div class="page-hero tint-teal" aria-hidden="true">
+      <div class="page-hero-media"><img class="hero-water" src="assets/backgrounds/chrome-liquid.jpg" alt=""></div>
+      <div class="page-hero-tint"></div>
+      <div class="page-hero-glow"></div>
+      <div class="page-hero-grain"></div>
+      <div class="page-hero-vignette"></div>
+      <span class="hero-cross" style="top:28%;left:14%;"></span>
+      <span class="hero-cross" style="top:62%;left:82%;"></span>
+      <span class="page-hero-eyebrow">01 / Modulo</span>
+      <div class="page-hero-word">AGE<span>NDA</span></div>
+    </div>
+    <div class="mod-tag" data-reveal><b>01</b> / Calendario</div>
+    <span class="eyebrow" data-reveal><span class="eb-num">01</span>Modulo calendario</span>
+    <h2 class="sec-title" data-reveal>Agenda personale</h2>
+
+    <div class="cal-layout">
+      <div class="cal-panel">
+        <div class="cal-head">
+          <h3 id="calMonthLabel">—</h3>
+          <div class="cal-head-actions">
+            <input type="file" id="importICSInput" accept=".ics,text/calendar" hidden><button class="export-all-btn" id="importICSBtn" title="Importa eventi da Outlook, Apple Calendar o altri calendari">Importa .ics</button><button class="export-all-btn" id="exportAllBtn" title="Scarica tutti gli eventi come .ics">Esporta mese (.ics)</button>
+            <div class="cal-nav">
+              <button id="prevMonth">‹</button>
+              <button id="nextMonth">›</button>
+            </div>
+          </div>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+      </div>
+
+      <div class="cal-panel day-detail">
+        <span class="dd-date" id="ddDate">SELEZIONA UN GIORNO</span>
+        <h4 id="ddDay">—</h4>
+
+        <div class="ev-row" id="evPickerRow" style="margin-top:.9rem;display:none;">
+          <div>
+            <label for="evPicker">Modifica evento del giorno</label>
+            <select id="evPicker">
+              <option value="">— Nuovo evento —</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="ev-list" id="evList"></div>
+
+        <form class="ev-form" id="evForm">
+          <label for="evTitle">Titolo evento</label>
+          <input type="text" id="evTitle" placeholder="Es. Riunione, calcetto, compleanno..." required>
+          <label for="evDescription">Descrizione</label><textarea id="evDescription" placeholder="Dettagli opzionali..."></textarea>
+          <div class="ev-row"><div><label for="evTime">Ora inizio</label><div class="time-field"><span class="time-ico">⏱</span><select id="evTime"></select></div></div><div><label for="evEndTime">Ora fine</label><div class="time-field"><span class="time-ico">⏱</span><select id="evEndTime"></select></div></div></div>
+          <div class="ev-row"><div><label for="evLocation">Luogo</label><input type="text" id="evLocation" placeholder="Es. Bologna, SAIS..."></div></div>
+          <div class="ev-row"><div><label for="evCategory">Categoria</label><select id="evCategory"><option>Personale</option><option>Lavoro</option><option>Sport</option><option>Studio</option><option>Famiglia</option><option>Viaggio</option><option>Altro</option></select></div><div><label for="evColor">Colore</label><input class="ev-color" type="color" id="evColor" value="#93a8d6"></div></div>
+          <label style="display:flex;gap:8px;align-items:center;margin-top:12px"><input type="checkbox" id="evAllDay"> Tutto il giorno</label>
+          <button type="submit" class="ev-add-btn">+ Aggiungi evento</button>
+        <div id="authMessage" aria-live="polite"></div></form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PERCORSO ============ -->
+  <section class="module" id="mod-percorso" role="tabpanel" aria-labelledby="tab-percorso" tabindex="-1">
+    <div class="page-hero tint-gold" aria-hidden="true">
+      <div class="page-hero-media"><img class="hero-water" src="assets/backgrounds/focus.jpg" alt=""></div>
+      <div class="page-hero-tint"></div>
+      <div class="page-hero-glow"></div>
+      <div class="page-hero-grain"></div>
+      <div class="page-hero-vignette"></div>
+      <span class="hero-cross" style="top:24%;left:20%;"></span>
+      <span class="hero-cross" style="top:58%;left:78%;"></span>
+      <span class="page-hero-eyebrow">02 / Modulo</span>
+      <div class="page-hero-word">FO<span>CUS</span></div>
+    </div>
+    <div class="mod-tag" data-reveal><b>02</b> / Percorso</div>
+    <span class="eyebrow" data-reveal><span class="eb-num">02</span>Percorso professionale</span>
+    <h2 class="sec-title" data-reveal>Esperienza</h2>
+    <p style="color:var(--text-dim); margin-top:1rem; max-width:520px;">Seleziona una voce per accedere ai dettagli. Ogni utente gestisce il proprio percorso.</p>
+
+    <div class="console">
+      <div class="section-menu" id="careerMenu"></div>
+      <div class="ev-form" id="careerFormWrap" style="margin-top:0;padding-top:0;border-top:none;">
+        <h4 style="font-family:var(--font-display);color:var(--ink);margin-bottom:6px;" id="careerFormTitle">Nuova voce del percorso</h4>
+        <form id="careerForm">
+          <label for="crRole">Ruolo / Titolo</label>
+          <input type="text" id="crRole" placeholder="Es. Junior IT Assistant" required>
+          <div class="ev-row">
+            <div><label for="crOrg">Organizzazione</label><input type="text" id="crOrg" placeholder="Es. Johns Hopkins University"></div>
+            <div><label for="crPeriod">Periodo</label><input type="text" id="crPeriod" placeholder="Es. 2024 — oggi"></div>
+          </div>
+          <label for="crDescription">Descrizione</label>
+          <textarea id="crDescription" placeholder="Dettagli, mansioni, contesto..."></textarea>
+          <label for="crOrder">Ordine (opzionale, più basso = più in alto)</label>
+          <input type="number" id="crOrder" placeholder="0">
+          <div class="ev-row" style="margin-top:4px;">
+            <button type="submit" class="ev-add-btn" id="careerSubmitBtn">+ Aggiungi voce</button>
+            <button type="button" class="export-all-btn" id="careerCancelBtn" style="display:none;flex:0 0 auto;">Annulla</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CONTATTI ============ -->
+  <section class="module" id="mod-contatti" role="tabpanel" aria-labelledby="tab-contatti" tabindex="-1">
+    <div class="page-hero tint-crimson" aria-hidden="true">
+      <div class="page-hero-media"><img class="hero-water" src="assets/backgrounds/chrome-figure.jpg" alt=""></div>
+      <div class="page-hero-tint"></div>
+      <div class="page-hero-glow"></div>
+      <div class="page-hero-grain"></div>
+      <div class="page-hero-vignette"></div>
+      <span class="hero-cross" style="top:30%;left:16%;"></span>
+      <span class="hero-cross" style="top:60%;left:80%;"></span>
+      <span class="page-hero-eyebrow">03 / Modulo</span>
+      <div class="page-hero-word">CONTA<span>TTI</span></div>
+    </div>
+    <div class="mod-tag" data-reveal><b>03</b> / Contatti</div>
+    <span class="eyebrow" data-reveal><span class="eb-num">03</span>Comunicazione</span>
+    <h2 class="sec-title" data-reveal>Contatti</h2>
+    <p style="color:var(--text-dim); margin-top:1rem; max-width:520px;">La tua rubrica personale: visibile e modificabile solo da te.</p>
+
+    <div class="console">
+      <div>
+        <div class="ev-list" id="contactList" style="max-height:none;"></div>
+        <div class="ev-empty" id="contactEmpty" style="display:none;">Nessun contatto salvato.</div>
+      </div>
+      <div class="ev-form" id="contactFormWrap" style="margin-top:0;padding-top:0;border-top:none;">
+        <h4 style="font-family:var(--font-display);color:var(--ink);margin-bottom:6px;" id="contactFormTitle">Nuovo contatto</h4>
+        <form id="contactForm">
+          <label for="ctEmail">Email</label>
+          <input type="email" id="ctEmail" placeholder="nome@email.com">
+          <label for="ctPhone">Telefono</label>
+          <input type="tel" id="ctPhone" placeholder="Es. 347 935 5279">
+          <div class="ev-row" style="margin-top:4px;">
+            <button type="submit" class="ev-add-btn" id="contactSubmitBtn">+ Aggiungi contatto</button>
+            <button type="button" class="export-all-btn" id="contactCancelBtn" style="display:none;flex:0 0 auto;">Annulla</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WISHLIST ============ -->
+  <section class="module" id="mod-wishlist" role="tabpanel" aria-labelledby="tab-wishlist" tabindex="-1">
+    <div class="page-hero tint-sunset" aria-hidden="true">
+      <div class="page-hero-media"><img class="hero-water" src="assets/backgrounds/statue-cosmic.jpg" alt=""></div>
+      <div class="page-hero-tint"></div>
+      <div class="page-hero-glow"></div>
+      <div class="page-hero-grain"></div>
+      <div class="page-hero-vignette"></div>
+      <span class="hero-cross" style="top:26%;left:18%;"></span>
+      <span class="hero-cross" style="top:64%;left:76%;"></span>
+      <span class="page-hero-eyebrow">04 / Modulo</span>
+      <div class="page-hero-word">WISH<span>LIST</span></div>
+    </div>
+    <div class="mod-tag" data-reveal><b>04</b> / Wishlist</div>
+    <span class="eyebrow" data-reveal><span class="eb-num">04</span>Shopping cross-sito</span>
+    <h2 class="sec-title" data-reveal>Wishlist</h2>
+    <p style="color:var(--text-dim); margin-top:1rem; max-width:560px;">Incolla il link di un prodotto da qualsiasi sito: provo a leggerne titolo, immagine e prezzo automaticamente. Seleziona "Nel carrello" per calcolare il totale di ciò che vuoi comprare adesso.</p>
+
+    <div class="wl-summary">
+      <div class="wl-summary-box">
+        <span class="qk">Totale wishlist</span>
+        <div class="qv" id="wlTotalAll">€0,00</div>
+        <div class="qsub"><span id="wlCountAll">0</span> prodotti salvati</div>
+      </div>
+      <div class="wl-summary-box accent">
+        <span class="qk">Totale carrello</span>
+        <div class="qv" id="wlTotalCart">€0,00</div>
+        <div class="qsub"><span id="wlCountCart">0</span> selezionati</div>
+      </div>
+    </div>
+
+    <div class="console">
+      <div>
+        <div class="wl-grid" id="wlGrid"></div>
+        <div class="ev-empty" id="wlEmpty" style="display:none;">Nessun prodotto in wishlist. Aggiungine uno dal modulo qui a fianco.</div>
+      </div>
+      <div class="ev-form" id="wlFormWrap" style="margin-top:0;padding-top:0;border-top:none;">
+        <h4 style="font-family:var(--font-display);color:var(--ink);margin-bottom:6px;" id="wlFormTitle">Nuovo prodotto</h4>
+
+        <label for="wlUrlInput">Link del prodotto (Amazon, Zalando, qualsiasi sito...)</label>
+        <div class="ev-row" style="align-items:flex-end;">
+          <input type="url" id="wlUrlInput" placeholder="https://...">
+          <button type="button" class="export-all-btn" id="wlAnalyzeBtn" style="flex:0 0 auto;">Analizza link</button>
+        </div>
+        <div id="wlAnalyzeMsg" class="ev-meta"></div>
+
+        <form id="wlForm" style="margin-top:14px;">
+          <label for="wlTitle">Nome prodotto</label>
+          <input type="text" id="wlTitle" placeholder="Es. Cuffie wireless XYZ" required>
+          <div class="ev-row">
+            <div><label for="wlPrice">Prezzo</label><input type="text" inputmode="decimal" id="wlPrice" placeholder="Es. 49.90"></div>
+            <div><label for="wlCurrency">Valuta</label><select id="wlCurrency"><option value="EUR">EUR €</option><option value="USD">USD $</option><option value="GBP">GBP £</option></select></div>
+          </div>
+          <label for="wlImage">URL immagine (opzionale)</label>
+          <input type="url" id="wlImage" placeholder="https://...">
+          <label for="wlProductUrl">Link al prodotto</label>
+          <input type="url" id="wlProductUrl" placeholder="https://...">
+          <div class="ev-row">
+            <div><label for="wlSite">Sito / Negozio</label><input type="text" id="wlSite" placeholder="Es. Amazon"></div>
+            <div><label for="wlCategory">Categoria</label><input type="text" id="wlCategory" placeholder="Es. Tech, Regali..."></div>
+          </div>
+          <label for="wlNotes">Note</label>
+          <textarea id="wlNotes" placeholder="Taglia, colore, per chi è..."></textarea>
+          <div class="ev-row" style="margin-top:4px;">
+            <button type="submit" class="ev-add-btn" id="wlSubmitBtn">+ Aggiungi alla wishlist</button>
+            <button type="button" class="export-all-btn" id="wlCancelBtn" style="display:none;flex:0 0 auto;">Annulla</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SPESE ============ -->
+  <section class="module" id="mod-spese" role="tabpanel" aria-labelledby="tab-spese" tabindex="-1">
+    <div class="page-hero tint-jade" aria-hidden="true">
+      <div class="page-hero-media"><img class="hero-water" src="assets/backgrounds/chrome-liquid.jpg" alt=""></div>
+      <div class="page-hero-tint"></div>
+      <div class="page-hero-glow"></div>
+      <div class="page-hero-grain"></div>
+      <div class="page-hero-vignette"></div>
+      <span class="hero-cross" style="top:30%;left:20%;"></span>
+      <span class="hero-cross" style="top:62%;left:78%;"></span>
+      <span class="page-hero-eyebrow">05 / Modulo</span>
+      <div class="page-hero-word">SPE<span>SE</span></div>
+    </div>
+    <div class="mod-tag" data-reveal><b>05</b> / Spese</div>
+    <span class="eyebrow" data-reveal><span class="eb-num">05</span>Bilancio personale</span>
+    <h2 class="sec-title" data-reveal>Spese</h2>
+    <p style="color:var(--text-dim); margin-top:1rem; max-width:560px;">Segna ogni spesa con importo, categoria e data: qui sotto trovi il totale del mese in corso (navigabile) e il totale complessivo, con il dettaglio per categoria.</p>
+
+    <div class="wl-summary">
+      <div class="wl-summary-box">
+        <span class="qk">Totale del mese</span>
+        <div class="qv" id="spMonthTotal">€0,00</div>
+        <div class="qsub"><span id="spMonthCount">0</span> spese</div>
+      </div>
+      <div class="wl-summary-box accent">
+        <span class="qk">Totale complessivo</span>
+        <div class="qv" id="spAllTotal">€0,00</div>
+        <div class="qsub"><span id="spAllCount">0</span> spese registrate</div>
+      </div>
+    </div>
+
+    <div class="sp-cat-breakdown" id="spCatBreakdown"></div>
+
+    <div class="console">
+      <div>
+        <div class="sp-month-nav">
+          <button type="button" class="carousel-arrow" id="spPrevMonth" aria-label="Mese precedente"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <span id="spMonthLabel" class="sp-month-label"></span>
+          <button type="button" class="carousel-arrow" id="spNextMonth" aria-label="Mese successivo"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+          <button type="button" class="export-all-btn" id="spTodayMonth" style="margin-left:auto;">Mese corrente</button>
+        </div>
+        <div class="ev-list" id="spList" style="max-height:none;"></div>
+        <div class="ev-empty" id="spEmpty" style="display:none;">Nessuna spesa in questo mese.</div>
+      </div>
+      <div class="ev-form" id="spFormWrap" style="margin-top:0;padding-top:0;border-top:none;">
+        <h4 style="font-family:var(--font-display);color:var(--ink);margin-bottom:6px;" id="spFormTitle">Nuova spesa</h4>
+        <form id="spForm">
+          <label for="spDescription">Descrizione</label>
+          <input type="text" id="spDescription" placeholder="Es. Spesa al supermercato" required>
+          <div class="ev-row">
+            <div><label for="spAmount">Importo (€)</label><input type="text" inputmode="decimal" id="spAmount" placeholder="Es. 24.50" required></div>
+            <div><label for="spCategory">Categoria</label>
+              <select id="spCategory">
+                <option>Cibo</option>
+                <option>Trasporti</option>
+                <option>Casa</option>
+                <option>Salute</option>
+                <option>Svago</option>
+                <option>Abbonamenti</option>
+                <option selected>Altro</option>
+              </select>
+            </div>
+          </div>
+          <label for="spDate">Data</label>
+          <input type="date" id="spDate">
+          <label for="spNotes">Note (opzionale)</label>
+          <textarea id="spNotes" placeholder="Dettagli aggiuntivi..."></textarea>
+          <div class="ev-row" style="margin-top:4px;">
+            <button type="submit" class="ev-add-btn" id="spSubmitBtn">+ Aggiungi spesa</button>
+            <button type="button" class="export-all-btn" id="spCancelBtn" style="display:none;flex:0 0 auto;">Annulla</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PROGETTI / DEMO TECNICHE ============ -->
+  <section class="module" id="mod-esperimenti" role="tabpanel" aria-labelledby="tab-esperimenti" tabindex="-1">
+    <div class="page-hero tint-slate" aria-hidden="true">
+      <div class="page-hero-media"><img class="hero-water" src="assets/backgrounds/chrome-figure.jpg" alt=""></div>
+      <div class="page-hero-tint"></div>
+      <div class="page-hero-glow"></div>
+      <div class="page-hero-grain"></div>
+      <div class="page-hero-vignette"></div>
+      <span class="hero-cross" style="top:32%;left:22%;"></span>
+      <span class="hero-cross" style="top:56%;left:74%;"></span>
+      <span class="page-hero-eyebrow">06 / Modulo</span>
+      <div class="page-hero-word">PROGE<span>TTI</span></div>
+    </div>
+    <div class="mod-tag" data-reveal><b>06</b> / Progetti</div>
+    <span class="eyebrow" data-reveal><span class="eb-num">06</span>Laboratorio</span>
+    <h2 class="sec-title" data-reveal>Progetti &amp; demo tecniche</h2>
+    <p style="color:var(--text-dim); margin-top:1rem; max-width:560px;">Piccoli progetti realizzati per esercitarmi con diverse tecnologie front-end. Si aprono in una nuova scheda.</p>
+
+    <div class="carousel-wrap">
+    <div class="carousel-track" data-reveal>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Wiki Searcher</div>
+        <div class="qsub">Motore di ricerca su Wikipedia in JavaScript</div>
+        <a class="go" href="experiments/wiki-searcher.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Pass Generator</div>
+        <div class="qsub">Generatore di password personalizzabile</div>
+        <a class="go" href="experiments/pass-generator.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Flip a Coin</div>
+        <div class="qsub">Testa o croce, animato in 3D</div>
+        <a class="go" href="experiments/flip-coin.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">QR Code Generator</div>
+        <div class="qsub">Generatore di codici QR personalizzabili</div>
+        <a class="go" href="experiments/qr-generator.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Sasso Carta Forbici</div>
+        <div class="qsub">Sfida il computer, al meglio di 3</div>
+        <a class="go" href="experiments/sasso-carta-forbici.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Dado Fortunato</div>
+        <div class="qsub">Lancio del dado con statistiche in tempo reale</div>
+        <a class="go" href="experiments/dado-fortunato.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Quiz Lampo</div>
+        <div class="qsub">Mini quiz a risposta multipla</div>
+        <a class="go" href="experiments/quiz-lampo.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Sfera Magica</div>
+        <div class="qsub">Fai una domanda, tocca la sfera</div>
+        <a class="go" href="experiments/sfera-magica.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Palette Generator</div>
+        <div class="qsub">Genera e copia palette di colori</div>
+        <a class="go" href="experiments/palette-generator.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Snake</div>
+        <div class="qsub">Il classico arcade, in stile retro</div>
+        <a class="go" href="experiments/snake.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Fuochi d'Artificio</div>
+        <div class="qsub">Spettacolo pirotecnico interattivo</div>
+        <a class="go" href="experiments/fuochi-artificio.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Universo 3D</div>
+        <div class="qsub">Campo stellare esplorabile in 3D con audio ambientale</div>
+        <a class="go" href="experiments/universo.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Cosmo Explorer</div>
+        <div class="qsub">Galassie e buchi neri 3D, dalla Via Lattea al Sistema Solare</div>
+        <a class="go" href="experiments/cosmo-explorer.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Atlante delle Meraviglie</div>
+        <div class="qsub">Mappa interattiva delle 8 meraviglie del mondo</div>
+        <a class="go" href="experiments/meraviglie-mondo.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Piano Virtuale</div>
+        <div class="qsub">Suona con mouse o tastiera, tre timbri diversi</div>
+        <a class="go" href="experiments/piano-virtuale.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Generatore di Nomi Fantasy</div>
+        <div class="qsub">Nomi ed epiteti per elfi, nani, orchi e draghi</div>
+        <a class="go" href="experiments/generatore-nomi.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Serie A Live</div>
+        <div class="qsub">Classifica aggiornata e risultati/prossime partite del campionato</div>
+        <a class="go" href="experiments/serie-a.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Meteo Radar</div>
+        <div class="qsub">Cerca una città: meteo attuale e previsioni a 6 giorni</div>
+        <a class="go" href="experiments/meteo-radar.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Cosa sono le Outer Banks</div>
+        <div class="qsub">Scena 3D interattiva: oceano, boe e bussola spiegano il tema del sito</div>
+        <a class="go" href="experiments/outer-banks.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Outer Banks — la serie</div>
+        <div class="qsub">Mappa 3D di Kildare Island: The Cut, Figure Eight, ciurma e trama</div>
+        <a class="go" href="experiments/outer-banks-serie.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Oracolo IA</div>
+        <div class="qsub">Fai una domanda a una vera intelligenza artificiale</div>
+        <a class="go" href="experiments/oracolo-ai.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+      <div class="quick-card">
+        <span class="qk">Demo</span>
+        <div class="qv">Scroll Infinito</div>
+        <div class="qsub">Una pagina lunga da scorrere fino in fondo, con effetti speciali</div>
+        <a class="go" href="experiments/scroll-infinito.html" target="_blank" rel="noopener">Apri →</a>
+      </div>
+    </div>
+    <div class="carousel-nav">
+      <div class="carousel-dots" id="carouselDots"></div>
+      <button class="carousel-arrow prev" type="button" aria-label="Precedente"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <button class="carousel-arrow next" type="button" aria-label="Successivo"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+    </div>
+    </div>
+  </section>
+
+</main>
+
+<div style="display:flex;justify-content:flex-end;gap:10px;padding:0 5vw">
+  <button id="logoutBtn" class="logout-btn" type="button" style="display:none">Esci</button>
+</div>
+<footer>
+  <div class="footer-cta">
+    <span class="eyebrow"><span class="eb-num">07</span>Contatti</span>
+    <h2>Parliamo<br>del prossimo passo</h2>
+    <button class="go-btn" type="button" data-goto="contatti">Apri i miei contatti →</button>
+  </div>
+  <div class="footer-fine">
+    <span>© 2026 Davide Villano</span>
+    <span>Bologna, Italia</span>
+    <a href="privacy.html">Privacy &amp; Cookie Policy</a>
+  </div>
+</footer>
+
+<script src="js/config.js"></script>
+<script src="js/toast.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ui-core.js"></script>
+<script src="js/calendar.js"></script>
+<script src="js/career.js"></script>
+<script src="js/contacts.js"></script>
+<script src="js/wishlist.js"></script>
+<script src="js/spese.js"></script>
+<script src="js/ics.js"></script>
+<script src="js/search.js"></script>
+<script src="js/init.js"></script>
+<script src="js/theme.js"></script>
+<script src="js/motion.js"></script>
+<script src="js/music.js"></script>
+
+<script>
+// Registra il service worker per rendere l'app installabile e usabile offline.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('service-worker.js').catch(function(err){
+      console.warn('Service worker non registrato:', err);
+    });
+  });
+}
+</script>
+
+</body>
+</html>
