@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atlante delle Meraviglie</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=Space+Mono:wght@400;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Space Mono',monospace;}
+html,body{height:100%;overflow:hidden;background:#0b1620;}
+#map{position:fixed;inset:0;z-index:1;filter:saturate(.85) brightness(.92);}
+
+.leaflet-control-attribution{background:rgba(11,22,32,.75)!important;color:#8fa7a0!important;font-size:9px!important;backdrop-filter:blur(4px);}
+.leaflet-control-attribution a{color:#c9a24b!important;}
+.leaflet-control-zoom{border:1px solid rgba(201,162,75,.35)!important;}
+.leaflet-control-zoom a{background:rgba(11,22,32,.85)!important;color:#c9a24b!important;border-color:rgba(201,162,75,.25)!important;}
+.leaflet-control-zoom a:hover{background:rgba(201,162,75,.2)!important;}
+
+.back-link{position:fixed;top:14px;left:14px;font-size:13px;color:#eef4f1;text-decoration:none;font-weight:700;background:rgba(11,22,32,.72);border:1px solid rgba(201,162,75,.35);padding:9px 15px;border-radius:20px;transition:all .25s;backdrop-filter:blur(6px);z-index:30;}
+.back-link:hover{background:rgba(201,162,75,.18);border-color:#c9a24b;}
+
+/* ---------- header card ---------- */
+.header-card{
+  position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:30;text-align:center;
+  background:rgba(11,22,32,.72);border:1px solid rgba(201,162,75,.35);border-radius:16px;
+  padding:12px 26px 13px;backdrop-filter:blur(8px);box-shadow:0 10px 30px rgba(0,0,0,.35);
+  max-width:88vw;
+}
+.header-card h1{font-family:'Fraunces',serif;font-weight:800;font-size:1.15rem;color:#eef4f1;letter-spacing:.01em;}
+.header-card p{font-size:.66rem;color:#8fa7a0;letter-spacing:.08em;text-transform:uppercase;margin-top:3px;}
+
+/* ---------- compass signature (decorative, top-right) ---------- */
+.compass{position:fixed;top:16px;right:16px;width:58px;height:58px;z-index:30;opacity:.9;filter:drop-shadow(0 4px 10px rgba(0,0,0,.4));animation:compassSpin 40s linear infinite;}
+@keyframes compassSpin{to{transform:rotate(360deg);}}
+
+/* ---------- legend counter ---------- */
+.legend{
+  position:fixed;bottom:16px;left:16px;z-index:30;background:rgba(11,22,32,.72);border:1px solid rgba(201,162,75,.3);
+  border-radius:12px;padding:10px 15px;color:#c8d6d1;font-size:11px;letter-spacing:.05em;backdrop-filter:blur(6px);
+}
+.legend b{color:#c9a24b;}
+
+/* ---------- custom marker ---------- */
+.wonder-pin{
+  width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe6ad,#c9a24b 60%,#8a6a24);
+  border:2px solid #eef4f1;box-shadow:0 0 0 4px rgba(201,162,75,.22),0 3px 10px rgba(0,0,0,.5);cursor:pointer;transition:transform .2s;
+}
+.wonder-pin:hover{transform:scale(1.25);}
+.wonder-pin.seen{background:radial-gradient(circle at 35% 30%,#bff5e8,#2f9c86 60%,#136354);}
+
+/* ---------- info card (bottom sheet on mobile / side card desktop) ---------- */
+#infoCard{
+  position:fixed;z-index:40;left:50%;bottom:0;transform:translate(-50%,110%);
+  width:min(430px,94vw);max-height:72vh;overflow-y:auto;
+  background:linear-gradient(165deg,rgba(15,32,39,.97),rgba(9,18,23,.98));
+  border:1px solid rgba(201,162,75,.4);border-radius:20px 20px 0 0;padding:26px 26px 30px;
+  box-shadow:0 -20px 60px rgba(0,0,0,.5);transition:transform .45s cubic-bezier(.2,.8,.2,1);
+}
+#infoCard.open{transform:translate(-50%,0);}
+#infoCard .close-btn{position:absolute;top:14px;right:16px;background:none;border:1px solid rgba(201,162,75,.35);color:#eef4f1;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:13px;}
+#infoCard .close-btn:hover{background:rgba(201,162,75,.15);}
+#infoCard .ic-emoji{font-size:2.6rem;line-height:1;}
+#infoCard .ic-kicker{font-size:.66rem;color:#c9a24b;letter-spacing:.16em;text-transform:uppercase;font-weight:700;margin-top:12px;}
+#infoCard h2{font-family:'Fraunces',serif;font-weight:800;font-size:1.55rem;color:#eef4f1;margin-top:6px;line-height:1.2;}
+#infoCard .ic-loc{color:#8fa7a0;font-size:.78rem;margin-top:5px;letter-spacing:.03em;}
+#infoCard .ic-stats{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:18px 0;}
+#infoCard .ic-stat{background:rgba(201,162,75,.07);border:1px solid rgba(201,162,75,.18);border-radius:9px;padding:9px 11px;}
+#infoCard .ic-stat b{display:block;color:#e8c672;font-size:.86rem;}
+#infoCard .ic-stat span{display:block;color:#8fa7a0;font-size:.6rem;text-transform:uppercase;letter-spacing:.06em;margin-top:2px;}
+#infoCard p.ic-desc{color:#cfe0da;font-size:.87rem;line-height:1.65;margin-top:4px;}
+
+@media(min-width:760px){
+  #infoCard{left:auto;right:22px;bottom:22px;top:auto;transform:translateX(120%);border-radius:18px;width:380px;}
+  #infoCard.open{transform:translateX(0);}
+}
+
+.hint{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);color:rgba(238,244,241,.45);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;z-index:25;text-align:center;pointer-events:none;transition:opacity 1s;}
+@media(min-width:760px){.hint{bottom:20px;}}
+@media(max-width:759px){.legend{display:none;}}
+</style>
+</head>
+<body>
+<a class="back-link" href="../index.html" onclick="if(window.history.length>1){history.back();return false;}">← Indietro</a>
+
+<div class="header-card">
+  <h1>Atlante delle Meraviglie</h1>
+  <p>8 luoghi straordinari · clicca un punto dorato sulla mappa</p>
+</div>
+
+<svg class="compass" viewBox="0 0 100 100">
+  <circle cx="50" cy="50" r="46" fill="none" stroke="#c9a24b" stroke-width="1.5" opacity=".55"/>
+  <circle cx="50" cy="50" r="36" fill="none" stroke="#c9a24b" stroke-width="1" opacity=".35"/>
+  <path d="M50 8 L56 48 L50 92 L44 48 Z" fill="#c9a24b" opacity=".9"/>
+  <path d="M8 50 L48 44 L92 50 L48 56 Z" fill="#eef4f1" opacity=".5"/>
+  <circle cx="50" cy="50" r="4" fill="#eef4f1"/>
+  <text x="50" y="20" text-anchor="middle" fill="#eef4f1" font-size="9" font-weight="700">N</text>
+</svg>
+
+<div class="legend" id="legend">SCOPERTE: <b id="seenCount">0</b> / 8</div>
+
+<div id="map"></div>
+<div class="hint" id="hint">trascina per esplorare la mappa · scorri per zoomare</div>
+
+<div id="infoCard">
+  <button class="close-btn" id="closeCard">✕</button>
+  <div class="ic-emoji" id="icEmoji">🏛️</div>
+  <div class="ic-kicker" id="icKicker">MERAVIGLIA</div>
+  <h2 id="icTitle">—</h2>
+  <div class="ic-loc" id="icLoc">—</div>
+  <div class="ic-stats" id="icStats"></div>
+  <p class="ic-desc" id="icDesc"></p>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const wonders = [
+  {
+    name: 'Colosseo', country: 'Roma, Italia', lat: 41.8902, lng: 12.4922, emoji: '🏛️',
+    kicker: 'ANFITEATRO ROMANO — 80 D.C.',
+    stats: [['🏗️ Costruito', '70-80 d.C.'], ['👥 Capienza', '~50.000 spettatori'], ['📏 Altezza', '48 metri'], ['🏆 Status', 'Patrimonio UNESCO']],
+    desc: 'Il più grande anfiteatro mai costruito dall\'Impero Romano, ospitava combattimenti tra gladiatori e spettacoli pubblici davanti a decine di migliaia di spettatori. Oggi è il monumento più visitato d\'Italia.'
+  },
+  {
+    name: 'Petra', country: 'Ma\'an, Giordania', lat: 30.3285, lng: 35.4444, emoji: '🏜️',
+    kicker: 'CITTÀ SCAVATA NELLA ROCCIA — IV SEC. A.C.',
+    stats: [['🏗️ Fondata', 'circa 312 a.C.'], ['👥 Popolo', 'Nabatei'], ['🎨 Materiale', 'Arenaria rosa'], ['🏆 Status', 'Patrimonio UNESCO']],
+    desc: 'Antica capitale del regno dei Nabatei, scolpita direttamente nelle pareti di arenaria rosa del deserto. Vi si accede attraverso il Siq, uno stretto canyon lungo oltre un chilometro.'
+  },
+  {
+    name: 'Cristo Redentore', country: 'Rio de Janeiro, Brasile', lat: -22.9519, lng: -43.2105, emoji: '⛰️',
+    kicker: 'STATUA MONUMENTALE — 1931',
+    stats: [['📏 Altezza', '38 metri'], ['⛰️ Sul monte', 'Corcovado (710 m)'], ['⚖️ Peso', '~635 tonnellate'], ['🏗️ Inaugurata', '1931']],
+    desc: 'Simbolo di Rio de Janeiro, domina la città dalla cima del monte Corcovado con le braccia aperte in un gesto di accoglienza. È una delle statue Art Déco più grandi al mondo.'
+  },
+  {
+    name: 'Machu Picchu', country: 'Regione di Cusco, Perù', lat: -13.1631, lng: -72.5450, emoji: '🏔️',
+    kicker: 'CITTADELLA INCA — XV SECOLO',
+    stats: [['🏗️ Costruita', 'circa 1450'], ['⛰️ Altitudine', '~2.430 m'], ['👥 Popolo', 'Impero Inca'], ['🏆 Status', 'Patrimonio UNESCO']],
+    desc: 'Cittadella inca costruita sulla cresta di una montagna tra le Ande, rimasta sconosciuta al mondo occidentale fino al 1911. Un capolavoro di architettura e ingegneria integrata al paesaggio.'
+  },
+  {
+    name: 'Chichén Itzá', country: 'Yucatán, Messico', lat: 20.6843, lng: -88.5678, emoji: '🔺',
+    kicker: 'CITTÀ MAYA — PIRAMIDE DI KUKULCÁN',
+    stats: [['🏗️ Costruita', 'circa 600-900 d.C.'], ['👥 Popolo', 'Maya'], ['📐 Piramide', '24 metri, 365 gradini'], ['🏆 Status', 'Patrimonio UNESCO']],
+    desc: 'Una delle più importanti città Maya, dominata dalla piramide di Kukulcán: durante gli equinozi, un gioco d\'ombre sui gradini crea l\'illusione di un serpente che scende lungo la struttura.'
+  },
+  {
+    name: 'Grande Muraglia Cinese', country: 'Cina settentrionale', lat: 40.4319, lng: 116.5704, emoji: '🧱',
+    kicker: 'FORTIFICAZIONE — SECOLI DI COSTRUZIONE',
+    stats: [['📏 Lunghezza', '~21.000 km totali'], ['🏗️ Iniziata', 'VII secolo a.C.'], ['👥 Scopo', 'Difesa dei confini'], ['🏆 Status', 'Patrimonio UNESCO']],
+    desc: 'Un sistema di fortificazioni costruito e ampliato nel corso di secoli da diverse dinastie cinesi per proteggere i confini settentrionali. È una delle opere di ingegneria più estese mai realizzate.'
+  },
+  {
+    name: 'Taj Mahal', country: 'Agra, India', lat: 27.1751, lng: 78.0421, emoji: '🕌',
+    kicker: 'MAUSOLEO IN MARMO BIANCO — 1653',
+    stats: [['🏗️ Completato', '1653'], ['👤 Voluto da', 'Shah Jahan'], ['🎨 Materiale', 'Marmo bianco'], ['🏆 Status', 'Patrimonio UNESCO']],
+    desc: 'Mausoleo fatto costruire dall\'imperatore Moghul Shah Jahan in memoria della moglie Mumtaz Mahal. Considerato un capolavoro dell\'architettura Moghul, simboleggia amore eterno.'
+  },
+  {
+    name: 'Piramidi di Giza', country: 'Giza, Egitto', lat: 29.9792, lng: 31.1342, emoji: '🔻',
+    kicker: 'NECROPOLI FARAONICA — MEMBRO ONORARIO',
+    stats: [['🏗️ Costruita', 'circa 2560 a.C.'], ['📏 Grande Piramide', '~146,6 m (originale)'], ['👤 Faraone', 'Cheope'], ['🏆 Status', 'Unica meraviglia antica superstite']],
+    desc: 'L\'unica delle Sette Meraviglie del Mondo Antico giunta fino a noi quasi intatta. La Grande Piramide di Cheope rimase l\'edificio più alto costruito dall\'uomo per oltre 3.800 anni.'
+  }
+];
+
+const map = L.map('map', { zoomControl: true, worldCopyJump: true, minZoom: 2 }).setView([18, 12], 2.3);
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; OpenStreetMap &copy; CARTO',
+  subdomains: 'abcd',
+  maxZoom: 18
+}).addTo(map);
+
+const seenCountEl = document.getElementById('seenCount');
+const infoCard = document.getElementById('infoCard');
+const hint = document.getElementById('hint');
+const seen = new Set();
+const markerEls = {};
+
+function openCard(w) {
+  document.getElementById('icEmoji').textContent = w.emoji;
+  document.getElementById('icKicker').textContent = w.kicker;
+  document.getElementById('icTitle').textContent = w.name;
+  document.getElementById('icLoc').textContent = w.country;
+  document.getElementById('icDesc').textContent = w.desc;
+  const statsEl = document.getElementById('icStats');
+  statsEl.innerHTML = '';
+  w.stats.forEach(([label, val]) => {
+    const el = document.createElement('div');
+    el.className = 'ic-stat';
+    el.innerHTML = `<b>${val}</b><span>${label}</span>`;
+    statsEl.appendChild(el);
+  });
+  infoCard.classList.add('open');
+  hint.style.opacity = '0';
+  if (!seen.has(w.name)) {
+    seen.add(w.name);
+    seenCountEl.textContent = seen.size;
+    if (markerEls[w.name]) markerEls[w.name].classList.add('seen');
+  }
+}
+document.getElementById('closeCard').addEventListener('click', () => infoCard.classList.remove('open'));
+
+wonders.forEach(w => {
+  const icon = L.divIcon({ className: '', html: `<div class="wonder-pin" title="${w.name}"></div>`, iconSize: [16, 16] });
+  const marker = L.marker([w.lat, w.lng], { icon }).addTo(map);
+  marker.on('click', () => openCard(w));
+  marker.on('add', () => {
+    const el = marker.getElement();
+    if (el) markerEls[w.name] = el.querySelector('.wonder-pin');
+  });
+});
+
+setTimeout(() => { if (!infoCard.classList.contains('open')) hint.style.opacity = '0'; }, 7000);
+</script>
+</body>
+</html>
