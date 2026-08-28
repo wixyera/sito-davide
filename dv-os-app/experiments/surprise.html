@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>???</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;background:#07030f;font-family:'Space Mono',monospace;}
+canvas{display:block;position:fixed;inset:0;}
+.back-link{position:fixed;top:14px;left:14px;font-size:12px;color:#e8b4ff;text-decoration:none;font-weight:700;background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.35);padding:8px 14px;border-radius:20px;z-index:10;letter-spacing:.05em;backdrop-filter:blur(6px);transition:all .25s;}
+.back-link:hover{background:rgba(168,85,247,.25);border-color:#e879f9;}
+
+.hint{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);color:rgba(232,180,255,.35);font-size:11px;letter-spacing:.12em;text-transform:uppercase;z-index:10;text-align:center;pointer-events:none;transition:opacity 1s;}
+
+.secret{
+  position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+  color:#fff; font-size:clamp(20px,4vw,42px); font-weight:700; letter-spacing:.08em;
+  text-align:center; opacity:0; pointer-events:none; z-index:9;
+  text-shadow:0 0 24px rgba(232,121,249,.8), 0 0 60px rgba(168,85,247,.6);
+  transition:opacity 2s ease;
+}
+.secret.show{opacity:1;}
+.secret span{display:block;font-size:.35em;color:#67e8f9;letter-spacing:.25em;margin-top:14px;font-weight:400;}
+
+.counter{position:fixed;top:14px;right:14px;color:rgba(232,180,255,.5);font-size:11px;letter-spacing:.08em;z-index:10;text-align:right;line-height:1.6;}
+.counter b{color:#e879f9;}
+</style>
+</head>
+<body>
+<a class="back-link" href="../index.html" onclick="if(window.history.length>1){history.back();return false;}">← Indietro</a>
+<div class="counter">PARTICELLE ATTIVE: <b id="pCount">0</b><br>CLIC REGISTRATI: <b id="cCount">0</b></div>
+<canvas id="c"></canvas>
+<div class="secret" id="secret">CIAO, DAVIDE<span>QUESTO ESPERIMENTO ESISTE SOLO PERCHÉ TI PIACEVA GIOCARE CON LE PARTICELLE</span></div>
+<div class="hint" id="hint">muovi il mouse • clicca per esplodere • aspetta un po'</div>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let W, H;
+function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
+resize();
+addEventListener('resize', resize);
+
+const palette = ['#a855f7', '#e879f9', '#67e8f9', '#f472b6', '#c084fc'];
+const mouse = { x: W / 2, y: H / 2, active: false };
+let clicks = 0;
+let idleTimer = 0;
+const secretEl = document.getElementById('secret');
+const hintEl = document.getElementById('hint');
+const pCountEl = document.getElementById('pCount');
+const cCountEl = document.getElementById('cCount');
+
+class Particle {
+  constructor(burst) {
+    this.reset(burst);
+  }
+  reset(burst) {
+    if (burst) {
+      this.x = mouse.x; this.y = mouse.y;
+      const a = Math.random() * Math.PI * 2, sp = Math.random() * 6 + 2;
+      this.vx = Math.cos(a) * sp; this.vy = Math.sin(a) * sp;
+      this.life = 1; this.decay = 0.008 + Math.random() * 0.01;
+      this.burstParticle = true;
+    } else {
+      this.x = Math.random() * W; this.y = Math.random() * H;
+      this.vx = (Math.random() - 0.5) * 0.35; this.vy = (Math.random() - 0.5) * 0.35;
+      this.life = 1; this.decay = 0; this.burstParticle = false;
+    }
+    this.r = Math.random() * 1.6 + 0.6;
+    this.color = palette[Math.floor(Math.random() * palette.length)];
+  }
+  update() {
+    if (mouse.active && !this.burstParticle) {
+      const dx = this.x - mouse.x, dy = this.y - mouse.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist < 140) {
+        const force = (140 - dist) / 140 * 0.55;
+        this.vx += (dx / dist) * force;
+        this.vy += (dy / dist) * force;
+      }
+    }
+    this.x += this.vx; this.y += this.vy;
+    this.vx *= 0.98; this.vy *= 0.98;
+    if (this.burstParticle) {
+      this.life -= this.decay;
+    } else {
+      if (this.x < 0) this.x = W; if (this.x > W) this.x = 0;
+      if (this.y < 0) this.y = H; if (this.y > H) this.y = 0;
+    }
+  }
+  draw() {
+    ctx.globalAlpha = this.burstParticle ? Math.max(this.life, 0) : 0.85;
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+const N = Math.min(140, Math.floor((W * H) / 9000));
+let particles = Array.from({ length: N }, () => new Particle(false));
+let bursts = [];
+
+function burstAt() {
+  for (let i = 0; i < 40; i++) bursts.push(new Particle(true));
+  if (bursts.length > 400) bursts.splice(0, bursts.length - 400);
+}
+
+canvas.addEventListener('mousemove', e => {
+  mouse.x = e.clientX; mouse.y = e.clientY; mouse.active = true;
+  idleTimer = 0; hideSecret();
+});
+canvas.addEventListener('mouseleave', () => mouse.active = false);
+canvas.addEventListener('click', e => {
+  mouse.x = e.clientX; mouse.y = e.clientY;
+  burstAt();
+  clicks++; cCountEl.textContent = clicks;
+  idleTimer = 0; hideSecret();
+});
+canvas.addEventListener('touchmove', e => {
+  const t = e.touches[0];
+  mouse.x = t.clientX; mouse.y = t.clientY; mouse.active = true;
+  idleTimer = 0; hideSecret();
+}, { passive: true });
+canvas.addEventListener('touchstart', e => {
+  const t = e.touches[0];
+  mouse.x = t.clientX; mouse.y = t.clientY;
+  burstAt();
+  clicks++; cCountEl.textContent = clicks;
+}, { passive: true });
+
+let secretShown = false;
+function hideSecret() {
+  if (secretShown) { secretEl.classList.remove('show'); secretShown = false; }
+}
+
+function connectLines() {
+  ctx.globalAlpha = 1;
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
+      const dist = Math.hypot(dx, dy);
+      if (dist < 110) {
+        ctx.strokeStyle = `rgba(168,85,247,${(1 - dist / 110) * 0.35})`;
+        ctx.lineWidth = 0.6;
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.stroke();
+      }
+    }
+  }
+}
+
+function loop() {
+  ctx.fillStyle = 'rgba(7,3,15,0.28)';
+  ctx.fillRect(0, 0, W, H);
+
+  particles.forEach(p => { p.update(); p.draw(); });
+  connectLines();
+
+  bursts.forEach(p => { p.update(); p.draw(); });
+  bursts = bursts.filter(p => p.life > 0);
+
+  pCountEl.textContent = particles.length + bursts.length;
+
+  idleTimer++;
+  if (idleTimer === 60 * 9) {
+    hintEl.style.opacity = '0';
+  }
+  if (idleTimer === 60 * 12 && !secretShown) {
+    secretEl.classList.add('show');
+    secretShown = true;
+  }
+
+  requestAnimationFrame(loop);
+}
+loop();
+</script>
+</body>
+</html>
