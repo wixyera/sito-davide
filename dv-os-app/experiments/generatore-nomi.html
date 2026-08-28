@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generatore di Nomi Fantasy</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Fira+Code:wght@500&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Fira Code',monospace;}
+
+body{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
+  background:
+    radial-gradient(circle at 85% 15%, rgba(255,255,255,.08), transparent 45%),
+    linear-gradient(150deg,#1a0f07 0%,#3d2410 45%,#5c3a1a 100%);
+  overflow:hidden;position:relative;
+}
+body::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(rgba(255,210,120,.08) 1px, transparent 1px);
+  background-size:28px 28px;
+}
+
+.container{
+  width:460px;max-width:100%;background:rgba(20,12,6,.85);border:1px solid rgba(217,164,65,.4);border-radius:16px;
+  box-shadow:0 30px 70px -18px rgba(0,0,0,.6);padding:34px 34px 28px;position:relative;z-index:1;
+  animation:pop .5s cubic-bezier(.2,.8,.2,1);text-align:center;backdrop-filter:blur(6px);
+}
+@keyframes pop{from{opacity:0;transform:translateY(18px) scale(.96);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+h1{font-family:'Cinzel',serif;color:#f3d9a4;font-weight:700;font-size:1.4rem;letter-spacing:.03em;}
+.subtitle{color:#c9a876;font-weight:600;font-size:.8rem;margin-top:6px;letter-spacing:.03em;}
+
+.race-select{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:24px 0 6px;}
+.race-btn{
+  background:rgba(217,164,65,.08);border:1px solid rgba(217,164,65,.35);color:#e8c987;
+  font-family:'Fira Code',monospace;font-weight:600;font-size:.72rem;padding:8px 14px;
+  border-radius:20px;cursor:pointer;transition:all .2s;letter-spacing:.02em;
+}
+.race-btn:hover{background:rgba(217,164,65,.18);}
+.race-btn.active{background:#d9a441;color:#1a0f07;}
+
+.result-stage{
+  margin:26px 0;min-height:130px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.25);border:1px solid rgba(217,164,65,.25);border-radius:12px;padding:20px;
+}
+.result-name{font-family:'Cinzel',serif;font-weight:800;font-size:1.9rem;color:#f8e3b0;letter-spacing:.02em;text-shadow:0 0 20px rgba(217,164,65,.4);min-height:1.3em;}
+.result-title{color:#c9a876;font-size:.82rem;margin-top:10px;font-style:italic;min-height:1.2em;}
+.placeholder{color:rgba(201,168,118,.45);font-size:.85rem;}
+
+.gen-btn{
+  width:100%;color:#1a0f07;border:none;outline:none;cursor:pointer;
+  background:linear-gradient(135deg,#f3d9a4,#d9a441);font-size:1rem;font-weight:700;
+  padding:1rem 0;border-radius:12px;letter-spacing:.03em;transition:all .25s;
+  box-shadow:0 10px 24px -8px rgba(217,164,65,.55);font-family:'Fira Code',monospace;
+}
+.gen-btn:hover{transform:translateY(-2px);box-shadow:0 14px 30px -8px rgba(217,164,65,.65);}
+
+.copy-hint{color:rgba(201,168,118,.6);font-size:.7rem;margin-top:12px;}
+
+.back-link{position:fixed;top:14px;left:14px;font-size:13px;color:#fff;text-decoration:none;font-weight:600;background:rgba(0,0,0,.25);padding:9px 15px;border-radius:20px;transition:all .25s;backdrop-filter:blur(4px);z-index:2;}
+.back-link:hover{background:rgba(0,0,0,.4);}
+</style>
+</head>
+<body>
+<a class="back-link" href="../index.html" onclick="if(window.history.length>1){history.back();return false;}">← Indietro</a>
+<div class="container">
+  <h1>⚔️ Generatore di Nomi Fantasy</h1>
+  <p class="subtitle">Crea nomi ed epiteti per i tuoi personaggi</p>
+
+  <div class="race-select" id="raceSelect">
+    <button class="race-btn active" data-race="elfo">Elfo</button>
+    <button class="race-btn" data-race="nano">Nano</button>
+    <button class="race-btn" data-race="orco">Orco</button>
+    <button class="race-btn" data-race="umano">Umano</button>
+    <button class="race-btn" data-race="drago">Drago</button>
+  </div>
+
+  <div class="result-stage">
+    <div class="result-name placeholder" id="resultName">Premi genera</div>
+    <div class="result-title" id="resultTitle"></div>
+  </div>
+
+  <button class="gen-btn" id="genBtn">✨ Genera Nome</button>
+  <div class="copy-hint" id="copyHint">clicca sul nome per copiarlo</div>
+</div>
+
+<script>
+const syllables = {
+  elfo: {
+    pre: ['Ael', 'Thal', 'Sil', 'Gal', 'Eri', 'Fae', 'Lor', 'Cael', 'Ithil', 'Ny'],
+    mid: ['an', 'iel', 'or', 'wen', 'ith', 'as', 'ora', 'eth'],
+    suf: ['driel', 'thas', 'wyn', 'ion', 'ael', 'lorien', 'anor'],
+    titles: ['della Foresta Silente', 'Custode delle Stelle', 'Figlio della Luna', 'del Bosco Antico', 'Portatore di Luce']
+  },
+  nano: {
+    pre: ['Thor', 'Grum', 'Bor', 'Durn', 'Kaz', 'Brok', 'Grim', 'Dain', 'Fund', 'Rok'],
+    mid: ['in', 'ar', 'ok', 'un', 'ir', 'ad'],
+    suf: ['grim', 'bard', 'axe', 'forge', 'hammer', 'din', 'shield'],
+    titles: ['Signore della Montagna', 'Forgiatore d\u2019Acciaio', 'Guardiano delle Miniere', 'Spaccaroccia', 'del Martello di Ferro']
+  },
+  orco: {
+    pre: ['Grak', 'Mug', 'Zug', 'Krosh', 'Thok', 'Ugr', 'Nazg', 'Borz', 'Skar', 'Grash'],
+    mid: ['a', 'u', 'o', 'ar', 'ok'],
+    suf: ['nak', 'gor', 'mash', 'ruk', 'zog', 'thak', 'grub'],
+    titles: ['Spaccaossa', 'Flagello delle Pianure', 'il Sanguinario', 'Distruttore di Mura', 'Capo della Orda']
+  },
+  umano: {
+    pre: ['Ed', 'Al', 'Ric', 'Wil', 'Bran', 'Cor', 'Mar', 'Ar', 'Gwen', 'Isa'],
+    mid: ['ar', 'in', 'wyn', 'el', 'on', 'us'],
+    suf: ['ward', 'don', 'mund', 'ric', 'wick', 'ley', 'stone'],
+    titles: ['Cavaliere del Regno', 'l\u2019Errante', 'Difensore delle Terre', 'il Coraggioso', 'del Vento del Nord']
+  },
+  drago: {
+    pre: ['Vor', 'Zir', 'Kaen', 'Ryth', 'Bael', 'Vex', 'Draug', 'Fyr', 'Malak', 'Ossy'],
+    mid: ['ax', 'or', 'ith', 'an', 'og'],
+    suf: ['gorath', 'nyx', 'thraxus', 'zvor', 'draken', 'morath', 'skorn'],
+    titles: ['Signore delle Fiamme', 'Divoratore di Regni', 'lo Squamoso', 'Antico delle Vette', 'Terrore dei Cieli']
+  }
+};
+
+let currentRace = 'elfo';
+const raceSelect = document.getElementById('raceSelect');
+const resultName = document.getElementById('resultName');
+const resultTitle = document.getElementById('resultTitle');
+const genBtn = document.getElementById('genBtn');
+const copyHint = document.getElementById('copyHint');
+
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+function generate() {
+  const s = syllables[currentRace];
+  const name = pick(s.pre) + pick(s.mid) + pick(s.suf);
+  const title = pick(s.titles);
+  resultName.textContent = name;
+  resultName.classList.remove('placeholder');
+  resultTitle.textContent = title;
+}
+
+raceSelect.addEventListener('click', e => {
+  const btn = e.target.closest('.race-btn');
+  if (!btn) return;
+  document.querySelectorAll('.race-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentRace = btn.dataset.race;
+});
+
+genBtn.addEventListener('click', generate);
+
+resultName.addEventListener('click', () => {
+  if (resultName.classList.contains('placeholder')) return;
+  navigator.clipboard.writeText(resultName.textContent);
+  copyHint.textContent = 'copiato!';
+  setTimeout(() => { copyHint.textContent = 'clicca sul nome per copiarlo'; }, 1200);
+});
+
+document.addEventListener('keydown', e => {
+  if (e.code === 'Space' && !e.target.closest('button')) { e.preventDefault(); generate(); }
+});
+</script>
+</body>
+</html>

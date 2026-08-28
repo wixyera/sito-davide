@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Lampo</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&family=Fira+Code:wght@500&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Nunito',sans-serif;}
+
+body{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
+  background:
+    radial-gradient(circle at 10% 90%, rgba(255,255,255,.14), transparent 45%),
+    linear-gradient(135deg,#f59e0b,#f97316 55%,#ec4899);
+  overflow:hidden;position:relative;
+}
+body::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(rgba(255,255,255,.10) 1.5px, transparent 1.5px);
+  background-size:26px 26px;
+}
+
+.container{
+  width:460px;max-width:100%;background:rgba(255,255,255,.98);border-radius:22px;
+  box-shadow:0 30px 70px -18px rgba(120,30,10,.45);padding:30px 32px 26px;position:relative;z-index:1;
+  animation:pop .5s cubic-bezier(.2,.8,.2,1);
+}
+@keyframes pop{from{opacity:0;transform:translateY(18px) scale(.96);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+.top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+h1{color:#9a3412;font-weight:800;font-size:1.35rem;}
+.score-badge{font-family:'Fira Code',monospace;font-weight:700;color:#fff;background:linear-gradient(135deg,#f97316,#ec4899);padding:6px 14px;border-radius:20px;font-size:.85rem;}
+
+.progress-track{height:8px;background:#fff1e6;border-radius:8px;overflow:hidden;margin-bottom:20px;}
+.progress-fill{height:100%;width:0%;background:linear-gradient(90deg,#f59e0b,#ec4899);border-radius:8px;transition:width .4s ease;}
+
+.question-box{min-height:70px;}
+.q-count{font-family:'Fira Code',monospace;font-size:.72rem;color:#c2410c;font-weight:700;letter-spacing:.05em;text-transform:uppercase;}
+.q-text{font-weight:700;font-size:1.18rem;color:#1f2937;margin-top:6px;line-height:1.4;}
+
+.options{display:flex;flex-direction:column;gap:10px;margin:20px 0 8px;}
+.opt-btn{
+  text-align:left;padding:14px 16px;border-radius:12px;border:2px solid #fef3e2;background:#fffaf3;
+  font-family:'Nunito',sans-serif;font-weight:600;font-size:.96rem;color:#7c2d12;cursor:pointer;transition:all .2s;
+}
+.opt-btn:hover:not(:disabled){border-color:#f97316;background:#fff1e0;transform:translateX(3px);}
+.opt-btn.correct{border-color:#16a34a;background:#dcfce7;color:#166534;}
+.opt-btn.wrong{border-color:#dc2626;background:#fee2e2;color:#991b1b;}
+.opt-btn:disabled{cursor:default;}
+
+.feedback{min-height:1.6em;text-align:center;font-weight:700;margin:6px 0 14px;font-size:.95rem;}
+.feedback.correct{color:#16a34a;}
+.feedback.wrong{color:#dc2626;}
+
+.next-btn{
+  width:100%;color:#fff;border:none;outline:none;cursor:pointer;
+  background:linear-gradient(135deg,#f97316,#ec4899);font-size:1rem;font-weight:700;
+  padding:.95rem 0;border-radius:12px;transition:all .25s;box-shadow:0 10px 24px -8px rgba(236,72,153,.5);
+  display:none;
+}
+.next-btn:hover{transform:translateY(-2px);}
+
+.result-screen{display:none;text-align:center;padding:20px 0;}
+.result-screen .emoji{font-size:52px;margin-bottom:10px;}
+.result-screen h2{color:#9a3412;font-size:1.4rem;font-weight:800;}
+.result-screen p{color:#c2410c;font-weight:600;margin-top:8px;font-size:.95rem;}
+.restart-btn{
+  margin-top:20px;width:100%;color:#fff;border:none;outline:none;cursor:pointer;
+  background:linear-gradient(135deg,#f97316,#ec4899);font-size:1rem;font-weight:700;
+  padding:.95rem 0;border-radius:12px;transition:all .25s;
+}
+.restart-btn:hover{transform:translateY(-2px);}
+
+.back-link{position:fixed;top:14px;left:14px;font-size:13px;color:#fff;text-decoration:none;font-weight:700;background:rgba(0,0,0,.2);padding:9px 15px;border-radius:20px;transition:all .25s;backdrop-filter:blur(4px);z-index:2;}
+.back-link:hover{background:rgba(0,0,0,.32);}
+</style>
+</head>
+<body>
+<a class="back-link" href="../index.html" onclick="if(window.history.length>1){history.back();return false;}">← Indietro</a>
+<div class="container">
+  <div class="quiz-view">
+    <div class="top-row">
+      <h1>⚡ Quiz Lampo</h1>
+      <div class="score-badge" id="scoreBadge">0 / 0</div>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+
+    <div class="question-box">
+      <div class="q-count" id="qCount">Domanda 1 di 8</div>
+      <div class="q-text" id="qText">—</div>
+    </div>
+
+    <div class="options" id="options"></div>
+    <div class="feedback" id="feedback"></div>
+    <button class="next-btn" id="nextBtn">Prossima domanda →</button>
+  </div>
+
+  <div class="result-screen" id="resultScreen">
+    <div class="emoji" id="resultEmoji">🎉</div>
+    <h2 id="resultTitle">Ottimo lavoro!</h2>
+    <p id="resultScore">Hai risposto correttamente a 0 domande su 0</p>
+    <button class="restart-btn" id="restartBtn">Rigioca</button>
+  </div>
+</div>
+
+<script>
+const questions = [
+  { q: "Qual è la capitale d'Italia?", opts: ["Milano", "Roma", "Napoli", "Torino"], correct: 1 },
+  { q: "Quanti pianeti ci sono nel Sistema Solare?", opts: ["7", "8", "9", "10"], correct: 1 },
+  { q: "Chi ha dipinto la Gioconda?", opts: ["Michelangelo", "Raffaello", "Leonardo da Vinci", "Caravaggio"], correct: 2 },
+  { q: "Qual è l'elemento chimico con simbolo 'O'?", opts: ["Oro", "Ossigeno", "Osmio", "Ozono"], correct: 1 },
+  { q: "In che anno è caduto il Muro di Berlino?", opts: ["1987", "1989", "1991", "1993"], correct: 1 },
+  { q: "Qual è il fiume più lungo d'Italia?", opts: ["Tevere", "Adige", "Po", "Arno"], correct: 2 },
+  { q: "Quante corde ha una chitarra classica?", opts: ["4", "5", "6", "7"], correct: 2 },
+  { q: "Qual è il linguaggio di programmazione usato per lo stile di questa pagina?", opts: ["Python", "CSS", "SQL", "Java"], correct: 1 }
+];
+
+let current = 0, score = 0, answered = false;
+
+const qCount = document.getElementById('qCount');
+const qText = document.getElementById('qText');
+const optionsEl = document.getElementById('options');
+const feedback = document.getElementById('feedback');
+const nextBtn = document.getElementById('nextBtn');
+const scoreBadge = document.getElementById('scoreBadge');
+const progressFill = document.getElementById('progressFill');
+const quizView = document.querySelector('.quiz-view');
+const resultScreen = document.getElementById('resultScreen');
+const resultTitle = document.getElementById('resultTitle');
+const resultScore = document.getElementById('resultScore');
+const resultEmoji = document.getElementById('resultEmoji');
+
+function loadQuestion() {
+  answered = false;
+  const item = questions[current];
+  qCount.textContent = `Domanda ${current + 1} di ${questions.length}`;
+  qText.textContent = item.q;
+  scoreBadge.textContent = `${score} / ${questions.length}`;
+  progressFill.style.width = `${(current / questions.length) * 100}%`;
+  feedback.textContent = '';
+  feedback.className = 'feedback';
+  nextBtn.style.display = 'none';
+
+  optionsEl.innerHTML = '';
+  item.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.textContent = opt;
+    btn.addEventListener('click', () => selectAnswer(i, btn));
+    optionsEl.appendChild(btn);
+  });
+}
+
+function selectAnswer(i, btn) {
+  if (answered) return;
+  answered = true;
+  const item = questions[current];
+  const allBtns = optionsEl.querySelectorAll('.opt-btn');
+  allBtns.forEach(b => b.disabled = true);
+
+  if (i === item.correct) {
+    btn.classList.add('correct');
+    score++;
+    feedback.textContent = 'Esatto! 🎯';
+    feedback.classList.add('correct');
+  } else {
+    btn.classList.add('wrong');
+    allBtns[item.correct].classList.add('correct');
+    feedback.textContent = 'Risposta sbagliata';
+    feedback.classList.add('wrong');
+  }
+  scoreBadge.textContent = `${score} / ${questions.length}`;
+  nextBtn.style.display = 'block';
+}
+
+nextBtn.addEventListener('click', () => {
+  current++;
+  if (current < questions.length) {
+    loadQuestion();
+  } else {
+    showResult();
+  }
+});
+
+function showResult() {
+  progressFill.style.width = '100%';
+  quizView.style.display = 'none';
+  resultScreen.style.display = 'block';
+  const pct = score / questions.length;
+  resultEmoji.textContent = pct === 1 ? '🏆' : pct >= 0.6 ? '🎉' : '📚';
+  resultTitle.textContent = pct === 1 ? 'Perfetto!' : pct >= 0.6 ? 'Ottimo lavoro!' : 'Si può migliorare!';
+  resultScore.textContent = `Hai risposto correttamente a ${score} domande su ${questions.length}`;
+}
+
+document.getElementById('restartBtn').addEventListener('click', () => {
+  current = 0; score = 0;
+  quizView.style.display = 'block';
+  resultScreen.style.display = 'none';
+  loadQuestion();
+});
+
+loadQuestion();
+</script>
+</body>
+</html>
