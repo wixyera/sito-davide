@@ -28,8 +28,10 @@ canvas{display:block;position:fixed;inset:0;cursor:crosshair;}
 .msg.show{opacity:1;}
 .msg span{display:block;font-size:.4em;color:#93c5fd;letter-spacing:.2em;margin-top:12px;font-weight:400;}
 </style>
+<link rel="stylesheet" href="../css/lab.css">
+<link rel="icon" href="../assets/icons/space.svg" type="image/svg+xml">
 </head>
-<body>
+<body data-lab-skin="scene">
 <a class="back-link" href="../index.html" onclick="if(window.history.length>1){history.back();return false;}">← Indietro</a>
 <div class="hud">POZZI ATTIVI: <b id="wCount">1</b><br>MASSA TOTALE: <b id="mTotal">0</b></div>
 <canvas id="c"></canvas>
@@ -175,5 +177,6 @@ function loop() {
 }
 loop();
 </script>
+<a class="dv-lab-bar" href="../index.html" aria-label="Torna al tuo spazio personale"><span class="dv-lab-mark">dv.</span><span>SPACE / LAB</span><span>↖</span></a>
 </body>
 </html>

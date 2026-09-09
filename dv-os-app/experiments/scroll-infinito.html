@@ -159,8 +159,10 @@ canvas#bg{
   text-shadow:0 0 20px rgba(103,232,249,.9), 0 0 60px rgba(168,85,247,.6);
 }
 </style>
+<link rel="stylesheet" href="../css/lab.css">
+<link rel="icon" href="../assets/icons/space.svg" type="image/svg+xml">
 </head>
-<body>
+<body data-lab-skin="scene">
 
 <a class="back-link" href="../index.html" onclick="if(window.history.length>1){history.back();return false;}">← Indietro</a>
 <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
@@ -517,5 +519,6 @@ addEventListener('scroll', () => {
 }, { passive: true });
 </script>
 
+<a class="dv-lab-bar" href="../index.html" aria-label="Torna al tuo spazio personale"><span class="dv-lab-mark">dv.</span><span>SPACE / LAB</span><span>↖</span></a>
 </body>
 </html>

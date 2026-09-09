@@ -39,7 +39,7 @@ function updateClock() {
   else if (h >= 12 && h < 18) saluto = `Buon pomeriggio, ${name}`;
   else if (h >= 18 && h < 23) saluto = `Buonasera, ${name}`;
   else saluto = `Buonanotte, ${name}`;
-  document.getElementById('greetingText').textContent = saluto;
+  document.getElementById('greetingText').textContent = saluto + '.';
 }
 updateClock();
 setInterval(updateClock, 1000);
@@ -51,14 +51,13 @@ const tabBtns = document.querySelectorAll('.tab-btn');
 const modules = document.querySelectorAll('.module');
 
 const MODULE_TITLES = {
-  home: 'Home', calendario: 'Calendario', percorso: 'Percorso', contatti: 'Contatti',
-  wishlist: 'Wishlist', spese: 'Spese', esperimenti: 'Progetti'
+  home: 'Panoramica', calendario: 'Calendario', percorso: 'Percorso', contatti: 'Contatti',
+  wishlist: 'Wishlist', spese: 'Spese', esperimenti: 'Laboratorio'
 };
 
 function showModule(name) {
   if (!document.getElementById('mod-' + name)) return;
   document.body.dataset.scene = name;
-  window.dispatchEvent(new CustomEvent('workspace:module', {detail: name}));
   modules.forEach(m => m.classList.toggle('active', m.id === 'mod-' + name));
   tabBtns.forEach(b => {
     const active = b.dataset.module === name;
@@ -67,9 +66,12 @@ function showModule(name) {
     b.setAttribute('tabindex', active ? '0' : '-1');
   });
   document.getElementById('tabNav').classList.remove('open');
+  document.body.classList.remove('menu-open');
+  document.getElementById('navToggle').setAttribute('aria-expanded', 'false');
   window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
-  document.title = MODULE_TITLES[name] ? `${MODULE_TITLES[name]} — Davide Villano` : 'Davide Villano — Personal Workspace';
+  document.title = MODULE_TITLES[name] ? `${MODULE_TITLES[name]} — DV / SPACE` : 'Davide Villano — Personal Workspace';
   try { localStorage.setItem('dv_os_last_module', name); } catch (_) {}
+  window.dispatchEvent(new CustomEvent('workspace:module', {detail: name}));
   // sposta il focus sul contenuto del modulo appena aperto: utile per chi
   // naviga con lettore di schermo o solo tastiera, senza rubare il focus
   // quando il cambio parte da un click col mouse.
@@ -80,105 +82,22 @@ function showModule(name) {
 }
 tabBtns.forEach(b => b.addEventListener('click', () => showModule(b.dataset.module)));
 document.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', () => showModule(b.dataset.goto)));
-document.getElementById('navToggle').addEventListener('click', () => document.getElementById('tabNav').classList.toggle('open'));
-
-/* ===================================================================
-   SCROLL VERTICALE TRA SEZIONI
-   Da qualunque modulo (a partire dalla Home): quando si scorre con la
-   rotella fino in fondo alla sezione corrente e si continua a scorrere
-   giù, si passa automaticamente alla sezione successiva — e viceversa
-   scorrendo su dalla cima. Usa la stessa animazione di comparsa
-   (modIn) già presente al cambio scheda, così il passaggio è morbido
-   e coerente col resto del sito.
-   =================================================================== */
-const MODULE_ORDER = Array.from(tabBtns).map(b => b.dataset.module);
-// selettori con scroll interno proprio: qui la rotella non deve "scappare"
-// verso la sezione successiva finché non si è arrivati in fondo a loro
-const INNER_SCROLL_SELECTOR = '.ev-list, .wl-grid, .music-results, .music-panel, #searchOverlay, .carousel-track, .tab-nav, .cal-grid, .auth-card';
-let sectionSwitchLocked = false;
-
-function goToAdjacentModule(direction) {
-  if (sectionSwitchLocked) return;
-  const current = document.querySelector('.module.active');
-  if (!current) return;
-  const idx = MODULE_ORDER.indexOf(current.id.replace('mod-', ''));
-  const nextIdx = idx + direction;
-  if (idx === -1 || nextIdx < 0 || nextIdx >= MODULE_ORDER.length) return;
-  sectionSwitchLocked = true;
-
-  if (reducedMotion) {
-    showModule(MODULE_ORDER[nextIdx]);
-    setTimeout(() => { sectionSwitchLocked = false; }, 250);
-    return;
-  }
-
-  // la sezione corrente sfanisce (verso l'alto se si va avanti, verso il
-  // basso se si torna indietro), poi appare quella nuova con la sua modIn.
-  const leavingClass = direction > 0 ? 'module-leaving-down' : 'module-leaving-up';
-  current.classList.add(leavingClass);
-  setTimeout(() => {
-    current.classList.remove(leavingClass);
-    showModule(MODULE_ORDER[nextIdx]);
-    setTimeout(() => { sectionSwitchLocked = false; }, 500);
-  }, 320);
-}
-
-window.addEventListener('wheel', (e) => {
-  if (document.body.classList.contains('search-open')) return;
-  const authOverlayEl = document.getElementById('authOverlay');
-  if (authOverlayEl && !authOverlayEl.classList.contains('hidden')) return;
-  if (e.target.closest && e.target.closest(INNER_SCROLL_SELECTOR)) return;
-
-  const doc = document.documentElement;
-  const atBottom = doc.scrollTop + window.innerHeight >= doc.scrollHeight - 4;
-  const atTop = doc.scrollTop <= 2;
-
-  if (e.deltaY > 14 && atBottom) goToAdjacentModule(1);
-  else if (e.deltaY < -14 && atTop) goToAdjacentModule(-1);
-}, { passive: true });
-
-/* Stesso comportamento con lo scroll a dito su schermi touch: la rotella
-   del mouse non genera eventi "wheel" lì, serve intercettare il gesto
-   di trascinamento (touchstart → touchend) per riconoscere uno swipe
-   verso l'alto/basso quando si è già in fondo/in cima alla sezione. */
-let touchStartY = null;
-let touchBlocked = false;
-
-window.addEventListener('touchstart', (e) => {
-  if (e.touches.length !== 1) { touchStartY = null; return; }
-  touchBlocked = !!(
-    (document.body.classList.contains('search-open')) ||
-    (document.getElementById('authOverlay') && !document.getElementById('authOverlay').classList.contains('hidden')) ||
-    (e.target.closest && e.target.closest(INNER_SCROLL_SELECTOR))
-  );
-  touchStartY = touchBlocked ? null : e.touches[0].clientY;
-}, { passive: true });
-
-window.addEventListener('touchend', (e) => {
-  if (touchStartY === null || touchBlocked) { touchStartY = null; touchBlocked = false; return; }
-  const endY = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientY : touchStartY;
-  const deltaY = touchStartY - endY; // positivo = dito trascinato verso l'alto → si vuole scorrere in giù
-  touchStartY = null;
-
-  const doc = document.documentElement;
-  const atBottom = doc.scrollTop + window.innerHeight >= doc.scrollHeight - 4;
-  const atTop = doc.scrollTop <= 2;
-
-  if (deltaY > 60 && atBottom) goToAdjacentModule(1);
-  else if (deltaY < -60 && atTop) goToAdjacentModule(-1);
-}, { passive: true });
+document.getElementById('navToggle').addEventListener('click', () => {
+  const open = document.body.classList.toggle('menu-open');
+  document.getElementById('navToggle').setAttribute('aria-expanded', String(open));
+});
 
 /* Frecce sinistra/destra per muoversi tra i tab quando uno di essi ha il focus,
    come da comportamento standard ARIA per role="tablist" */
 document.getElementById('tabNav').addEventListener('keydown', e => {
-  if (!['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(e.key)) return;
+  if (!['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End'].includes(e.key)) return;
   const list = Array.from(tabBtns);
   const i = list.indexOf(document.activeElement);
   if (i === -1) return;
   e.preventDefault();
   let next;
-  if (e.key === 'ArrowRight') next = list[(i + 1) % list.length];
-  else if (e.key === 'ArrowLeft') next = list[(i - 1 + list.length) % list.length];
+  if (['ArrowRight', 'ArrowDown'].includes(e.key)) next = list[(i + 1) % list.length];
+  else if (['ArrowLeft', 'ArrowUp'].includes(e.key)) next = list[(i - 1 + list.length) % list.length];
   else if (e.key === 'Home') next = list[0];
   else next = list[list.length - 1];
   next.focus();

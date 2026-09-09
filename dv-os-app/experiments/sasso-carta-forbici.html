@@ -66,8 +66,10 @@ h1{text-align:center;color:#7c2d12;font-weight:800;font-size:1.5rem;letter-spaci
 .back-link{position:fixed;top:14px;left:14px;font-size:13px;color:#fff;text-decoration:none;font-weight:700;background:rgba(0,0,0,.2);padding:9px 15px;border-radius:20px;transition:all .25s;backdrop-filter:blur(4px);z-index:2;}
 .back-link:hover{background:rgba(0,0,0,.32);}
 </style>
+<link rel="stylesheet" href="../css/lab.css">
+<link rel="icon" href="../assets/icons/space.svg" type="image/svg+xml">
 </head>
-<body>
+<body data-lab-skin="paper">
 <a class="back-link" href="../index.html" onclick="if(window.history.length>1){history.back();return false;}">← Indietro</a>
 <div class="container">
   <h1>🪨 Sasso Carta Forbici ✂️</h1>
@@ -167,5 +169,6 @@ resetBtn.addEventListener('click', () => {
   resultMsg.className = 'result-msg';
 });
 </script>
+<a class="dv-lab-bar" href="../index.html" aria-label="Torna al tuo spazio personale"><span class="dv-lab-mark">dv.</span><span>SPACE / LAB</span><span>↖</span></a>
 </body>
 </html>

@@ -130,13 +130,12 @@ function goToSearchResult(m) {
   if (m.module === 'calendario' && m.dateKey) {
     const [y, mo, d] = m.dateKey.split('-').map(Number);
     viewYear = y; viewMonth = mo - 1;
-    selectedDateKey = m.dateKey;
-    renderCalendar();
-    renderEventList();
+    selectDay(m.dateKey, d);
   }
 }
 
 function openSearch() {
+  if (!document.getElementById('authOverlay').classList.contains('hidden') || document.getElementById('galleryDialog')?.open) return;
   lastFocusedBeforeSearch = document.activeElement;
   searchOverlay.classList.add('open');
   document.body.classList.add('search-open');

@@ -63,8 +63,10 @@ h1{color:#f3e8ff;font-weight:700;font-size:1.4rem;letter-spacing:.06em;}
 .back-link{position:fixed;top:14px;left:14px;font-size:12px;color:#e9d5ff;text-decoration:none;font-weight:700;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.35);padding:8px 14px;border-radius:20px;z-index:10;letter-spacing:.05em;backdrop-filter:blur(6px);transition:all .25s;}
 .back-link:hover{background:rgba(139,92,246,.25);border-color:#e879f9;}
 </style>
+<link rel="stylesheet" href="../css/lab.css">
+<link rel="icon" href="../assets/icons/space.svg" type="image/svg+xml">
 </head>
-<body>
+<body data-lab-skin="paper">
 <a class="back-link" href="../index.html" onclick="if(window.history.length>1){history.back();return false;}">← Indietro</a>
 <div class="container">
   <h1>🔮 La Sfera Magica</h1>
@@ -125,5 +127,6 @@ ball.addEventListener('click', () => {
   }, 650);
 });
 </script>
+<a class="dv-lab-bar" href="../index.html" aria-label="Torna al tuo spazio personale"><span class="dv-lab-mark">dv.</span><span>SPACE / LAB</span><span>↖</span></a>
 </body>
 </html>

@@ -34,8 +34,10 @@ canvas{display:block;position:fixed;inset:0;cursor:crosshair;}
   pointer-events:none;transition:opacity 1.2s;
 }
 </style>
+<link rel="stylesheet" href="../css/lab.css">
+<link rel="icon" href="../assets/icons/space.svg" type="image/svg+xml">
 </head>
-<body>
+<body data-lab-skin="scene">
 <a class="back-link" href="../index.html" onclick="if(window.history.length>1){history.back();return false;}">← Indietro</a>
 <div class="hud">RAZZI LANCIATI: <b id="rCount">0</b><br>MODALITÀ: <b id="modeLabel">MANUALE</b></div>
 <canvas id="c"></canvas>
@@ -296,5 +298,6 @@ loop();
 setTimeout(() => { launch(W * 0.3, H * 0.28, false); }, 500);
 setTimeout(() => { launch(W * 0.68, H * 0.22, true); }, 1100);
 </script>
+<a class="dv-lab-bar" href="../index.html" aria-label="Torna al tuo spazio personale"><span class="dv-lab-mark">dv.</span><span>SPACE / LAB</span><span>↖</span></a>
 </body>
 </html>

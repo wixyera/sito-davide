@@ -1,104 +1,46 @@
-/* Service worker per D.V. Personal OS.
-   Livello 1 — "shell" statica (HTML, CSS, JS, manifest, icone): sempre
-   in cache, così l'app si apre anche offline o con connessione instabile.
-   Livello 2 — dati (Supabase, GET soli): rete-prima-poi-cache, così se
-   l'utente va offline vede comunque l'ultima versione salvata invece di
-   uno schermo vuoto. Le scritture (POST/PATCH/DELETE) restano SEMPRE
-   dirette in rete, mai gestite dal service worker.
-
-   Se aggiorni i file dell'app e vuoi che il cambiamento arrivi SUBITO
-   alla prima riapertura (invece che alla seconda), alza il numero qui
-   sotto (v1 -> v2 -> v3...). */
-const CACHE_NAME = 'dv-os-shell-museum-v2';
+/* DV / SPACE: offline static shell and existing per-user read cache.
+   Auth and write requests always use the network. */
+const CACHE_NAME = 'dv-os-shell-space-v3';
 const DATA_CACHE_NAME = 'dv-os-data-v2';
 const APP_SHELL = [
-  './',
-  './index.html',
-  './manifest.json',
-  './css/style.css',
-  './css/cinematic.css',
-  './js/cinematic.js',
-  './js/museum.js',
-  './vendor/three.module.js',
-  './assets/earth.jpg',
-  './assets/backgrounds/chrome-liquid.jpg',
-  './js/config.js',
-  './js/toast.js',
-  './js/auth.js',
-  './js/ui-core.js',
-  './js/calendar.js',
-  './js/career.js',
-  './js/contacts.js',
-  './js/wishlist.js',
-  './js/spese.js',
-  './js/ics.js',
-  './js/search.js',
-  './js/init.js',
-  './js/theme.js',
-  './js/motion.js',
-  './js/music.js',
-  './assets/icons/icon-192.png',
-  './assets/icons/icon-512.png',
-  './assets/icons/icon-512-maskable.png'
+ './','./index.html','./manifest.json','./css/style.css','./css/lab.css',
+ './js/config.js','./js/toast.js','./js/auth.js','./js/ui-core.js','./js/calendar.js',
+ './js/career.js','./js/contacts.js','./js/wishlist.js','./js/spese.js','./js/ics.js',
+ './js/search.js','./js/init.js','./js/theme.js','./js/music.js','./js/experience.js',
+ './js/focus-timer.js','./assets/art/chrome-loop.png','./assets/icons/space.svg',
+ './assets/icons/space-192.png','./assets/icons/space-512.png'
 ];
-
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(APP_SHELL))
-      .then(() => self.skipWaiting())
-  );
+self.addEventListener('install',event=>{
+ event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.addAll(APP_SHELL)).then(()=>self.skipWaiting()));
 });
-
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k.startsWith('dv-os-') && k !== CACHE_NAME && k !== DATA_CACHE_NAME).map(k => caches.delete(k)))
-    ).then(() => self.clients.claim())
-  );
+self.addEventListener('activate',event=>{
+ event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('dv-os-')&&k!==CACHE_NAME&&k!==DATA_CACHE_NAME).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));
 });
-
-self.addEventListener('fetch', event => {
-  const req = event.request;
-  if (req.method !== 'GET') return; // scritture: mai in cache, sempre in rete
-
-  const url = new URL(req.url);
-  if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/auth/') || url.pathname.startsWith('/functions/')) return;
-
-  // Dati Supabase (qualunque progetto): rete-prima, con fallback su
-  // cache se la rete non risponde (offline / connessione instabile).
-  if (url.hostname.endsWith('.supabase.co')) {
-    if (!url.pathname.startsWith('/rest/v1/') || !url.searchParams.has('user_id')) return;
-    event.respondWith(
-      fetch(req)
-        .then(res => {
-          if (res && res.ok) {
-            const clone = res.clone();
-            caches.open(DATA_CACHE_NAME).then(cache => cache.put(req, clone));
-          }
-          return res;
-        })
-        .catch(async () => await caches.match(req) || Response.json({ message: 'Connessione non disponibile.' }, { status: 503 }))
-    );
-    return;
-  }
-
-  // Solo richieste dello stesso dominio (la shell). Tutto il resto
-  // (font esterni, ecc.) va diretto in rete.
-  if (url.origin !== self.location.origin) return;
-
-  event.respondWith(
-    caches.match(req).then(cached => {
-      const network = fetch(req)
-        .then(res => {
-          if (res && res.ok) {
-            const clone = res.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(req, clone));
-          }
-          return res;
-        })
-        .catch(() => cached || caches.match('./index.html'));
-      return network;
-    })
-  );
+self.addEventListener('message',event=>{
+ if(event.data?.type==='CLEAR_PERSONAL_CACHE') event.waitUntil(caches.delete(DATA_CACHE_NAME));
+});
+self.addEventListener('fetch',event=>{
+ const req=event.request;
+ if(req.method!=='GET'||req.cache==='no-store')return;
+ const url=new URL(req.url);
+ if(url.pathname.startsWith('/api/')||url.pathname.startsWith('/auth/')||url.pathname.startsWith('/functions/'))return;
+ if(url.hostname.endsWith('.supabase.co')){
+  if(!url.pathname.startsWith('/rest/v1/')||!url.searchParams.has('user_id'))return;
+  event.respondWith(fetch(req).then(res=>{
+   if(res.ok){const clone=res.clone();event.waitUntil(caches.open(DATA_CACHE_NAME).then(cache=>cache.put(req,clone)))}
+   return res;
+  }).catch(async()=>await caches.match(req)||Response.json({message:'Connessione non disponibile.'},{status:503})));
+  return;
+ }
+ if(url.origin!==self.location.origin)return;
+ event.respondWith(fetch(req).then(res=>{
+  if(res.ok){const clone=res.clone();event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.put(req,clone)))}
+  return res;
+ }).catch(async()=>{
+  const cached=await caches.match(req);
+  if(cached)return cached;
+  // A missing script or image must never receive HTML as its fallback.
+  if(req.mode==='navigate')return await caches.match('./index.html')||Response.error();
+  return Response.error();
+ }));
 });

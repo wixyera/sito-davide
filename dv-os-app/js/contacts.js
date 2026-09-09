@@ -14,6 +14,7 @@ async function loadContacts() {
     renderContacts();
   } catch (err) {
     console.error('Errore nel caricamento dei contatti:', err);
+    showLoadError(contactList, loadContacts);
   }
 }
 

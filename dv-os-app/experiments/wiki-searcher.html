@@ -53,8 +53,10 @@ header p{color:#5c6bc0;font-weight:600;font-size:13px;font-family:'Fira Code',mo
 .back-link{position:fixed;top:14px;left:14px;font-size:13px;color:#616161;text-decoration:none;font-weight:600;background:#fff;padding:9px 15px;border-radius:20px;box-shadow:0 4px 14px rgba(0,0,0,.08);transition:all .25s;z-index:5;}
 .back-link:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,0,0,.12);}
 </style>
+<link rel="stylesheet" href="../css/lab.css">
+<link rel="icon" href="../assets/icons/space.svg" type="image/svg+xml">
 </head>
-<body>
+<body data-lab-skin="paper">
 <a class="back-link" href="../index.html" onclick="if(window.history.length>1){history.back();return false;}">← Indietro</a>
 <div class="container">
   <header>
@@ -112,5 +114,6 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 </script>
+<a class="dv-lab-bar" href="../index.html" aria-label="Torna al tuo spazio personale"><span class="dv-lab-mark">dv.</span><span>SPACE / LAB</span><span>↖</span></a>
 </body>
 </html>

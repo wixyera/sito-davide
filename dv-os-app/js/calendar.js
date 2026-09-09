@@ -29,18 +29,21 @@ buildTimeOptions(document.getElementById('evTime'), '— Nessuna —');
 buildTimeOptions(document.getElementById('evEndTime'), '— Nessuna —');
 
 function dateKey(y, m, d) { return `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`; }
-function todayKey() { return dateKey(today.getFullYear(), today.getMonth(), today.getDate()); }
+function todayKey() { const now = new Date(); return dateKey(now.getFullYear(), now.getMonth(), now.getDate()); }
 
 function mapRow(row) {
   const iso = String(row.start_at || '');
   const endIso = String(row.end_at || '');
-  const key = iso.slice(0, 10);
-  const time = row.all_day ? '' : iso.slice(11, 16);
-  const endTime = row.all_day ? '' : endIso.slice(11, 16);
+  const start = new Date(iso), end = endIso ? new Date(endIso) : null;
+  const validStart = Number.isFinite(start.getTime());
+  const localTime = date => `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+  const key = row.all_day || !validStart ? iso.slice(0, 10) : dateKey(start.getFullYear(), start.getMonth(), start.getDate());
+  const time = row.all_day ? '' : validStart ? localTime(start) : iso.slice(11, 16);
+  const endTime = row.all_day || !end || !Number.isFinite(end.getTime()) ? '' : localTime(end);
   return {
     id: row.id, title: row.title || 'Senza titolo', description: row.description || '',
-    time, endTime, dateKey: key, all_day: !!row.all_day, location: row.location || '',
-    category: row.category || 'Personale', color: row.color || '#00eeff'
+    time, endTime, dateKey: key, endDateKey: end && Number.isFinite(end.getTime()) ? dateKey(end.getFullYear(), end.getMonth(), end.getDate()) : key, all_day: !!row.all_day, location: row.location || '',
+    category: row.category || 'Personale', color: row.color || '#d6fc52'
   };
 }
 
@@ -60,7 +63,7 @@ async function loadEvents() {
 }
 
 function renderCalendar() {
-  calMonthLabel.textContent = `${monthNames[viewMonth].toUpperCase()} ${viewYear}`;
+  calMonthLabel.textContent = `${monthNames[viewMonth]} ${viewYear}`;
   calGrid.innerHTML = '';
   ['LUN', 'MAR', 'MER', 'GIO', 'VEN', 'SAB', 'DOM'].forEach(d => {
     const e = document.createElement('div'); e.className = 'cal-dow'; e.textContent = d; calGrid.appendChild(e);
@@ -70,12 +73,17 @@ function renderCalendar() {
     const e = document.createElement('div'); e.className = 'cal-day empty'; calGrid.appendChild(e);
   }
   for (let d = 1; d <= days; d++) {
-    const key = dateKey(viewYear, viewMonth, d), cell = document.createElement('div');
+    const key = dateKey(viewYear, viewMonth, d), cell = document.createElement('button');
+    cell.type = 'button';
+    cell.setAttribute('aria-label', new Date(viewYear, viewMonth, d).toLocaleDateString('it-IT', { weekday:'long', day:'numeric', month:'long', year:'numeric' }) + (events[key]?.length ? `, ${events[key].length} eventi` : ''));
+    cell.setAttribute('aria-pressed', String(key === selectedDateKey));
+    if (key === todayKey()) cell.setAttribute('aria-current', 'date');
     cell.className = 'cal-day'; cell.textContent = d;
     if (key === todayKey()) cell.classList.add('today');
     if (key === selectedDateKey) cell.classList.add('selected');
     if (events[key]?.length) {
       const dot = document.createElement('span'); dot.className = 'ev-dot'; cell.appendChild(dot);
+      const preview = document.createElement('span'); preview.className = 'cal-event-label'; preview.textContent = events[key][0].title; cell.appendChild(preview);
     }
     cell.addEventListener('click', () => selectDay(key, d));
     calGrid.appendChild(cell);
@@ -90,6 +98,7 @@ function updateMonthCount() {
   document.getElementById('monthEventCount').textContent = count;
   document.getElementById('monthLabel').textContent = `${monthNames[viewMonth]} ${viewYear}`;
   updateNextEvent();
+  window.refreshDashboard?.();
 }
 
 function updateNextEvent() {
@@ -102,10 +111,11 @@ function updateNextEvent() {
 }
 
 function selectDay(key, dayNum) {
+  if (selectedDateKey !== key) resetEventForm();
   selectedDateKey = key;
   const dObj = new Date(key + 'T00:00:00');
   ddDate.textContent = `${dowNames[dObj.getDay()].toUpperCase()}, ${key}`;
-  ddDay.textContent = `${dayNum} ${monthNames[viewMonth]}`;
+  ddDay.textContent = `${dayNum} ${monthNames[dObj.getMonth()]}`;
   renderEventList();
   renderCalendar();
 }
@@ -115,7 +125,7 @@ let editingEventId = null;
 function resetEventForm() {
   editingEventId = null;
   evForm.reset();
-  document.getElementById('evColor').value = '#00eeff';
+  document.getElementById('evColor').value = '#d6fc52';
   evForm.querySelector('button[type="submit"]').textContent = '+ Aggiungi evento';
   if (evPicker) evPicker.value = '';
 }
@@ -129,7 +139,7 @@ function editEvent(ev) {
   document.getElementById('evEndTime').value = ev.endTime || '';
   document.getElementById('evLocation').value = ev.location || '';
   document.getElementById('evCategory').value = ev.category || 'Personale';
-  document.getElementById('evColor').value = ev.color || '#00eeff';
+  document.getElementById('evColor').value = ev.color || '#d6fc52';
   document.getElementById('evAllDay').checked = !!ev.all_day;
   evForm.querySelector('button[type="submit"]').textContent = 'Salva modifiche';
   evForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -160,7 +170,7 @@ function renderEventList() {
   list.forEach(ev => {
     const item = document.createElement('details');
     item.className = 'ev-item';
-    item.style.borderLeft = `3px solid ${ev.color || '#00eeff'}`;
+    item.style.borderLeft = `3px solid ${ev.color || '#d6fc52'}`;
     item.innerHTML = `<summary><div class="ev-info">${ev.time ? `<div class="ev-time">${ev.time}${ev.endTime ? ' - ' + ev.endTime : ''}</div>` : ''}<div class="ev-title"></div></div></summary><div class="ev-body"><div class="ev-details"></div><div class="ev-item-actions"><button class="ev-edit" type="button" title="Modifica" aria-label="Modifica">${ICON_EDIT}</button><button class="ev-ics" title="Esporta .ics" aria-label="Esporta .ics" type="button">${ICON_ICS}</button><button class="ev-del" title="Elimina" aria-label="Elimina" type="button">${ICON_DEL}</button></div></div>`;
     item.querySelector('.ev-title').textContent = ev.title;
     const details = [];
@@ -189,7 +199,7 @@ function toDbPayload(data, key) {
       title: data.title, description: data.description || null,
       start_at: `${key}T00:00:00.000Z`, end_at: `${key}T23:59:59.999Z`,
       all_day: true, location: data.location || null,
-      category: data.category || 'Personale', color: data.color || '#00eeff'
+      category: data.category || 'Personale', color: data.color || '#d6fc52'
     };
   }
   const startTime = data.time || '00:00', endTime = data.endTime || startTime;
@@ -199,7 +209,7 @@ function toDbPayload(data, key) {
     title: data.title, description: data.description || null,
     start_at: start.toISOString(), end_at: end.toISOString(),
     all_day: false, location: data.location || null,
-    category: data.category || 'Personale', color: data.color || '#00eeff'
+    category: data.category || 'Personale', color: data.color || '#d6fc52'
   };
 }
 
@@ -217,6 +227,7 @@ evForm.addEventListener('submit', async e => {
     allDay: document.getElementById('evAllDay').checked
   };
   if (!data.title) return;
+  if (!data.allDay && data.time && data.endTime && data.endTime <= data.time) { toastError('L’ora di fine deve essere successiva all’ora di inizio.'); return; }
   const btn = evForm.querySelector('button[type="submit"]');
   btn.disabled = true; btn.textContent = 'Salvataggio...';
   try {

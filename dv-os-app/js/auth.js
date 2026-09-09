@@ -80,6 +80,7 @@ async function logout() {
   accessToken = null;
   currentUser = null;
   localStorage.removeItem('dv_os_access_token');
+  if (typeof navigator !== 'undefined' && navigator.serviceWorker?.controller) navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_PERSONAL_CACHE' });
   location.reload();
 }
 
@@ -182,6 +183,7 @@ async function resetPasswordWithCode() {
     setForgotMessage('Password aggiornata! Accesso in corso...');
     document.getElementById('authEmail').value = email;
     document.getElementById('authPassword').value = password;
+    setAuthMode('login');
     showAuthView('authViewLogin');
     await login();
   } catch (e) {
@@ -195,10 +197,14 @@ document.getElementById('newPassword')?.addEventListener('keydown', e => { if (e
 let authMode = 'login';
 function setAuthMode(mode) {
   authMode = mode;
+  const card = document.querySelector('.auth-card');
+  if (card?.dataset) card.dataset.mode = mode;
+  const intro = document.getElementById('authIntro');
+  if (intro) intro.textContent = mode === 'signup' ? 'Crea il tuo account e dai un posto a impegni, progetti e nuove idee.' : 'Accedi e riparti da dove avevi lasciato. Le tue idee ti aspettano qui.';
   document.querySelector('#authViewLogin h2').textContent = mode === 'signup' ? 'Il tuo prossimo inizio.' : 'Bentornato.';
   document.getElementById('authPassword').autocomplete = mode === 'signup' ? 'new-password' : 'current-password';
-  document.getElementById('signupBtn').textContent = mode === 'signup' ? 'Crea account' : 'Registrati';
-  document.getElementById('loginBtn').textContent = mode === 'signup' ? 'Ho già un account' : 'Accedi';
+  document.getElementById('signupBtn').textContent = mode === 'signup' ? 'Crea il tuo account ↗' : 'Non hai un account? Registrati';
+  document.getElementById('loginBtn').textContent = mode === 'signup' ? 'Ho già un account' : 'Entra nel tuo spazio ↗';
   setAuthMessage('');
   const nameWrap = document.getElementById('nameFieldWrap');
   if (nameWrap) nameWrap.style.display = mode === 'signup' ? 'block' : 'none';

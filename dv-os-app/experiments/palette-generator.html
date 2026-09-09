@@ -76,8 +76,10 @@ h1 .ic{font-size:1.3rem;}
   .lock-btn{opacity:1;top:12px;}
 }
 </style>
+<link rel="stylesheet" href="../css/lab.css">
+<link rel="icon" href="../assets/icons/space.svg" type="image/svg+xml">
 </head>
-<body>
+<body data-lab-skin="scene">
 <a class="back-link" href="../index.html" onclick="if(window.history.length>1){history.back();return false;}">← Indietro</a>
 
 <div class="top-bar">
@@ -173,5 +175,6 @@ document.addEventListener('keydown', e => {
 for (let i = 0; i < COUNT; i++) { const { h, s, l } = randomHsl(); colors.push(hslToHex(h, s, l)); }
 render();
 </script>
+<a class="dv-lab-bar" href="../index.html" aria-label="Torna al tuo spazio personale"><span class="dv-lab-mark">dv.</span><span>SPACE / LAB</span><span>↖</span></a>
 </body>
 </html>

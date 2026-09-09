@@ -128,7 +128,7 @@ function applyDisplayName(user) {
     user?.user_metadata?.full_name ||
     user?.user_metadata?.name ||
     (user?.email ? user.email.split('@')[0] : 'Utente');
-  const safe = String(raw).trim().split(/\s+/)[0].toUpperCase();
+  const safe = String(raw).trim().split(/\s+/)[0];
   window.jarvisDisplayName = safe || 'UTENTE';
   updateClock();
 }

@@ -3,86 +3,67 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script>(function(){try{var t=localStorage.getItem('dv-os-theme')||'light';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
-<title>Davide Villano — Personal Workspace</title>
+<script>(function(){try{var t=localStorage.getItem('dv-os-theme')||'dark';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<title>DV / SPACE — Il tuo spazio personale</title>
 <meta name="robots" content="noindex, nofollow">
 <meta name="description" content="Spazio di lavoro personale di Davide Villano: calendario, percorso professionale, contatti, wishlist e spese in un unico posto.">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Davide Villano — Personal Workspace">
+<meta property="og:title" content="DV / SPACE — Il tuo spazio personale">
 <meta property="og:description" content="Calendario, percorso professionale, contatti, wishlist e spese in un unico spazio di lavoro personale.">
 <meta property="og:image" content="assets/icons/icon-512.png">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Davide Villano — Personal Workspace">
+<meta name="twitter:title" content="DV / SPACE — Il tuo spazio personale">
 <meta name="twitter:description" content="Calendario, percorso professionale, contatti, wishlist e spese in un unico spazio di lavoro personale.">
 <meta name="twitter:image" content="assets/icons/icon-512.png">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0a0e17">
-<link rel="icon" href="assets/icons/icon-192.png" type="image/png">
-<link rel="icon" href="assets/icons/favicon-32.png" sizes="32x32" type="image/png">
+<meta name="theme-color" content="#111310">
+<link rel="icon" href="assets/icons/space-192.png" type="image/png">
+<link rel="icon" href="assets/icons/space-32.png" sizes="32x32" type="image/png">
 <link rel="icon" href="assets/icons/favicon-16.png" sizes="16x16" type="image/png">
-<link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+<link rel="icon" href="assets/icons/space.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icons/space-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="D. Villano">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/cinematic.css">
+<link rel="preload" href="assets/art/chrome-loop.png" as="image" fetchpriority="high">
 </head>
-<body class="cinema-site" data-scene="home" data-mood="orbit">
+<body class="space-site" data-scene="home">
 
-<svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <defs>
-    <linearGradient id="markGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#c5d1ec"/>
-      <stop offset="100%" stop-color="#93a8d6"/>
-    </linearGradient>
-  </defs>
-  <symbol id="dvMark" viewBox="0 0 100 100">
-    <circle cx="50" cy="50" r="46" fill="none" stroke="#93a8d6" stroke-width="1.4" opacity=".45"/>
-    <text x="50" y="61" text-anchor="middle" font-family="Montserrat, sans-serif" font-weight="700" font-size="38" fill="url(#markGrad)">DV</text>
-  </symbol>
-  <filter id="waterFilter" x="-30%" y="-30%" width="160%" height="160%">
-    <feTurbulence id="waterTurb" type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="2" seed="7" result="turb"/>
-    <feDisplacementMap id="waterDisp" in="SourceGraphic" in2="turb" scale="6" xChannelSelector="R" yChannelSelector="G" result="disp"/>
-    <feOffset id="waterOffR" in="disp" dx="0" dy="0" result="rShift"/>
-    <feColorMatrix in="rShift" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="rOnly"/>
-    <feOffset id="waterOffB" in="disp" dx="0" dy="0" result="bShift"/>
-    <feColorMatrix in="bShift" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="bOnly"/>
-    <feColorMatrix in="disp" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="gOnly"/>
-    <feBlend in="rOnly" in2="gOnly" mode="screen" result="rg"/>
-    <feBlend in="rg" in2="bOnly" mode="screen"/>
-  </filter>
-</svg>
+<svg class="svg-defs" width="0" height="0" aria-hidden="true"><defs><symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/></symbol><symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4M17 3v4M3 11h18M8 15h1M15 15h1M8 18h1"/></symbol><symbol id="i-career" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="14" rx="3"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12c6 4 12 4 18 0M12 12v4"/></symbol><symbol id="i-contacts" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 21v-2a6 6 0 0 1 12 0v2M16 5a3 3 0 0 1 0 6M17 15a5 5 0 0 1 4 5"/></symbol><symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></symbol><symbol id="i-wallet" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="15" rx="3"/><path d="M3 9V5a2 2 0 0 1 2-2h12M21 12h-6v5h6M17 14.5h.01"/></symbol><symbol id="i-lab" viewBox="0 0 24 24"><path d="M8 3h8M9 3v6L3.5 18.5A1.7 1.7 0 0 0 5 21h14a1.7 1.7 0 0 0 1.5-2.5L15 9V3M7 15h10"/></symbol><symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 19 19 5M5 5h14v14"/></symbol><symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="7.5"/><path d="m16 16 5 5"/></symbol><symbol id="i-focus" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol><symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M9 12h12m-5-5 5 5-5 5"/></symbol><symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 3 2.4 6.6L21 12l-6.6 2.4L12 21l-2.4-6.6L3 12l6.6-2.4Z"/></symbol><symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></symbol><symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol><symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></symbol><symbol id="i-shield" viewBox="0 0 24 24"><path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6Z"/><path d="m8 12 3 3 5-6"/></symbol><symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></symbol><symbol id="i-cube" viewBox="0 0 24 24"><path d="m12 2 9 5v10l-9 5-9-5V7Zm0 10 9-5M12 12 3 7M12 12v10M7.5 4.5l9 5"/></symbol><symbol id="dvMark" viewBox="0 0 100 100"><rect x="4" y="4" width="92" height="92" rx="25" fill="#d6fc52"/><text x="50" y="65" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="44" fill="#111310">dv.</text></symbol></defs></svg>
+<a class="skip-link" href="#main-content">Vai al contenuto</a>
 
 <div id="authOverlay" class="auth-overlay" role="dialog" aria-modal="true" aria-label="Accesso al tuo spazio personale">
-  <section class="auth-welcome" aria-label="Davide Villano, spazio personale">
-    <div class="welcome-top"><b>D.VILLANO<span>®</span></b><span>PERSONAL SPACE<br>BOLOGNA, ITALIA</span></div>
-    <div class="welcome-title" aria-hidden="true">UN MONDO<br>DI <em>IDEE.</em></div>
-    <div id="authArt" class="cinema-art" aria-hidden="true"></div>
-    <div class="welcome-bottom"><p>Organizza il presente.<br><b>Esplora quello che viene.</b></p><div class="mood-controls" aria-label="Atmosfera"><button type="button" data-mood="orbit" aria-pressed="true">01 <span>Orbita</span></button><button type="button" data-mood="pink" aria-pressed="false">02 <span>Rosa</span></button><button type="button" data-mood="night" aria-pressed="false">03 <span>Notte</span></button></div></div>
+  <section class="auth-welcome" aria-label="DV / SPACE, il tuo spazio personale">
+    <div class="welcome-top"><a class="space-brand" href="./" aria-label="DV Space, home"><span class="brand-square">dv.</span><span>SPACE<span class="brand-slash">/</span></span></a><span class="welcome-edition">PERSONAL EDITION<br>BY DAVIDE VILLANO</span></div>
+    <div class="welcome-head"><span class="eyebrow">UN POSTO PER TUTTO QUELLO CHE SEI</span><h1>Il tuo spazio.<br><em>Senza limiti.</em></h1></div>
+    <div class="auth-art"><img src="assets/art/chrome-loop.png" width="1536" height="1024" alt="Scultura astratta in cromo, illuminata da riflessi verde lime" fetchpriority="high" decoding="async"></div>
+    <div class="art-caption" aria-hidden="true"><span>FIG. 01 — POSSIBILITÀ</span><span>∞</span></div>
+    <div class="welcome-bottom"><p>Le tue giornate. Le tue idee.<br><span>Tutto trova il suo spazio.</span></p><button type="button" id="welcomeMotion" class="motion-switch" aria-pressed="false" aria-label="Metti in pausa le animazioni">Ⅱ</button></div>
   </section>
-  <div class="auth-card"><div class="auth-eyebrow"><span></span> IL TUO SPAZIO, SEMPRE CON TE</div>
+  <div class="auth-form-side"><div class="auth-side-top"><span>IL TUO PROSSIMO INIZIO</span><span class="edition-pill">VOL. 03</span></div>
+  <div class="auth-card"><div class="auth-eyebrow"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-spark"/></svg> IL TUO SPAZIO PERSONALE</div>
 
     <div id="authViewLogin" class="auth-view">
       <h2>Bentornato<span>.</span></h2>
-      <p>Un solo posto per i tuoi impegni, i tuoi progetti e le prossime idee.</p>
-      <label for="authEmail">Email</label>
-
+      <p id="authIntro">Accedi e riparti da dove avevi lasciato.<br>Le tue idee ti aspettano qui.</p>
       <div id="nameFieldWrap" style="display:none">
         <label for="authName">Nome</label><input id="authName" type="text" placeholder="Nome" autocomplete="name" />
       </div>
+      <label for="authEmail">Indirizzo email</label>
       <input id="authEmail" type="email" autocomplete="email" placeholder="nome@email.com">
       <label for="authPassword">Password</label>
-      <input id="authPassword" type="password" autocomplete="current-password" placeholder="Password">
+      <div class="password-field"><input id="authPassword" type="password" autocomplete="current-password" placeholder="La tua password"><button type="button" class="password-toggle" id="passwordToggle" aria-label="Mostra password" aria-pressed="false"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-eye"/></svg></button></div>
 
       <button class="forgot-link" id="forgotLink" type="button">Password dimenticata?</button>
       <div class="auth-actions">
-        <button id="loginBtn" type="button">Accedi</button>
-        <button id="signupBtn" type="button">Registrati</button>
+        <button id="loginBtn" type="button">Entra nel tuo spazio ↗</button>
+        <button id="signupBtn" type="button">Non hai un account? Registrati</button>
       </div>
-      <div id="authMsg" class="auth-msg" role="status" aria-live="polite"></div><p class="auth-footnote">Calendario · Percorso · Contatti · Wishlist · Spese</p>
+      <div id="authMsg" class="auth-msg" role="status" aria-live="polite"></div><p class="auth-footnote"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-shield"/></svg>Uno spazio personale, accessibile con il tuo account.</p>
     </div>
 
     <div id="authViewForgot" class="auth-view hidden">
@@ -111,7 +92,7 @@
       </div>
     </div>
 
-  </div>
+  </div><div class="auth-side-bottom"><span>© 2026 DV / SPACE</span><a href="privacy.html">Privacy &amp; cookie</a></div></div>
 </div>
 
 <div id="scrollProgress" aria-hidden="true"></div>
@@ -125,7 +106,7 @@
 
   <div id="musicPanel" class="music-panel">
     <div class="music-panel-head">
-      <span>Musica per esplorare il sito</span>
+      <span>La tua colonna sonora</span>
       <button id="musicClose" type="button" aria-label="Chiudi">✕</button>
     </div>
 
@@ -137,7 +118,7 @@
     </div>
     <div class="music-results" id="musicResults"></div>
 
-    <p class="music-subhead">Playlist pronte</p>
+    <p class="music-subhead">La colonna sonora del tuo spazio</p>
     <div class="music-presets" id="musicPresets">
       <button type="button" data-type="playlist" data-id="37i9dQZF1DWZeKCadgRdKQ">Deep Focus</button>
       <button type="button" data-type="playlist" data-id="37i9dQZF1DX4WYpdgoIcn6">Chill Hits</button>
@@ -191,156 +172,49 @@
   </div>
 </div>
 
-<header>
-  <div class="header-top">
-    <div class="logo-wrap">
-      <div class="logo"><svg class="logo-icon" viewBox="0 0 100 100" aria-hidden="true"><use href="#dvMark"/></svg>D. Villano<span>·</span></div>
-      <div class="logo-tag">PERSONAL WORKSPACE</div>
-    </div>
-    <div class="clock-box">
-      <div class="clock-time" id="clockTime">--:--:--</div>
-      <div class="clock-date" id="clockDate">caricamento data...</div>
-    </div>
-  </div>
-  <div class="tab-nav" id="tabNav" role="tablist" aria-label="Sezioni dell'app">
-    <div class="tab-indicator" id="tabIndicator" aria-hidden="true"></div>
-    <button class="tab-btn active" data-module="home" role="tab" aria-selected="true" aria-controls="mod-home" id="tab-home" tabindex="0"><span class="n">00</span>Home</button>
-    <button class="tab-btn" data-module="calendario" role="tab" aria-selected="false" aria-controls="mod-calendario" id="tab-calendario" tabindex="-1"><span class="n">01</span>Calendario</button>
-    <button class="tab-btn" data-module="percorso" role="tab" aria-selected="false" aria-controls="mod-percorso" id="tab-percorso" tabindex="-1"><span class="n">02</span>Percorso</button>
-    <button class="tab-btn" data-module="contatti" role="tab" aria-selected="false" aria-controls="mod-contatti" id="tab-contatti" tabindex="-1"><span class="n">03</span>Contatti</button>
-    <button class="tab-btn" data-module="wishlist" role="tab" aria-selected="false" aria-controls="mod-wishlist" id="tab-wishlist" tabindex="-1"><span class="n">04</span>Wishlist</button>
-    <button class="tab-btn" data-module="spese" role="tab" aria-selected="false" aria-controls="mod-spese" id="tab-spese" tabindex="-1"><span class="n">05</span>Spese</button>
-    <button class="tab-btn" data-module="esperimenti" role="tab" aria-selected="false" aria-controls="mod-esperimenti" id="tab-esperimenti" tabindex="-1"><span class="n">06</span>Progetti</button>
-  </div>
-  <button class="theme-toggle-btn" id="searchTriggerBtn" type="button" aria-label="Cerca in tutto il sito (Ctrl+K)">
-    <svg viewBox="0 0 24 24" class="theme-ic"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-  </button>
-  <button class="theme-toggle-btn" id="themeToggleBtn" type="button" aria-label="Cambia tema chiaro/scuro">
-    <svg id="themeIconMoon" viewBox="0 0 24 24" class="theme-ic"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
-    <svg id="themeIconSun" viewBox="0 0 24 24" class="theme-ic" style="display:none;"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M4.22 4.22l1.77 1.77M18 18l1.78 1.78M2 12h2.5M19.5 12H22M4.22 19.78 6 18M18 6l1.78-1.78"/></svg>
-  </button>
-  <button class="nav-toggle" id="navToggle" aria-label="Apri menu"><span></span><span></span><span></span></button>
+<div class="app-shell" id="appShell" inert>
+<aside class="sidebar" id="sidebar" aria-label="Navigazione principale">
+ <a class="space-brand" href="./"><span class="brand-square">dv.</span><span>SPACE<span class="brand-slash">/</span></span></a>
+ <div class="sidebar-label">IL TUO MONDO</div>
+ <div class="tab-nav" id="tabNav" role="tablist" aria-orientation="vertical" aria-label="Sezioni dell’app"><button class="tab-btn active" data-module="home" role="tab" aria-selected="true" aria-controls="mod-home" id="tab-home" tabindex="0"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-home"/></svg><span>Panoramica</span><span class="nav-num">00</span></button><button class="tab-btn" data-module="calendario" role="tab" aria-selected="false" aria-controls="mod-calendario" id="tab-calendario" tabindex="-1"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-calendar"/></svg><span>Calendario</span><span class="nav-num">01</span></button><button class="tab-btn" data-module="percorso" role="tab" aria-selected="false" aria-controls="mod-percorso" id="tab-percorso" tabindex="-1"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-career"/></svg><span>Percorso</span><span class="nav-num">02</span></button><button class="tab-btn" data-module="contatti" role="tab" aria-selected="false" aria-controls="mod-contatti" id="tab-contatti" tabindex="-1"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-contacts"/></svg><span>Contatti</span><span class="nav-num">03</span></button><button class="tab-btn" data-module="wishlist" role="tab" aria-selected="false" aria-controls="mod-wishlist" id="tab-wishlist" tabindex="-1"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-heart"/></svg><span>Wishlist</span><span class="nav-num">04</span></button><button class="tab-btn" data-module="spese" role="tab" aria-selected="false" aria-controls="mod-spese" id="tab-spese" tabindex="-1"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wallet"/></svg><span>Spese</span><span class="nav-num">05</span></button><button class="tab-btn" data-module="esperimenti" role="tab" aria-selected="false" aria-controls="mod-esperimenti" id="tab-esperimenti" tabindex="-1"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-lab"/></svg><span>Laboratorio</span><span class="nav-num">06</span></button></div>
+ <div class="sidebar-bottom"><button class="sidebar-focus" type="button" id="sidebarFocus"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-focus"/></svg><span>Un momento di focus<small>Una cosa alla volta.</small></span></button>
+ <div class="sidebar-profile"><span class="profile-avatar" id="profileInitials">DV</span><div><b id="sidebarName">Il tuo account</b><span>Spazio personale</span></div><button id="logoutBtn" class="icon-button" type="button" style="display:none" aria-label="Esci dall’account"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-logout"/></svg></button></div></div>
+</aside>
+<button type="button" class="sidebar-scrim" id="sidebarScrim" aria-label="Chiudi menu" tabindex="-1"></button>
+<header class="app-topbar"><div class="topbar-location"><button class="icon-button nav-toggle" id="navToggle" aria-label="Apri menu" aria-expanded="false" aria-controls="sidebar" type="button"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-grid"/></svg></button><span>Il tuo spazio</span><span class="breadcrumb-slash">/</span><b id="currentSection">Panoramica</b></div>
+ <div class="topbar-actions"><div class="clock-box"><span class="clock-time" id="clockTime">--:--:--</span><span class="clock-date" id="clockDate"></span></div><button class="search-trigger" id="searchTriggerBtn" type="button" aria-label="Cerca in tutto il sito (Ctrl+K)"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-search"/></svg><span>Cerca nel tuo spazio</span><kbd>⌘ K</kbd></button><button class="icon-button" id="themeToggleBtn" type="button" aria-label="Cambia tema chiaro/scuro"><svg id="themeIconMoon" class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-moon"/></svg><svg id="themeIconSun" class="icon" viewBox="0 0 24 24" style="display:none" aria-hidden="true"><use href="#i-sun"/></svg></button><button class="icon-button" id="motionToggle" type="button" aria-label="Metti in pausa le animazioni" aria-pressed="false">Ⅱ</button></div>
 </header>
-
 <main id="main-content">
 
   <!-- ============ HOME ============ -->
   <section class="module active" id="mod-home" role="tabpanel" aria-labelledby="tab-home" tabindex="-1">
-    <div class="hero">
-      <div class="home-hero">
-        <div class="hero-visual" id="heroVisual">
-          <div id="homeArt" class="cinema-art" aria-hidden="true"></div><div class="hero-orbit-label">UN MONDO DI POSSIBILITÀ / 2026</div>
-          <div class="hero-caustics" aria-hidden="true"></div>
-          <div class="hero-vignette" aria-hidden="true"></div>
-
-          <span class="hero-cross" style="top:34%;left:56%;"></span>
-          <span class="hero-cross" style="top:57%;left:84%;"></span>
-          <span class="hero-cross" style="top:52%;left:18%;"></span>
-
-          <div class="hero-topline" data-reveal>
-            <p>Gestisco calendario, percorso e contatti in un unico spazio, <b>costruito da me</b>, pronto in ogni momento.</p>
-            <button class="hero-explore magnetic" type="button" data-goto="calendario">Apri calendario <span class="arrow">↗</span></button>
-          </div>
-
-          <div class="hero-card" data-reveal>
-            <div class="hero-card-avatar"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#dvMark"/></svg></div>
-            <div class="hero-card-txt">
-              <span class="hero-card-eyebrow" id="greetingText">Bentornato</span>
-              <div class="hero-card-title">Davide Villano</div>
-              <div class="hero-card-sub">Junior IT &amp; Multimedia Assistant</div>
-            </div>
-          </div>
-
-          <div class="hero-caption" data-reveal>
-            <span class="hero-caption-num">01/</span>
-            <span>JavaScript</span>
-            <span>Cloudflare Pages</span>
-            <span>Supabase</span>
-          </div>
-
-          <div class="hero-corner">
-            <span>© 2026</span>
-            <span class="ticks" aria-hidden="true"></span>
-            <span id="heroTimer">00'</span>
-          </div>
-
-          <h1 class="hero-wordmark" aria-hidden="true"><span class="line"><b>DAVIDE</b></span><span class="line"><b><span class="accent">VILLANO</span></b></span></h1>
-        </div>
-      </div>
-
-      <p class="home-lead" data-reveal>Spazio di lavoro personale — Bologna. Da qui gestisco il mio calendario, il mio percorso professionale, i miei contatti e la mia wishlist in un unico posto.</p>
-
-      <div class="quick-grid">
-        <div class="quick-card" data-reveal>
-          <span class="qk">Prossimo evento</span>
-          <div class="qv" id="nextEventTitle">Nessun evento in programma</div>
-          <div class="qsub" id="nextEventDate">&nbsp;</div>
-          <button class="go" data-goto="calendario">Apri calendario →</button>
-        </div>
-        <div class="quick-card" data-reveal>
-          <span class="qk">Ruolo attuale</span>
-          <div class="qv">Johns Hopkins University</div>
-          <div class="qsub">Junior IT &amp; Multimedia Assistant</div>
-          <button class="go" data-goto="percorso">Vedi percorso →</button>
-        </div>
-        <div class="quick-card" data-reveal>
-          <span class="qk">Eventi questo mese</span>
-          <div class="qv" id="monthEventCount">0</div>
-          <div class="qsub" id="monthLabel">&nbsp;</div>
-          <button class="go" data-goto="calendario">Gestisci →</button>
-        </div>
-      </div>
-
-      <div class="marquee" data-reveal>
-        <div class="marquee-track">
-          <span>JavaScript</span><span>Cloudflare Pages</span><span>Supabase</span><span>UI / UX</span><span>Automazione</span><span>Front-end</span>
-          <span>JavaScript</span><span>Cloudflare Pages</span><span>Supabase</span><span>UI / UX</span><span>Automazione</span><span>Front-end</span>
-        </div>
-      </div>
-
-      <div class="status-strip" data-reveal>
-        <span><span class="dot"></span>Bologna, Italia</span>
-        <span><span class="dot"></span>Disponibile per nuove opportunità</span>
-      </div>
-
-      <div class="stats-strip" data-reveal>
-        <div class="stat-box">
-          <div class="stat-num" id="statExperiments">00<span class="accent">+</span></div>
-          <div class="stat-label">Progetti &amp; demo</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-num">05</div>
-          <div class="stat-label">Moduli attivi</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-num" id="statCareer">00</div>
-          <div class="stat-label">Tappe del percorso</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-num">100<span class="accent">%</span></div>
-          <div class="stat-label">Front-end fatto a mano</div>
-        </div>
-      </div>
+    <div class="dashboard-heading"><div><span class="eyebrow" id="homeDate">IL TUO OGGI</span><h1 id="greetingText">Bentornato.</h1><p>Un nuovo giorno, spazio a nuove possibilità.</p></div><button class="primary-button" id="newEventQuick" type="button"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg> Nuovo evento</button></div>
+    <div class="home-feature-grid">
+      <article class="inspiration-card" data-tilt>
+        <img src="assets/art/chrome-loop.png" alt="" width="1536" height="1024" decoding="async" class="feature-art">
+        <div class="feature-content"><span class="eyebrow">LA TUA PROSSIMA IDEA INIZIA QUI</span><h2>Fai spazio<br>alle <em>possibilità.</em></h2><p>Organizza il presente.<br>Immagina tutto il resto.</p><button class="light-button" type="button" data-goto="esperimenti">Esplora il laboratorio <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></button></div>
+        <div class="feature-bottom"><span>PERSONAL SPACE / 2026</span><button type="button" id="openGallery" class="gallery-link"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-cube"/></svg> Galleria 3D</button></div>
+      </article>
+      <article class="focus-card" id="focusCard"><div class="card-topline"><span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-focus"/></svg> MOMENTO FOCUS</span><span class="small-badge">PER TE</span></div>
+       <div class="focus-modes" role="group" aria-label="Durata della sessione"><button type="button" data-focus-minutes="25" aria-pressed="true">25 min</button><button type="button" data-focus-minutes="50" aria-pressed="false">50 min</button><button type="button" data-focus-minutes="5" aria-pressed="false">Pausa</button></div>
+       <div class="focus-clock"><svg class="focus-ring" viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="90"/><circle id="focusProgress" cx="100" cy="100" r="90"/></svg><div><span id="focusTime" role="timer" aria-label="Tempo rimanente">25:00</span><span id="focusState">Trova il tuo ritmo.</span></div></div>
+       <div class="focus-actions"><button type="button" class="primary-button" id="focusStart">Inizia la sessione</button><button type="button" class="icon-button" id="focusReset" aria-label="Reimposta il timer">↺</button></div><p class="sr-only" id="focusAnnouncement" aria-live="polite"></p>
+      </article>
     </div>
+    <div class="section-topline"><h2>A portata di mano</h2><span>I piccoli passi fanno spazio alle grandi cose.</span></div>
+    <div class="home-shortcuts">
+      <button type="button" class="shortcut-card" data-goto="calendario"><span class="shortcut-icon lime"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-calendar"/></svg></span><span><b>Calendario</b><small>Il tempo, dalla tua parte.</small></span><svg class="icon shortcut-arrow" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+      <button type="button" class="shortcut-card" data-goto="percorso"><span class="shortcut-icon blue"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-career"/></svg></span><span><b>Percorso</b><small>Ogni passo conta.</small></span><svg class="icon shortcut-arrow" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+      <button type="button" class="shortcut-card" data-goto="wishlist"><span class="shortcut-icon pink"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-heart"/></svg></span><span><b>Wishlist</b><small>Tieni vicini i desideri.</small></span><svg class="icon shortcut-arrow" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+      <button type="button" class="shortcut-card" data-goto="spese"><span class="shortcut-icon orange"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wallet"/></svg></span><span><b>Spese</b><small>Tutto sotto controllo.</small></span><svg class="icon shortcut-arrow" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+    </div>
+    <div class="home-bottom-grid"><article class="agenda-card"><div class="section-topline"><h2>In arrivo</h2><button class="text-button" type="button" data-goto="calendario">Apri agenda ↗</button></div><div class="next-event"><div class="event-date-stamp"><b id="nextDayNumber">—</b><span id="nextDayMonth">AGENDA</span></div><div><span class="eyebrow">IL PROSSIMO APPUNTAMENTO</span><h3 id="nextEventTitle">Nessun evento in programma</h3><p id="nextEventDate">Il prossimo impegno inizia da qui.</p></div></div><div class="home-agenda" id="homeAgenda"></div></article>
+     <article class="snapshot-card"><span class="eyebrow">IL TUO SPAZIO, IN NUMERI</span><div class="snapshot-row"><span>Eventi <small id="monthLabel">questo mese</small></span><b id="monthEventCount">0</b></div><div class="snapshot-row"><span>Tappe del percorso</span><b id="statCareer">0</b></div><div class="snapshot-row"><span>Esperimenti da esplorare</span><b id="statExperiments">25</b></div></article></div>
   </section>
 
   <!-- ============ CALENDARIO ============ -->
   <section class="module" id="mod-calendario" role="tabpanel" aria-labelledby="tab-calendario" tabindex="-1">
-    <div class="page-hero tint-teal" aria-hidden="true">
-      <div class="page-hero-media"><img class="hero-water" src="assets/backgrounds/chrome-liquid.jpg" alt=""></div>
-      <div class="page-hero-tint"></div>
-      <div class="page-hero-glow"></div>
-      <div class="page-hero-grain"></div>
-      <div class="page-hero-vignette"></div>
-      <span class="hero-cross" style="top:28%;left:14%;"></span>
-      <span class="hero-cross" style="top:62%;left:82%;"></span>
-      <span class="page-hero-eyebrow">01 / Modulo</span>
-      <div class="page-hero-word">AGE<span>NDA</span></div>
-    </div>
-    <div class="mod-tag" data-reveal><b>01</b> / Calendario</div>
-    <span class="eyebrow" data-reveal><span class="eb-num">01</span>Modulo calendario</span>
-    <h2 class="sec-title" data-reveal>Agenda personale</h2>
-
+<div class="module-heading"><div><span class="eyebrow">Dai tempo alle tue idee.</span><h1 class="sec-title">Calendario<span>.</span></h1><p>Impegni, appuntamenti e piccoli momenti da ricordare.</p></div><span class="module-emblem" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-calendar"/></svg><small>01</small></span></div>
     <div class="cal-layout">
       <div class="cal-panel">
         <div class="cal-head">
@@ -348,12 +222,12 @@
           <div class="cal-head-actions">
             <input type="file" id="importICSInput" accept=".ics,text/calendar" hidden><button class="export-all-btn" id="importICSBtn" title="Importa eventi da Outlook, Apple Calendar o altri calendari">Importa .ics</button><button class="export-all-btn" id="exportAllBtn" title="Scarica tutti gli eventi come .ics">Esporta mese (.ics)</button>
             <div class="cal-nav">
-              <button id="prevMonth">‹</button>
-              <button id="nextMonth">›</button>
+              <button id="calToday" type="button">Oggi</button><button id="prevMonth" type="button" aria-label="Mese precedente">‹</button>
+              <button id="nextMonth" type="button" aria-label="Mese successivo">›</button>
             </div>
           </div>
         </div>
-        <div class="cal-grid" id="calGrid"></div>
+        <div class="cal-grid" id="calGrid" role="group" aria-label="Giorni del mese"></div><div class="cal-legend"><span><i></i> Eventi in programma</span><span>Seleziona un giorno per organizzarlo</span></div>
       </div>
 
       <div class="cal-panel day-detail">
@@ -377,7 +251,7 @@
           <label for="evDescription">Descrizione</label><textarea id="evDescription" placeholder="Dettagli opzionali..."></textarea>
           <div class="ev-row"><div><label for="evTime">Ora inizio</label><div class="time-field"><span class="time-ico">⏱</span><select id="evTime"></select></div></div><div><label for="evEndTime">Ora fine</label><div class="time-field"><span class="time-ico">⏱</span><select id="evEndTime"></select></div></div></div>
           <div class="ev-row"><div><label for="evLocation">Luogo</label><input type="text" id="evLocation" placeholder="Es. Bologna, SAIS..."></div></div>
-          <div class="ev-row"><div><label for="evCategory">Categoria</label><select id="evCategory"><option>Personale</option><option>Lavoro</option><option>Sport</option><option>Studio</option><option>Famiglia</option><option>Viaggio</option><option>Altro</option></select></div><div><label for="evColor">Colore</label><input class="ev-color" type="color" id="evColor" value="#93a8d6"></div></div>
+          <div class="ev-row"><div><label for="evCategory">Categoria</label><select id="evCategory"><option>Personale</option><option>Lavoro</option><option>Sport</option><option>Studio</option><option>Famiglia</option><option>Viaggio</option><option>Altro</option></select></div><div><label for="evColor">Colore</label><input class="ev-color" type="color" id="evColor" value="#d6fc52"></div></div>
           <label style="display:flex;gap:8px;align-items:center;margin-top:12px"><input type="checkbox" id="evAllDay"> Tutto il giorno</label>
           <button type="submit" class="ev-add-btn">+ Aggiungi evento</button>
         <div id="authMessage" aria-live="polite"></div></form>
@@ -387,22 +261,7 @@
 
   <!-- ============ PERCORSO ============ -->
   <section class="module" id="mod-percorso" role="tabpanel" aria-labelledby="tab-percorso" tabindex="-1">
-    <div class="page-hero tint-gold" aria-hidden="true">
-      <div class="page-hero-media"><img class="hero-water" src="assets/backgrounds/focus.jpg" alt=""></div>
-      <div class="page-hero-tint"></div>
-      <div class="page-hero-glow"></div>
-      <div class="page-hero-grain"></div>
-      <div class="page-hero-vignette"></div>
-      <span class="hero-cross" style="top:24%;left:20%;"></span>
-      <span class="hero-cross" style="top:58%;left:78%;"></span>
-      <span class="page-hero-eyebrow">02 / Modulo</span>
-      <div class="page-hero-word">FO<span>CUS</span></div>
-    </div>
-    <div class="mod-tag" data-reveal><b>02</b> / Percorso</div>
-    <span class="eyebrow" data-reveal><span class="eb-num">02</span>Percorso professionale</span>
-    <h2 class="sec-title" data-reveal>Esperienza</h2>
-    <p style="color:var(--text-dim); margin-top:1rem; max-width:520px;">Seleziona una voce per accedere ai dettagli. Ogni utente gestisce il proprio percorso.</p>
-
+<div class="module-heading"><div><span class="eyebrow">La tua storia, un passo alla volta.</span><h1 class="sec-title">Il tuo percorso<span>.</span></h1><p>Esperienze, traguardi e quello che viene dopo.</p></div><span class="module-emblem" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-career"/></svg><small>02</small></span></div>
     <div class="console">
       <div class="section-menu" id="careerMenu"></div>
       <div class="ev-form" id="careerFormWrap" style="margin-top:0;padding-top:0;border-top:none;">
@@ -429,22 +288,7 @@
 
   <!-- ============ CONTATTI ============ -->
   <section class="module" id="mod-contatti" role="tabpanel" aria-labelledby="tab-contatti" tabindex="-1">
-    <div class="page-hero tint-crimson" aria-hidden="true">
-      <div class="page-hero-media"><img class="hero-water" src="assets/backgrounds/chrome-figure.jpg" alt=""></div>
-      <div class="page-hero-tint"></div>
-      <div class="page-hero-glow"></div>
-      <div class="page-hero-grain"></div>
-      <div class="page-hero-vignette"></div>
-      <span class="hero-cross" style="top:30%;left:16%;"></span>
-      <span class="hero-cross" style="top:60%;left:80%;"></span>
-      <span class="page-hero-eyebrow">03 / Modulo</span>
-      <div class="page-hero-word">CONTA<span>TTI</span></div>
-    </div>
-    <div class="mod-tag" data-reveal><b>03</b> / Contatti</div>
-    <span class="eyebrow" data-reveal><span class="eb-num">03</span>Comunicazione</span>
-    <h2 class="sec-title" data-reveal>Contatti</h2>
-    <p style="color:var(--text-dim); margin-top:1rem; max-width:520px;">La tua rubrica personale: visibile e modificabile solo da te.</p>
-
+<div class="module-heading"><div><span class="eyebrow">Le connessioni che contano.</span><h1 class="sec-title">Contatti<span>.</span></h1><p>Le persone da tenere vicine, sempre a portata di mano.</p></div><span class="module-emblem" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-contacts"/></svg><small>03</small></span></div>
     <div class="console">
       <div>
         <div class="ev-list" id="contactList" style="max-height:none;"></div>
@@ -468,22 +312,7 @@
 
   <!-- ============ WISHLIST ============ -->
   <section class="module" id="mod-wishlist" role="tabpanel" aria-labelledby="tab-wishlist" tabindex="-1">
-    <div class="page-hero tint-sunset" aria-hidden="true">
-      <div class="page-hero-media"><img class="hero-water" src="assets/backgrounds/statue-cosmic.jpg" alt=""></div>
-      <div class="page-hero-tint"></div>
-      <div class="page-hero-glow"></div>
-      <div class="page-hero-grain"></div>
-      <div class="page-hero-vignette"></div>
-      <span class="hero-cross" style="top:26%;left:18%;"></span>
-      <span class="hero-cross" style="top:64%;left:76%;"></span>
-      <span class="page-hero-eyebrow">04 / Modulo</span>
-      <div class="page-hero-word">WISH<span>LIST</span></div>
-    </div>
-    <div class="mod-tag" data-reveal><b>04</b> / Wishlist</div>
-    <span class="eyebrow" data-reveal><span class="eb-num">04</span>Shopping cross-sito</span>
-    <h2 class="sec-title" data-reveal>Wishlist</h2>
-    <p style="color:var(--text-dim); margin-top:1rem; max-width:560px;">Incolla il link di un prodotto da qualsiasi sito: provo a leggerne titolo, immagine e prezzo automaticamente. Seleziona "Nel carrello" per calcolare il totale di ciò che vuoi comprare adesso.</p>
-
+<div class="module-heading"><div><span class="eyebrow">Tieni un posto ai desideri.</span><h1 class="sec-title">Wishlist<span>.</span></h1><p>Salva ciò che ti piace. Scegli quando farlo tuo.</p></div><span class="module-emblem" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-heart"/></svg><small>04</small></span></div>
     <div class="wl-summary">
       <div class="wl-summary-box">
         <span class="qk">Totale wishlist</span>
@@ -500,7 +329,7 @@
     <div class="console">
       <div>
         <div class="wl-grid" id="wlGrid"></div>
-        <div class="ev-empty" id="wlEmpty" style="display:none;">Nessun prodotto in wishlist. Aggiungine uno dal modulo qui a fianco.</div>
+        <div class="ev-empty" id="wlEmpty" style="display:none;">Qui c’è spazio per un desiderio. Aggiungi il tuo primo prodotto.</div>
       </div>
       <div class="ev-form" id="wlFormWrap" style="margin-top:0;padding-top:0;border-top:none;">
         <h4 style="font-family:var(--font-display);color:var(--ink);margin-bottom:6px;" id="wlFormTitle">Nuovo prodotto</h4>
@@ -540,22 +369,7 @@
 
   <!-- ============ SPESE ============ -->
   <section class="module" id="mod-spese" role="tabpanel" aria-labelledby="tab-spese" tabindex="-1">
-    <div class="page-hero tint-jade" aria-hidden="true">
-      <div class="page-hero-media"><img class="hero-water" src="assets/backgrounds/chrome-liquid.jpg" alt=""></div>
-      <div class="page-hero-tint"></div>
-      <div class="page-hero-glow"></div>
-      <div class="page-hero-grain"></div>
-      <div class="page-hero-vignette"></div>
-      <span class="hero-cross" style="top:30%;left:20%;"></span>
-      <span class="hero-cross" style="top:62%;left:78%;"></span>
-      <span class="page-hero-eyebrow">05 / Modulo</span>
-      <div class="page-hero-word">SPE<span>SE</span></div>
-    </div>
-    <div class="mod-tag" data-reveal><b>05</b> / Spese</div>
-    <span class="eyebrow" data-reveal><span class="eb-num">05</span>Bilancio personale</span>
-    <h2 class="sec-title" data-reveal>Spese</h2>
-    <p style="color:var(--text-dim); margin-top:1rem; max-width:560px;">Segna ogni spesa con importo, categoria e data: qui sotto trovi il totale del mese in corso (navigabile) e il totale complessivo, con il dettaglio per categoria.</p>
-
+<div class="module-heading"><div><span class="eyebrow">Fai spazio a ciò che conta.</span><h1 class="sec-title">Le tue spese<span>.</span></h1><p>Una vista chiara sulle piccole e grandi uscite.</p></div><span class="module-emblem" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wallet"/></svg><small>05</small></span></div>
     <div class="wl-summary">
       <div class="wl-summary-box">
         <span class="qk">Totale del mese</span>
@@ -616,24 +430,9 @@
 
   <!-- ============ PROGETTI / DEMO TECNICHE ============ -->
   <section class="module" id="mod-esperimenti" role="tabpanel" aria-labelledby="tab-esperimenti" tabindex="-1">
-    <div class="page-hero tint-slate" aria-hidden="true">
-      <div class="page-hero-media"><img class="hero-water" src="assets/backgrounds/chrome-figure.jpg" alt=""></div>
-      <div class="page-hero-tint"></div>
-      <div class="page-hero-glow"></div>
-      <div class="page-hero-grain"></div>
-      <div class="page-hero-vignette"></div>
-      <span class="hero-cross" style="top:32%;left:22%;"></span>
-      <span class="hero-cross" style="top:56%;left:74%;"></span>
-      <span class="page-hero-eyebrow">06 / Modulo</span>
-      <div class="page-hero-word">PROGE<span>TTI</span></div>
-    </div>
-    <div class="mod-tag" data-reveal><b>06</b> / Progetti</div>
-    <span class="eyebrow" data-reveal><span class="eb-num">06</span>Laboratorio</span>
-    <h2 class="sec-title" data-reveal>Progetti &amp; demo tecniche</h2>
-    <p style="color:var(--text-dim); margin-top:1rem; max-width:560px;">Piccoli progetti realizzati per esercitarmi con diverse tecnologie front-end. Si aprono in una nuova scheda.</p>
-
-    <div class="carousel-wrap">
-    <div class="carousel-track" data-reveal>
+<div class="module-heading"><div><span class="eyebrow">Segui la curiosità.</span><h1 class="sec-title">Il laboratorio<span>.</span></h1><p>Strumenti, giochi e piccoli mondi da esplorare.</p></div><span class="module-emblem" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-lab"/></svg><small>06</small></span></div>
+<div class="project-controls"><div class="project-filters" role="group" aria-label="Filtra i progetti"><button type="button" data-project-filter="all" aria-pressed="true">Tutti <span id="projectCount">25</span></button><button type="button" data-project-filter="tools" aria-pressed="false">Strumenti</button><button type="button" data-project-filter="play" aria-pressed="false">Play</button><button type="button" data-project-filter="explore" aria-pressed="false">Esplora</button></div><span class="project-caption">Scegli dove lasciarti sorprendere.</span></div>    <div class="carousel-wrap">
+    <div class="carousel-track project-grid" data-reveal>
       <div class="quick-card">
         <span class="qk">Demo</span>
         <div class="qv">Wiki Searcher</div>
@@ -766,32 +565,20 @@
         <div class="qsub">Una pagina lunga da scorrere fino in fondo, con effetti speciali</div>
         <a class="go" href="experiments/scroll-infinito.html" target="_blank" rel="noopener">Apri →</a>
       </div>
+<div class="quick-card"><span class="qk">Play</span><div class="qv">Materia interattiva</div><div class="qsub">Muovi il cursore e dai vita a un universo di particelle.</div><a class="go" href="experiments/surprise.html" target="_blank" rel="noopener">Apri →</a></div>
+<div class="quick-card"><span class="qk">Play</span><div class="qv">Pozzi gravitazionali</div><div class="qsub">Crea attrazioni e osserva le orbite prendere forma.</div><a class="go" href="experiments/surprise2.html" target="_blank" rel="noopener">Apri →</a></div>
+<div class="quick-card"><span class="qk">Play</span><div class="qv">Terminale segreto</div><div class="qsub">Un piccolo esperimento da esplorare, un comando alla volta.</div><a class="go" href="experiments/surprise3.html" target="_blank" rel="noopener">Apri →</a></div>
     </div>
-    <div class="carousel-nav">
-      <div class="carousel-dots" id="carouselDots"></div>
-      <button class="carousel-arrow prev" type="button" aria-label="Precedente"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
-      <button class="carousel-arrow next" type="button" aria-label="Successivo"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
-    </div>
+    <div id="projectEmpty" class="ev-empty" hidden>Nessun progetto in questa categoria.</div>
     </div>
   </section>
 
 </main>
 
-<div style="display:flex;justify-content:flex-end;gap:10px;padding:0 5vw">
-  <button id="logoutBtn" class="logout-btn" type="button" style="display:none">Esci</button>
+<footer class="app-footer"><span>dv. <span class="footer-space">SPACE /</span> <span>Fatto per le tue possibilità.</span></span><a href="privacy.html">Privacy &amp; cookie</a><span>© 2026 Davide Villano</span></footer>
 </div>
-<footer>
-  <div class="footer-cta">
-    <span class="eyebrow"><span class="eb-num">07</span>Contatti</span>
-    <h2>Parliamo<br>del prossimo passo</h2>
-    <button class="go-btn" type="button" data-goto="contatti">Apri i miei contatti →</button>
-  </div>
-  <div class="footer-fine">
-    <span>© 2026 Davide Villano</span>
-    <span>Bologna, Italia</span>
-    <a href="privacy.html">Privacy &amp; Cookie Policy</a>
-  </div>
-</footer>
+<dialog id="galleryDialog" class="gallery-dialog" aria-labelledby="galleryTitle"><div class="gallery-head"><div><span class="eyebrow">THE OBJECT COLLECTION</span><h2 id="galleryTitle">Sette stanze. Infinite idee.</h2></div><button type="button" class="icon-button" id="closeGallery" aria-label="Chiudi galleria">✕</button></div><div id="galleryStage" class="gallery-stage"><div id="galleryArt" class="gallery-art"></div><p class="gallery-loading" id="galleryLoading">La galleria sta prendendo forma…</p></div><p class="gallery-hint">Trascina per ruotare · Esplora le sette opere · Esc per uscire</p></dialog>
+<noscript><div class="noscript-notice">Per accedere al tuo spazio, attiva JavaScript nel browser.</div></noscript>
 
 <script src="js/config.js"></script>
 <script src="js/toast.js"></script>
@@ -806,9 +593,8 @@
 <script src="js/search.js"></script>
 <script src="js/init.js"></script>
 <script src="js/theme.js"></script>
-<script src="js/motion.js"></script>
 <script src="js/music.js"></script>
-<script type="module" src="js/cinematic.js"></script>
+<script src="js/experience.js"></script>
 
 <script>
 // Registra il service worker per rendere l'app installabile e usabile offline.

@@ -27,8 +27,10 @@ canvas{display:block;position:fixed;inset:0;}
 .counter{position:fixed;top:14px;right:14px;color:rgba(232,180,255,.5);font-size:11px;letter-spacing:.08em;z-index:10;text-align:right;line-height:1.6;}
 .counter b{color:#e879f9;}
 </style>
+<link rel="stylesheet" href="../css/lab.css">
+<link rel="icon" href="../assets/icons/space.svg" type="image/svg+xml">
 </head>
-<body>
+<body data-lab-skin="scene">
 <a class="back-link" href="../index.html" onclick="if(window.history.length>1){history.back();return false;}">← Indietro</a>
 <div class="counter">PARTICELLE ATTIVE: <b id="pCount">0</b><br>CLIC REGISTRATI: <b id="cCount">0</b></div>
 <canvas id="c"></canvas>
@@ -179,5 +181,6 @@ function loop() {
 }
 loop();
 </script>
+<a class="dv-lab-bar" href="../index.html" aria-label="Torna al tuo spazio personale"><span class="dv-lab-mark">dv.</span><span>SPACE / LAB</span><span>↖</span></a>
 </body>
 </html>

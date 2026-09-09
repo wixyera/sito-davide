@@ -63,8 +63,10 @@ canvas{display:block;position:fixed;inset:0;}
 .cursor{display:inline-block;width:8px;height:16px;background:#6bffb0;margin-left:2px;vertical-align:middle;animation:blink 1s step-end infinite;}
 @keyframes blink{50%{opacity:0;}}
 </style>
+<link rel="stylesheet" href="../css/lab.css">
+<link rel="icon" href="../assets/icons/space.svg" type="image/svg+xml">
 </head>
-<body class="crt">
+<body class="crt" data-lab-skin="scene">
 <a class="back-link" href="../index.html" onclick="if(window.history.length>1){history.back();return false;}">← Indietro</a>
 <canvas id="rain"></canvas>
 <div class="term-wrap">
@@ -220,5 +222,6 @@ wrap.addEventListener('click', () => input.focus());
   await typeLine('Benvenuto. Scrivi "help" per iniziare.', 'ok', 14);
 })();
 </script>
+<a class="dv-lab-bar" href="../index.html" aria-label="Torna al tuo spazio personale"><span class="dv-lab-mark">dv.</span><span>SPACE / LAB</span><span>↖</span></a>
 </body>
 </html>
