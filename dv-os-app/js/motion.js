@@ -70,7 +70,7 @@
   });
 
   /* ---------------- CURSORE CUSTOM ---------------- */
-  if (!reducedMotion && isFinePointer) {
+  if (!reducedMotion && isFinePointer && !document.body.classList.contains('cinema-site')) {
     document.body.classList.add('custom-cursor');
     const dot = document.createElement('div');
     dot.className = 'cursor-dot';

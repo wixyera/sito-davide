@@ -59,3 +59,7 @@ Apri http://127.0.0.1:4173. Per usare localmente anche i servizi con chiavi, cop
 `npm run build` prepara la cartella pubblica. `npm test` verifica i casi critici dell’accesso con risposte simulate e l’adattamento delle API. Il login reale e le operazioni sui dati vanno verificati con il tuo account e le configurazioni originali.
 
 Three.js è incluso localmente con licenza MIT in `vendor`. La texture terrestre proviene dagli [esempi ufficiali Three.js](https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg). Gli altri asset sono quelli del sito fornito. I video di riferimento non sono inclusi.
+
+## Tour del museo — nuova versione
+
+Sette sale con opere 3D diverse, piedistalli, portali, luci e ombre. Usa le frecce sopra le opere per cambiare sala; dopo il login aprono i moduli originali corrispondenti. Prima del login mostrano soltanto le opere, senza accesso ai dati. Trascina un’opera per ruotarla; il pulsante pausa arresta il movimento 3D. Il cursore nativo è sempre visibile. La preferenza di sistema per ridurre le animazioni viene rispettata.

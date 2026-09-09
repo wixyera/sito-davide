@@ -1,4 +1,5 @@
 import * as THREE from '../vendor/three.module.js';
+import { createMuseum } from './museum.js';
 
 const reduce=matchMedia('(prefers-reduced-motion: reduce)');
 const overlay=document.getElementById('authOverlay');
@@ -26,9 +27,10 @@ ring(2.07,.055,chrome,1.1,.1);ring(2.12,.015,accent,-.7,.5);
 const satellites=[];
 for(let i=0;i<12;i++){const mat=i%3===0?accent:chrome;const mesh=new THREE.Mesh(i%3?new THREE.IcosahedronGeometry(.10+i%3*.055,0):new THREE.TorusGeometry(.16,.044,8,28),mat);mesh.userData.angle=i*Math.PI*2/12;mesh.userData.radius=2.25+(i%3)*.3;mesh.userData.height=(i%4-1.5)*.68;orbit.add(mesh);satellites.push(mesh)}
 const stars=new THREE.Group();scene.add(stars);for(let i=0;i<22;i++){const m=new THREE.Mesh(new THREE.OctahedronGeometry(.018+(i%3)*.012),chrome);m.position.set(Math.sin(i*23)*4,Math.cos(i*7)*2.4,Math.sin(i*13)*2-2);stars.add(m)}
+const museum=createMuseum(THREE,{scene,group,globe,orbit,chrome,accent,camera,renderStill,overlay,holders});
 const moods={orbit:{earth:'#cce6ff',accent:'#bdff81',rim:'#f298e0'},pink:{earth:'#ffe3ef',accent:'#b12a64',rim:'#ff4b99'},night:{earth:'#c6efdf',accent:'#dfff8e',rim:'#6972ff'}};
 function setMood(name){const mood=moods[name]||moods.orbit;document.body.dataset.mood=name;earthMaterial.color.set(mood.earth);accent.color.set(mood.accent);rim.color.set(mood.rim);document.querySelectorAll('.mood-controls button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mood===name)));renderStill()}
-document.querySelectorAll('.mood-controls button').forEach(b=>b.addEventListener('click',()=>setMood(b.dataset.mood)));
+document.querySelectorAll('.mood-controls button').forEach(b=>b.addEventListener('click',()=>{setMood(b.dataset.mood);museum.selectMood(b.dataset.mood)}));
 let pointerX=0,pointerY=0,scroll=0,last=0,time=0;
 addEventListener('pointermove',e=>{pointerX=e.clientX/innerWidth-.5;pointerY=e.clientY/innerHeight-.5},{passive:true});
 addEventListener('scroll',()=>{scroll=Math.min(scrollY/Math.max(innerHeight*.8,1),1);document.documentElement.style.setProperty('--hero-progress',String(scroll));if(reduce.matches)renderStill()},{passive:true});
@@ -42,17 +44,17 @@ function updateHost(){const authenticated=overlay.classList.contains('hidden');c
  if(authenticated)setMood(current==='contatti'?'pink':current==='esperimenti'?'night':'orbit');
 }
 new MutationObserver(updateHost).observe(overlay,{attributes:true,attributeFilter:['class']});
-addEventListener('workspace:module',e=>{current=e.detail;updateHost();if(!reduce.matches){wipe.classList.remove('playing');void wipe.offsetWidth;wipe.classList.add('playing')}resize()});
+addEventListener('workspace:module',e=>{current=e.detail;updateHost();museum.selectModule(current);if(!reduce.matches){wipe.classList.remove('playing');void wipe.offsetWidth;wipe.classList.add('playing')}resize()});
 try{
- renderer=new THREE.WebGLRenderer({alpha:true,antialias:true,powerPreference:'low-power'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));renderer.setClearColor(0x000000,0);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.35;authArt.append(renderer.domElement);
+ renderer=new THREE.WebGLRenderer({alpha:true,antialias:true,powerPreference:'low-power'});renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));renderer.setClearColor(0x000000,0);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.35;authArt.append(renderer.domElement);
  renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();renderer.setAnimationLoop(null);renderer.domElement.style.display='none'});
- observation.observe(host);current=document.querySelector('.module.active')?.id.replace('mod-','')||'home';updateHost();resize();
- renderer.setAnimationLoop(now=>{if(!visible||document.hidden)return;if(reduce.matches){if(now-last<1000)return;last=now;renderStill();return}const dt=Math.min((now-last)/1000,.04);last=now;time+=dt;const targetX=pointerX*.25,targetY=pointerY*.15;
-  globe.rotation.y+=dt*.075;orbit.rotation.y=time*.16;group.rotation.y+=(targetX-group.rotation.y)*.04;group.rotation.x+=(targetY-group.rotation.x)*.04;
+ observation.observe(host);current=document.querySelector('.module.active')?.id.replace('mod-','')||'home';updateHost();museum.selectModule(current);resize();
+ renderer.setAnimationLoop(now=>{if(!visible||document.hidden)return;if(reduce.matches){if(now-last<1000)return;last=now;museum.tick(0,time,host!==authArt&&host!==homeArt);renderStill();return}const dt=Math.min((now-last)/1000,.04);last=now;if(!museum.paused)time+=dt;const targetX=museum.paused?0:pointerX*.25,targetY=museum.paused?0:pointerY*.15;
+  globe.rotation.y+=(museum.paused?0:dt)*.075;orbit.rotation.y=time*.16;group.rotation.y+=(targetX-group.rotation.y)*.04;group.rotation.x+=(targetY-group.rotation.x)*.04;
   group.position.y=Math.sin(time*.65)*.08-(host===homeArt?scroll*.5:0);group.rotation.z=-.19+Math.sin(time*.28)*.035+(host===homeArt?scroll*.25:0);
   const compact=host!==authArt&&host!==homeArt;group.scale.setScalar(compact?.76:1);
   for(const s of satellites){const a=s.userData.angle;s.position.set(Math.cos(a)*s.userData.radius,s.userData.height+Math.sin(time*.6+a)*.08,Math.sin(a)*s.userData.radius*.55);s.rotation.x=time*.2+a;s.rotation.z=time*.1+a}
-  stars.rotation.z=time*.012;renderer.render(scene,camera);
+  stars.rotation.z=time*.012;museum.tick(dt,time,compact);renderer.render(scene,camera);
  });
  addEventListener('resize',resize);new ResizeObserver(resize).observe(authArt);new ResizeObserver(resize).observe(homeArt);
 }catch(error){console.warn('La grafica 3D non è disponibile. Tutte le funzioni restano utilizzabili.',error);updateHost()}

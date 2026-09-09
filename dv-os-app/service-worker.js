@@ -9,7 +9,7 @@
    Se aggiorni i file dell'app e vuoi che il cambiamento arrivi SUBITO
    alla prima riapertura (invece che alla seconda), alza il numero qui
    sotto (v1 -> v2 -> v3...). */
-const CACHE_NAME = 'dv-os-shell-cinematic-v1';
+const CACHE_NAME = 'dv-os-shell-museum-v2';
 const DATA_CACHE_NAME = 'dv-os-data-v2';
 const APP_SHELL = [
   './',
@@ -18,6 +18,7 @@ const APP_SHELL = [
   './css/style.css',
   './css/cinematic.css',
   './js/cinematic.js',
+  './js/museum.js',
   './vendor/three.module.js',
   './assets/earth.jpg',
   './assets/backgrounds/chrome-liquid.jpg',
