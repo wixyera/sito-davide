@@ -97,6 +97,7 @@
 
 <div id="scrollProgress" aria-hidden="true"></div>
 <div id="ambientGlow" aria-hidden="true"></div>
+<canvas id="ambientFxCanvas" aria-hidden="true"></canvas>
 
 <div id="musicWidget" class="music-widget">
   <button id="musicToggle" class="music-toggle" type="button" aria-label="Musica di sottofondo" aria-expanded="false">
@@ -431,7 +432,7 @@
   <!-- ============ PROGETTI / DEMO TECNICHE ============ -->
   <section class="module" id="mod-esperimenti" role="tabpanel" aria-labelledby="tab-esperimenti" tabindex="-1">
 <div class="module-heading"><div><span class="eyebrow">Segui la curiosità.</span><h1 class="sec-title">Il laboratorio<span>.</span></h1><p>Strumenti, giochi e piccoli mondi da esplorare.</p></div><span class="module-emblem" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-lab"/></svg><small>06</small></span></div>
-<div class="project-controls"><div class="project-filters" role="group" aria-label="Filtra i progetti"><button type="button" data-project-filter="all" aria-pressed="true">Tutti <span id="projectCount">25</span></button><button type="button" data-project-filter="tools" aria-pressed="false">Strumenti</button><button type="button" data-project-filter="play" aria-pressed="false">Play</button><button type="button" data-project-filter="explore" aria-pressed="false">Esplora</button></div><span class="project-caption">Scegli dove lasciarti sorprendere.</span></div>    <div class="carousel-wrap">
+<div class="project-controls"><div class="project-filters" role="group" aria-label="Filtra i progetti"><button type="button" data-project-filter="all" aria-pressed="true">Tutti <span id="projectCount">28</span></button><button type="button" data-project-filter="tools" aria-pressed="false">Strumenti</button><button type="button" data-project-filter="play" aria-pressed="false">Play</button><button type="button" data-project-filter="explore" aria-pressed="false">Esplora</button><button type="button" data-project-filter="test" aria-pressed="false">Test</button></div><span class="project-caption">Scegli dove lasciarti sorprendere.</span></div>    <div class="carousel-wrap">
     <div class="carousel-track project-grid" data-reveal>
       <div class="quick-card">
         <span class="qk">Demo</span>
@@ -568,6 +569,9 @@
 <div class="quick-card"><span class="qk">Play</span><div class="qv">Materia interattiva</div><div class="qsub">Muovi il cursore e dai vita a un universo di particelle.</div><a class="go" href="experiments/surprise.html" target="_blank" rel="noopener">Apri →</a></div>
 <div class="quick-card"><span class="qk">Play</span><div class="qv">Pozzi gravitazionali</div><div class="qsub">Crea attrazioni e osserva le orbite prendere forma.</div><a class="go" href="experiments/surprise2.html" target="_blank" rel="noopener">Apri →</a></div>
 <div class="quick-card"><span class="qk">Play</span><div class="qv">Terminale segreto</div><div class="qsub">Un piccolo esperimento da esplorare, un comando alla volta.</div><a class="go" href="experiments/surprise3.html" target="_blank" rel="noopener">Apri →</a></div>
+<div class="quick-card"><span class="qk">Test</span><div class="qv">Space DNA</div><div class="qsub">Scopri quale energia porti nel tuo spazio personale.</div><a class="go" href="experiments/test-dna.html" target="_blank" rel="noopener">Fai il test →</a></div>
+<div class="quick-card"><span class="qk">Test</span><div class="qv">Rhythm Scan</div><div class="qsub">Leggi il tuo ritmo naturale tra focus, pausa e movimento.</div><a class="go" href="experiments/test-ritmo.html" target="_blank" rel="noopener">Fai il test →</a></div>
+<div class="quick-card"><span class="qk">Test</span><div class="qv">Next Horizon</div><div class="qsub">Individua il prossimo movimento che vuoi davvero fare.</div><a class="go" href="experiments/test-futuro.html" target="_blank" rel="noopener">Fai il test →</a></div>
     </div>
     <div id="projectEmpty" class="ev-empty" hidden>Nessun progetto in questa categoria.</div>
     </div>
@@ -594,6 +598,7 @@
 <script src="js/init.js"></script>
 <script src="js/theme.js"></script>
 <script src="js/music.js"></script>
+<script src="js/ambient-fx.js"></script>
 <script src="js/experience.js"></script>
 
 <script>

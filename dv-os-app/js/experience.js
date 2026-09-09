@@ -18,6 +18,7 @@
       button.setAttribute('aria-pressed', String(motionPaused));
     }
     galleryApi?.setPaused(motionPaused);
+    window.dispatchEvent(new CustomEvent('space:motion', {detail: {paused: motionPaused}}));
   }
   for (const id of ['welcomeMotion', 'motionToggle']) $(id).addEventListener('click', () => {
     if (motionQuery.matches) {
@@ -147,10 +148,11 @@
   const projectCategories = {
     'wiki-searcher':'tools','pass-generator':'tools','qr-generator':'tools','palette-generator':'tools','generatore-nomi':'tools','oracolo-ai':'tools',
     'meteo-radar':'explore','meraviglie-mondo':'explore','universo':'explore','cosmo-explorer':'explore','outer-banks':'explore','outer-banks-serie':'explore','serie-a':'explore',
-    'flip-coin':'play','snake':'play','dado-fortunato':'play','sasso-carta-forbici':'play','quiz-lampo':'play','piano-virtuale':'play','sfera-magica':'play','fuochi-artificio':'play','surprise':'play','surprise2':'play','surprise3':'play','scroll-infinito':'play'
+    'flip-coin':'play','snake':'play','dado-fortunato':'play','sasso-carta-forbici':'play','quiz-lampo':'play','piano-virtuale':'play','sfera-magica':'play','fuochi-artificio':'play','surprise':'play','surprise2':'play','surprise3':'play','scroll-infinito':'play',
+    'test-dna':'test','test-ritmo':'test','test-futuro':'test'
   };
   const cards = [...document.querySelectorAll('.project-grid > .quick-card')];
-  const categoryNames = {tools:'Strumenti',play:'Play',explore:'Esplora'};
+  const categoryNames = {tools:'Strumenti',play:'Play',explore:'Esplora',test:'Test'};
   cards.forEach((card,index)=> {
     const link=card.querySelector('a[href]');
     const slug=link.getAttribute('href').split('/').pop().replace('.html','');
@@ -159,7 +161,7 @@
     card.style.setProperty('--stagger', `${Math.min(index%6,5)*.045}s`);
     card.querySelector('.qk').textContent=categoryNames[category]+' / '+String(index+1).padStart(2,'0');
     const cover=document.createElement('div');cover.className='project-cover';cover.setAttribute('aria-hidden','true');
-    const icon = category==='tools'?'grid':category==='explore'?'cube':'spark';
+    const icon = category==='tools'?'grid':category==='explore'?'cube':category==='test'?'focus':'spark';
     cover.innerHTML=`<svg class="icon" viewBox="0 0 24 24"><use href="#i-${icon}"/></svg><span>${String(index+1).padStart(2,'0')} / LAB</span>`;
     if (['universo','cosmo-explorer','outer-banks-serie'].includes(slug)) {
       const img=document.createElement('img');
@@ -184,6 +186,14 @@
   // Gentle pointer depth; the native cursor remains visible.
   const tilt=document.querySelector('[data-tilt]');
   if(matchMedia('(hover: hover) and (pointer: fine)').matches){
+    addEventListener('pointermove',e=>{
+      body.style.setProperty('--pointer-x',`${e.clientX}px`);
+      body.style.setProperty('--pointer-y',`${e.clientY}px`);
+    },{passive:true});
+    addEventListener('pointerleave',()=>{
+      body.style.setProperty('--pointer-x','50vw');
+      body.style.setProperty('--pointer-y','25vh');
+    },{passive:true});
     tilt.addEventListener('pointermove',e=>{
       if(motionPaused)return;
       const rect=tilt.getBoundingClientRect();
@@ -191,6 +201,14 @@
       tilt.style.setProperty('--tilt-y',`${-(e.clientY-rect.top-rect.height/2)/rect.height*3}deg`);
     },{passive:true});
     tilt.addEventListener('pointerleave',()=>{tilt.style.setProperty('--tilt-x','0deg');tilt.style.setProperty('--tilt-y','0deg')});
+    cards.forEach(card=>{
+      card.addEventListener('pointermove',e=>{
+        const rect=card.getBoundingClientRect();
+        card.style.setProperty('--spot-x',`${e.clientX-rect.left}px`);
+        card.style.setProperty('--spot-y',`${e.clientY-rect.top}px`);
+      },{passive:true});
+      card.addEventListener('pointerleave',()=>{card.style.setProperty('--spot-x','50%');card.style.setProperty('--spot-y','20%')});
+    });
   }
   function scrollProgress(){
     const range=document.documentElement.scrollHeight-innerHeight;
@@ -244,8 +262,24 @@
 
   const dialog=$('galleryDialog');
   let galleryLoading=false;
+  const openGalleryDialog = () => {
+    if (typeof dialog.showModal === 'function') {
+      if (!dialog.open) dialog.showModal();
+    } else {
+      dialog.setAttribute('open', '');
+    }
+    body.classList.add('gallery-open');
+  };
+  const closeGalleryDialog = () => {
+    if (typeof dialog.close === 'function' && dialog.open) dialog.close();
+    else {
+      dialog.removeAttribute('open');
+      galleryApi?.stop();
+      body.classList.remove('gallery-open');
+    }
+  };
   $('openGallery').addEventListener('click',async()=>{
-    dialog.showModal();body.classList.add('gallery-open');
+    openGalleryDialog();
     if(galleryApi){galleryApi.start();return;}
     if(galleryLoading)return;
     galleryLoading=true;
@@ -253,13 +287,14 @@
       const {mountGallery}=await import('./js/gallery.js');
       galleryApi=mountGallery({stage:$('galleryStage'),host:$('galleryArt'),dialog,paused:motionPaused});
       $('galleryLoading').hidden=true;
-      if(dialog.open)galleryApi.start();
+      if(dialog.open || dialog.hasAttribute('open'))galleryApi.start();
     }catch(error){
       $('galleryLoading').textContent='La galleria 3D non è disponibile in questo browser. Tutti gli strumenti del tuo spazio restano accessibili.';
       console.warn('Galleria 3D non disponibile:',error);
     }finally{galleryLoading=false;}
   });
-  $('closeGallery').addEventListener('click',()=>dialog.close());
-  dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}});
+  $('closeGallery').addEventListener('click',closeGalleryDialog);
+  dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeGalleryDialog();}});
+  dialog.addEventListener('cancel',e=>{e.preventDefault();closeGalleryDialog()});
   dialog.addEventListener('close',()=>{galleryApi?.stop();body.classList.remove('gallery-open')});
 })();

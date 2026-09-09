@@ -1,6 +1,6 @@
 # DV / SPACE
 
-Lo spazio personale di Davide Villano è stato ridisegnato da zero con una direzione visiva **Obsidian & Electric Lime**: accesso editoriale, navigazione laterale, dashboard operativa, timer Focus, galleria 3D e laboratorio con 25 esperimenti interattivi.
+Lo spazio personale di Davide Villano è stato ridisegnato da zero con una direzione visiva **Obsidian & Electric Lime**: accesso editoriale, navigazione laterale, dashboard operativa, timer Focus, galleria 3D e laboratorio con esperimenti interattivi e tre test personali (Space DNA, Rhythm Scan e Next Horizon).
 
 Le funzioni originali restano disponibili:
 
@@ -48,7 +48,7 @@ npm run dev
 
 Apri `http://127.0.0.1:4173`. Per generare la cartella pubblica usa `npm run build`; per eseguire le verifiche usa `npm test`.
 
-Il timer Focus è locale al browser e non scrive dati nel database. La galleria 3D viene caricata solo quando viene aperta, così la dashboard resta veloce anche su dispositivi meno potenti.
+Il timer Focus è locale al browser e non scrive dati nel database. La galleria viene caricata solo quando viene aperta, così la dashboard resta veloce anche su dispositivi meno potenti: con WebGL attivo mostra le opere 3D, mentre in browser/desktop remoti che bloccano WebGL passa automaticamente a un fallback orbitale con le stesse stanze, drag e pausa. Il comando pausa in alto sincronizza galleria, timer visivo e particelle ambientali; il sito rispetta anche `prefers-reduced-motion`.
 
 ## Asset e licenze
 

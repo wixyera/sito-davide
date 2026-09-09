@@ -1,14 +1,15 @@
 /* DV / SPACE: offline static shell and existing per-user read cache.
    Auth and write requests always use the network. */
-const CACHE_NAME = 'dv-os-shell-space-v3';
+const CACHE_NAME = 'dv-os-shell-space-v5';
 const DATA_CACHE_NAME = 'dv-os-data-v2';
 const APP_SHELL = [
  './','./index.html','./manifest.json','./css/style.css','./css/lab.css',
  './js/config.js','./js/toast.js','./js/auth.js','./js/ui-core.js','./js/calendar.js',
  './js/career.js','./js/contacts.js','./js/wishlist.js','./js/spese.js','./js/ics.js',
- './js/search.js','./js/init.js','./js/theme.js','./js/music.js','./js/experience.js',
- './js/focus-timer.js','./assets/art/chrome-loop.png','./assets/icons/space.svg',
- './assets/icons/space-192.png','./assets/icons/space-512.png'
+ './js/search.js','./js/init.js','./js/theme.js','./js/music.js','./js/ambient-fx.js','./js/experience.js',
+ './js/focus-timer.js','./js/gallery.js','./js/museum.js','./vendor/three.module.js','./assets/earth.jpg',
+ './experiments/test.css','./experiments/test-engine.js','./experiments/test-dna.html','./experiments/test-ritmo.html','./experiments/test-futuro.html',
+ './assets/art/chrome-loop.png','./assets/icons/space.svg','./assets/icons/space-192.png','./assets/icons/space-512.png'
 ];
 self.addEventListener('install',event=>{
  event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.addAll(APP_SHELL)).then(()=>self.skipWaiting()));
