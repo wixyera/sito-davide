@@ -8,6 +8,7 @@ if (accessToken) {
     localStorage.removeItem('dv_os_access_token');
     accessToken = null;
     currentUser = null;
+    document.getElementById('authOverlay').classList.remove('hidden');
     setAuthMessage('Sessione non valida. Accedi di nuovo.', true);
   });
 }

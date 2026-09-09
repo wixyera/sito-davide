@@ -9,13 +9,18 @@
    Se aggiorni i file dell'app e vuoi che il cambiamento arrivi SUBITO
    alla prima riapertura (invece che alla seconda), alza il numero qui
    sotto (v1 -> v2 -> v3...). */
-const CACHE_NAME = 'dv-os-shell-v8';
-const DATA_CACHE_NAME = 'dv-os-data-v1';
+const CACHE_NAME = 'dv-os-shell-cinematic-v1';
+const DATA_CACHE_NAME = 'dv-os-data-v2';
 const APP_SHELL = [
   './',
   './index.html',
   './manifest.json',
   './css/style.css',
+  './css/cinematic.css',
+  './js/cinematic.js',
+  './vendor/three.module.js',
+  './assets/earth.jpg',
+  './assets/backgrounds/chrome-liquid.jpg',
   './js/config.js',
   './js/toast.js',
   './js/auth.js',
@@ -47,7 +52,7 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME && k !== DATA_CACHE_NAME).map(k => caches.delete(k)))
+      Promise.all(keys.filter(k => k.startsWith('dv-os-') && k !== CACHE_NAME && k !== DATA_CACHE_NAME).map(k => caches.delete(k)))
     ).then(() => self.clients.claim())
   );
 });
@@ -57,10 +62,12 @@ self.addEventListener('fetch', event => {
   if (req.method !== 'GET') return; // scritture: mai in cache, sempre in rete
 
   const url = new URL(req.url);
+  if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/auth/') || url.pathname.startsWith('/functions/')) return;
 
   // Dati Supabase (qualunque progetto): rete-prima, con fallback su
   // cache se la rete non risponde (offline / connessione instabile).
   if (url.hostname.endsWith('.supabase.co')) {
+    if (!url.pathname.startsWith('/rest/v1/') || !url.searchParams.has('user_id')) return;
     event.respondWith(
       fetch(req)
         .then(res => {
@@ -70,7 +77,7 @@ self.addEventListener('fetch', event => {
           }
           return res;
         })
-        .catch(() => caches.match(req))
+        .catch(async () => await caches.match(req) || Response.json({ message: 'Connessione non disponibile.' }, { status: 503 }))
     );
     return;
   }
@@ -90,8 +97,7 @@ self.addEventListener('fetch', event => {
           return res;
         })
         .catch(() => cached || caches.match('./index.html'));
-      return cached || network;
+      return network;
     })
   );
 });
-

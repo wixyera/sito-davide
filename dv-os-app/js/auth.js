@@ -8,6 +8,7 @@ function setAuthMessage(msg, error = false) {
 }
 
 async function login() {
+  if (authMode !== 'login') { setAuthMode('login'); return; }
   const email = document.getElementById('authEmail').value.trim();
   const password = document.getElementById('authPassword').value;
   if (!email || !password) return setAuthMessage('Inserisci email e password.', true);
@@ -42,6 +43,7 @@ async function hashRecoveryCode(email, code) {
 let pendingRecoveryCode = '';
 
 async function signup() {
+  if (authMode !== 'signup') { setAuthMode('signup'); return; }
   const nameEl = document.getElementById('authName');
   const name = nameEl ? nameEl.value.trim() : '';
   const email = document.getElementById('authEmail').value.trim();
@@ -82,9 +84,10 @@ async function logout() {
 }
 
 async function startApp() {
+  const user = await getCurrentUser();
+  if (!user) throw new Error('Accedi per continuare.');
   document.getElementById('authOverlay').classList.add('hidden');
   document.getElementById('logoutBtn').style.display = 'block';
-  const user = await getCurrentUser();
   if (user) applyDisplayName(user);
   await loadEvents();
   await loadCareer();
@@ -101,7 +104,7 @@ async function startApp() {
 }
 
 document.getElementById('loginBtn')?.addEventListener('click', login);
-document.getElementById('authPassword')?.addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+document.getElementById('authPassword')?.addEventListener('keydown', e => { if (e.key === 'Enter') { if (authMode === 'signup') signup(); else login(); } });
 document.getElementById('signupBtn')?.addEventListener('click', signup);
 document.getElementById('logoutBtn')?.addEventListener('click', logout);
 
@@ -192,6 +195,11 @@ document.getElementById('newPassword')?.addEventListener('keydown', e => { if (e
 let authMode = 'login';
 function setAuthMode(mode) {
   authMode = mode;
+  document.querySelector('#authViewLogin h2').textContent = mode === 'signup' ? 'Il tuo prossimo inizio.' : 'Bentornato.';
+  document.getElementById('authPassword').autocomplete = mode === 'signup' ? 'new-password' : 'current-password';
+  document.getElementById('signupBtn').textContent = mode === 'signup' ? 'Crea account' : 'Registrati';
+  document.getElementById('loginBtn').textContent = mode === 'signup' ? 'Ho già un account' : 'Accedi';
+  setAuthMessage('');
   const nameWrap = document.getElementById('nameFieldWrap');
   if (nameWrap) nameWrap.style.display = mode === 'signup' ? 'block' : 'none';
 }

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script>(function(){try{var t=localStorage.getItem('dv-os-theme')||'dark';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<script>(function(){try{var t=localStorage.getItem('dv-os-theme')||'light';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 <title>Davide Villano — Personal Workspace</title>
 <meta name="robots" content="noindex, nofollow">
 <meta name="description" content="Spazio di lavoro personale di Davide Villano: calendario, percorso professionale, contatti, wishlist e spese in un unico posto.">
@@ -28,8 +28,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/cinematic.css">
 </head>
-<body>
+<body class="cinema-site" data-scene="home" data-mood="orbit">
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
@@ -55,16 +56,22 @@
   </filter>
 </svg>
 
-<div id="authOverlay" class="auth-overlay">
-  <div class="auth-card">
+<div id="authOverlay" class="auth-overlay" role="dialog" aria-modal="true" aria-label="Accesso al tuo spazio personale">
+  <section class="auth-welcome" aria-label="Davide Villano, spazio personale">
+    <div class="welcome-top"><b>D.VILLANO<span>®</span></b><span>PERSONAL SPACE<br>BOLOGNA, ITALIA</span></div>
+    <div class="welcome-title" aria-hidden="true">UN MONDO<br>DI <em>IDEE.</em></div>
+    <div id="authArt" class="cinema-art" aria-hidden="true"></div>
+    <div class="welcome-bottom"><p>Organizza il presente.<br><b>Esplora quello che viene.</b></p><div class="mood-controls" aria-label="Atmosfera"><button type="button" data-mood="orbit" aria-pressed="true">01 <span>Orbita</span></button><button type="button" data-mood="pink" aria-pressed="false">02 <span>Rosa</span></button><button type="button" data-mood="night" aria-pressed="false">03 <span>Notte</span></button></div></div>
+  </section>
+  <div class="auth-card"><div class="auth-eyebrow"><span></span> IL TUO SPAZIO, SEMPRE CON TE</div>
 
     <div id="authViewLogin" class="auth-view">
-      <h2>Accesso</h2>
-      <p>Accedi al tuo spazio di lavoro personale per gestire calendario, percorso e contatti.</p>
+      <h2>Bentornato<span>.</span></h2>
+      <p>Un solo posto per i tuoi impegni, i tuoi progetti e le prossime idee.</p>
       <label for="authEmail">Email</label>
 
       <div id="nameFieldWrap" style="display:none">
-        <input id="authName" type="text" placeholder="Nome" autocomplete="name" />
+        <label for="authName">Nome</label><input id="authName" type="text" placeholder="Nome" autocomplete="name" />
       </div>
       <input id="authEmail" type="email" autocomplete="email" placeholder="nome@email.com">
       <label for="authPassword">Password</label>
@@ -75,7 +82,7 @@
         <button id="loginBtn" type="button">Accedi</button>
         <button id="signupBtn" type="button">Registrati</button>
       </div>
-      <div id="authMsg" class="auth-msg"></div>
+      <div id="authMsg" class="auth-msg" role="status" aria-live="polite"></div><p class="auth-footnote">Calendario · Percorso · Contatti · Wishlist · Spese</p>
     </div>
 
     <div id="authViewForgot" class="auth-view hidden">
@@ -222,7 +229,7 @@
     <div class="hero">
       <div class="home-hero">
         <div class="hero-visual" id="heroVisual">
-          <img class="hero-photo" src="assets/backgrounds/statue-cosmic.jpg" alt="" aria-hidden="true">
+          <div id="homeArt" class="cinema-art" aria-hidden="true"></div><div class="hero-orbit-label">UN MONDO DI POSSIBILITÀ / 2026</div>
           <div class="hero-caustics" aria-hidden="true"></div>
           <div class="hero-vignette" aria-hidden="true"></div>
 
@@ -232,7 +239,7 @@
 
           <div class="hero-topline" data-reveal>
             <p>Gestisco calendario, percorso e contatti in un unico spazio, <b>costruito da me</b>, pronto in ogni momento.</p>
-            <button class="hero-explore magnetic" type="button" data-goto="calendario">Explore Now <span class="arrow">↗</span></button>
+            <button class="hero-explore magnetic" type="button" data-goto="calendario">Apri calendario <span class="arrow">↗</span></button>
           </div>
 
           <div class="hero-card" data-reveal>
@@ -801,6 +808,7 @@
 <script src="js/theme.js"></script>
 <script src="js/motion.js"></script>
 <script src="js/music.js"></script>
+<script type="module" src="js/cinematic.js"></script>
 
 <script>
 // Registra il service worker per rendere l'app installabile e usabile offline.

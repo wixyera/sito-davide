@@ -56,6 +56,9 @@ const MODULE_TITLES = {
 };
 
 function showModule(name) {
+  if (!document.getElementById('mod-' + name)) return;
+  document.body.dataset.scene = name;
+  window.dispatchEvent(new CustomEvent('workspace:module', {detail: name}));
   modules.forEach(m => m.classList.toggle('active', m.id === 'mod-' + name));
   tabBtns.forEach(b => {
     const active = b.dataset.module === name;
