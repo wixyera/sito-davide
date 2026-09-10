@@ -123,28 +123,37 @@ const characters = {
   symbols: "!$%&|[](){}:;.,*+-#@<>~"
 };
 
+const passwordStatus = document.createElement('p');
+passwordStatus.setAttribute('role','status'); passwordStatus.style.fontSize='14px';
+passwordInput.parentElement.after(passwordStatus);
+function secureIndex(limit) {
+  const threshold = Math.floor(4294967296 / limit) * limit;
+  const random = new Uint32Array(1);
+  do { crypto.getRandomValues(random); } while (random[0] >= threshold);
+  return random[0] % limit;
+}
 const generatePassword = () => {
-  let staticPassword = "", randomPassword = "", excludeDuplicate = false, passLength = lengthSlider.value;
+  let pool = '', unique = false;
   options.forEach(option => {
-    if (option.checked) {
-      if (option.id !== "exc-duplicate" && option.id !== "spaces") {
-        staticPassword += characters[option.id];
-      } else if (option.id === "spaces") {
-        staticPassword += `  ${staticPassword}  `;
-      } else {
-        excludeDuplicate = true;
-      }
-    }
+    if (!option.checked) return;
+    if (characters[option.id]) pool += characters[option.id];
+    if (option.id === 'spaces') pool += ' ';
+    if (option.id === 'exc-duplicate') unique = true;
   });
-  for (let i = 0; i < passLength; i++) {
-    let randomChar = staticPassword[Math.floor(Math.random() * staticPassword.length)];
-    if (excludeDuplicate) {
-      !randomPassword.includes(randomChar) || randomChar == " " ? randomPassword += randomChar : i--;
-    } else {
-      randomPassword += randomChar;
-    }
+  pool = [...new Set(pool)].join('');
+  passwordStatus.textContent = '';
+  const length = Number(lengthSlider.value);
+  if (!pool || (unique && length > pool.length)) {
+    passwordInput.value = '';
+    passwordStatus.textContent = !pool ? 'Seleziona almeno un tipo di carattere.' : 'Per questa lunghezza aggiungi altri tipi di carattere o consenti le ripetizioni.';
+    return;
   }
-  passwordInput.value = randomPassword;
+  let value = '';
+  while (value.length < length) {
+    const index = secureIndex(pool.length); value += pool[index];
+    if (unique) pool = pool.slice(0,index) + pool.slice(index+1);
+  }
+  passwordInput.value = value;
 };
 
 const updatePassIndicator = () => {
@@ -164,8 +173,9 @@ const updateSlider = () => {
 };
 updateSlider();
 
-const copyPassword = () => {
-  navigator.clipboard.writeText(passwordInput.value);
+const copyPassword = async () => {
+  if (!passwordInput.value) return;
+  try { await navigator.clipboard.writeText(passwordInput.value); } catch { passwordInput.select(); passwordStatus.textContent = 'Seleziona e copia la password manualmente.'; return; }
   copyIcon.innerText = "check";
   copyIcon.style.color = "#43A047";
   setTimeout(() => {
@@ -177,6 +187,7 @@ const copyPassword = () => {
 copyIcon.addEventListener("click", copyPassword);
 lengthSlider.addEventListener("input", updateSlider);
 generateBtn.addEventListener("click", generatePassword);
+options.forEach(option => option.addEventListener("change", generatePassword));
 </script>
 <a class="dv-lab-bar" href="../index.html" aria-label="Torna al tuo spazio personale"><span class="dv-lab-mark">dv.</span><span>SPACE / LAB</span><span>↖</span></a>
 </body>
