@@ -1,4 +1,0 @@
-# Il reset è usato da utenti che non possono accedere.
-# L'autorizzazione è il codice casuale a 128 bit, verificato nella funzione.
-[functions.password-reset]
-verify_jwt = false
