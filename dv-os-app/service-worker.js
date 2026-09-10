@@ -1,9 +1,9 @@
 /* DV / SPACE: offline static shell and existing per-user read cache.
    Auth and write requests always use the network. */
-const CACHE_NAME = 'dv-os-shell-space-v6';
+const CACHE_NAME = 'dv-os-shell-space-v7';
 const DATA_CACHE_NAME = 'dv-os-data-v2';
 const APP_SHELL = [
- './','./index.html','./manifest.json','./css/style.css','./css/lab.css','./css/aurora.css','./assets/backgrounds/chrome-figure.jpg',
+ './','./index.html','./manifest.json','./css/style.css','./css/lab.css','./css/aurora.css','./css/kinetic.css','./js/kinetic.js','./js/entrance-scene.js','./assets/backgrounds/chrome-figure.jpg',
  './js/config.js','./js/toast.js','./js/auth.js','./js/ui-core.js','./js/calendar.js',
  './js/career.js','./js/contacts.js','./js/wishlist.js','./js/spese.js','./js/ics.js',
  './js/search.js','./js/init.js','./js/theme.js','./js/music.js','./js/ambient-fx.js','./js/experience.js',

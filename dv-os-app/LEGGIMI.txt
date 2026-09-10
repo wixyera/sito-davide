@@ -1,160 +1,99 @@
-DV / SPACE 3 — PRIMA DI INIZIARE
-==============================
+DV / SPACE 4 — KINETIC
+=====================
 
-Ciao Davide! Questa cartella contiene il sito aggiornato e tutte le funzioni originali.
-Il codice è stato corretto e verificato localmente. La configurazione online di
-Supabase, Cloudflare, Spotify e OpenAI va completata nel tuo account: non è stata
-eseguita da qui e non sono stati modificati i tuoi dati remoti.
+Davide, questa è la nuova versione: recupero e conferma via email,
+nuovo ingresso 3D, titoli animati, transizioni e microinterazioni.
 
-1. AGGIORNARE IL SITO SU GITHUB / CLOUDFLARE
+PARTI DA APRI-QUI.html: si apre con il browser e contiene la guida sintetica.
+Per le email la guida completa è EMAIL-SUPABASE.md.
 
-- Conserva una copia della versione attuale.
-- Estrai tutto lo ZIP.
-- Carica nel repository GitHub il CONTENUTO di questa cartella: index.html,
-  package.json, js, css, assets, experiments, functions, vendor e gli altri file.
-- Puoi conservare la struttura del repository originale: la cartella di lavoro
-  del progetto è dv-os-app. Non aggiungere un ulteriore livello di cartelle.
-- Su Cloudflare apri Workers & Pages, scegli il progetto Pages esistente e
-  controlla le impostazioni di build:
+1. AGGIORNA IL SITO
 
-    Framework preset: None
-    Build command: npm run build
-    Build output directory: dist
-    Root directory: dv-os-app se il sito è ancora dentro dv-os-app;
-                    vuota se hai messo package.json nella radice del repository.
+Estrai lo ZIP. Nel repository mantieni la cartella dv-os-app oppure caricane
+il contenuto nella radice. Non creare cartelle annidate aggiuntive.
 
-- Avvia una nuova distribuzione dopo il caricamento dei file.
-- Usa l'URL gratuito pages.dev già assegnato al progetto. Non serve modificare
-  il dominio che utilizzi per un altro sito.
-- La cartella functions deve stare accanto a package.json. Non caricare soltanto
-  dist tramite trascinamento nel pannello Cloudflare: quel metodo non pubblica
-  le Pages Functions di questo progetto. Usa GitHub oppure Wrangler.
+Cloudflare Pages:
+- Framework preset: None
+- Build command: npm run build
+- Build output directory: dist
+- Root directory: dv-os-app se package.json è in quella cartella;
+  vuota se package.json è nella radice del repository.
 
-Alternativa con Wrangler, dalla cartella che contiene package.json:
+Pubblica tramite il repository GitHub collegato. La cartella functions deve
+rimanere accanto a package.json. Il solo trascinamento di dist nel pannello
+Cloudflare non pubblica le Pages Functions del progetto.
 
-    npm run build
-    npx wrangler pages deploy dist --project-name NOME_DEL_TUO_PROGETTO
+Puoi usare il dominio pages.dev esistente senza cambiare altri domini.
 
-Il nome è quello reale del tuo progetto Pages. Non incollare il testo segnaposto.
+2. ATTIVA LE EMAIL IN SUPABASE
 
-2. COMPLETARE SUPABASE
+- Authentication > provider Email: attiva Confirm email.
+- Authentication > URL Configuration: Site URL e Redirect URLs devono contenere
+  l'indirizzo reale della home, con slash finale.
+- Authentication > Email / SMTP Settings: configura il servizio SMTP.
+  Se lo hai già configurato e funziona, mantieni i valori esistenti.
+- Authentication > Email Templates:
+    Confirm sign up  -> email-templates/conferma-account.html
+    Reset password   -> email-templates/recupero-password.html
+    Password changed -> email-templates/password-modificata.html
+- Per Password changed devi anche ATTIVARE la relativa notifica di sicurezza.
 
-- Apri il progetto Supabase che già usi con questo sito.
-- La configurazione pubblica esistente è mantenuta in js/config.js.
-- Se il progetto è sospeso, riattivalo dal pannello.
-- Apri SQL Editor, crea una nuova query e incolla sql/SETUP_COMPLETO.sql.
-- Eseguila: crea/completa events, career_entries, contacts, wishlist_items,
-  expenses e abilita l'accesso alle sole righe del proprietario.
-- Lo script non cancella dati. Eventuali vecchie righe senza user_id restano
-  invisibili: non assegna automaticamente dati di proprietà sconosciuta.
-- Se le tabelle esistenti hanno colonne obbligatorie aggiuntive o tipi diversi
-  da quelli previsti dal sito, serve allineare quello schema specifico.
-- Non sostituire la chiave pubblica nel frontend con una secret/service-role key.
+Apri i template con un editor di testo e copia il codice HTML nel pannello.
+Non sostituire {{ .ConfirmationURL }} con un URL generico.
 
-3. LOGIN, REGISTRAZIONE E RECUPERO PASSWORD VIA EMAIL
+Ora il recupero funziona così: inserisci l'email, ricevi il link, apri il link,
+scegli e confermi la nuova password, poi accedi. Non c'è più il codice personale.
 
-- In Supabase apri Authentication > URL Configuration.
-- Imposta Site URL all'indirizzo reale del sito, per esempio il tuo URL pages.dev.
-- Aggiungi in Redirect URLs l'URL esatto usato per aprire la home, con slash finale;
-  aggiungi anche l'indirizzo che termina in /index.html se utilizzi quello.
-- Per provare in locale aggiungi http://127.0.0.1:4173/.
-- In Authentication configura il servizio SMTP per l'invio di email.
-- I template di conferma e recupero devono includere il collegamento
-  {{ .ConfirmationURL }}, per esempio dentro href di un link HTML.
-- Se la conferma email è attiva, dopo la registrazione salva il codice di recupero,
-  conferma l'indirizzo dalla mail e poi accedi.
-- Il nuovo recupero via email si trova in Password dimenticata? > Invia link via email.
-- Aprendo il link compare il modulo per scegliere e confermare una nuova password.
-- Il vecchio account continua a funzionare: non devi registrarne uno nuovo.
+NON DEVI PUBBLICARE LA EDGE FUNCTION password-reset.
+Se l'avevi già pubblicata, dopo aver provato il flusso email puoi rimuoverla
+dal pannello Supabase > Edge Functions. Questa modifica non è stata eseguita
+a distanza e caricare lo ZIP non elimina automaticamente funzioni già online.
 
-4. RECUPERO CON CODICE PERSONALE
+Gli account esistenti restano. Se un account ha un'email inventata o non più
+accessibile, il proprietario del progetto dovrà correggerla in Supabase.
 
-Questo metodo è conservato e richiede la funzione Supabase password-reset.
+3. DATABASE E ALTRE INTEGRAZIONI
 
-Metodo dal pannello:
-- Apri Edge Functions e crea o modifica password-reset.
-- Usa il contenuto di supabase/functions/password-reset/index.ts.
-- Per questa sola funzione disattiva la verifica JWT del gateway: viene chiamata
-  quando l'utente non riesce ad accedere. La verifica di autorizzazione avviene
-  dentro la funzione, confrontando l'hash del codice casuale personale.
-- Non togliere la verifica del codice dal sorgente.
+La configurazione pubblica Supabase originale è conservata in js/config.js.
+Se calendario, percorso, contatti, wishlist e spese funzionano, non devi
+ricreare le tabelle. Se mancano, esegui sql/SETUP_COMPLETO.sql nel SQL Editor.
+Lo script non cancella righe e non assegna automaticamente dati senza proprietario.
 
-Alternativa CLI, dalla cartella del sito:
+Le API originali restano. In Cloudflare conserva queste variabili server:
+- OPENAI_API_KEY
+- SPOTIFY_CLIENT_ID
+- SPOTIFY_CLIENT_SECRET
 
-    supabase login
-    supabase link --project-ref ggysihcemzsoqxyzkfnh
-    supabase functions deploy password-reset
+La ricerca Spotify e l'Oracolo richiedono i rispettivi servizi configurati.
+Le playlist/link Spotify funzionano tramite il player esterno. L'analisi prodotti
+può essere bloccata da alcuni negozi: l'inserimento manuale resta disponibile.
+Meteo, mappe, Serie A e gli altri servizi esterni richiedono una connessione.
 
-Il progetto indicato è quello della configurazione originale. Se utilizzi un
-altro progetto, cambia sia il riferimento CLI sia URL/chiave pubblica del sito.
-La cartella supabase/config.toml contiene già verify_jwt = false per questa
-sola funzione. La funzione usa SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY disponibili
-nell'ambiente Supabase; non vanno mai messe nei file pubblici.
+4. PROVA ONLINE
 
-Il codice di recupero funziona solo per account che ne hanno effettivamente
-registrato l'hash. Per account precedenti o codice perso usa il recupero via email.
-La cartella supabase-edge-functions conserva una copia compatibile per chi
-utilizzava la vecchia struttura; per nuovi deploy usa la cartella supabase.
+- Registra un account di prova e apri la mail di conferma.
+- Esci, richiedi il recupero password e apri la nuova mail.
+- Salva una nuova password e accedi.
+- Controlla la mail Password changed, se hai attivato la notifica.
+- Prova i moduli del sito, Focus e Galleria 3D.
+- Prova il pulsante pausa nell'ingresso e nella barra superiore.
 
-5. SPOTIFY, ORACOLO E LINK PRODOTTI
+I test inclusi verificano il codice con richieste simulate. L'invio SMTP e le
+impostazioni del tuo account non sono stati configurati né verificati da qui.
+Non sono state eseguite prove visive in browser.
 
-In Cloudflare Pages > Settings > Variables and Secrets, per Production imposta:
+5. SE NON VEDI LE MODIFICHE
 
-    OPENAI_API_KEY            per l'Oracolo IA
-    SPOTIFY_CLIENT_ID         per la ricerca Spotify
-    SPOTIFY_CLIENT_SECRET     per la ricerca Spotify
+Attendi il completamento del nuovo deploy, poi chiudi e riapri il sito.
+Su Windows prova Ctrl+F5. Una finestra privata aiuta a verificare la cache.
 
-Usa valori reali dei tuoi account. Dopo le modifiche ridistribuisci il progetto.
-Non inviare chiavi private in chat e non metterle su GitHub.
+6. AVVIO DAL PC
 
-- Le playlist e i link Spotify si aprono anche senza le credenziali di ricerca.
-  La riproduzione dipende da Spotify, dall'account e dal browser.
-- L'Oracolo necessita di una chiave API OpenAI abilitata e di credito API.
-- L'analisi dei prodotti usa /api/fetch-product e non richiede una chiave aggiuntiva.
-  Alcuni negozi ne bloccano la lettura: puoi comunque salvare il prodotto a mano.
-- Meteo, Serie A, mappe, ricerca Wikipedia e alcuni esperimenti 3D usano servizi
-  esterni. Non funzionano senza rete e la loro disponibilità dipende dai fornitori.
-
-6. PROVA FINALE SUL TUO SITO
-
-- Accedi con il tuo account.
-- Crea un evento, modificalo ed esportalo; prova a reimportare un file di esempio
-  facendo attenzione a non duplicare gli eventi che vuoi conservare.
-- Aggiungi e poi elimina un contatto di prova, una voce di percorso, un prodotto
-  in wishlist e una piccola spesa di prova.
-- Avvia Focus, mettilo in pausa e riprendilo.
-- Apri Galleria 3D; prova stanze, trascinamento e pausa. Se WebGL è bloccato la
-  galleria principale passa alla visualizzazione alternativa.
-- Prova registrazione, conferma email e recupero con un account di test.
-- Controlla Oracolo e ricerca Spotify dopo aver configurato le rispettive chiavi.
-
-7. SE VEDI ANCORA LA VECCHIA GRAFICA
-
-- Prima attendi che Cloudflare indichi il completamento del deploy.
-- Chiudi e riapri il sito. Su Windows prova Ctrl+F5.
-- Se serve, apri il sito in una finestra privata per distinguere un problema di
-  cache da un problema del deploy. Non cancellare i dati del browser per prima cosa.
-
-8. AVVIO DAL PC
-
-Installa Node.js 22 o superiore. Apri il terminale nella cartella del sito:
+Con Node.js 22 o superiore, apri un terminale nella cartella del progetto:
 
     npm run dev
 
-Poi apri http://127.0.0.1:4173.
-Il doppio clic su index.html non avvia le funzioni del server.
-Per controllare il codice: npm test. Per rigenerare dist: npm run build.
+Apri http://127.0.0.1:4173. Per i test: npm test. Per la build: npm run build.
+Non aprire index.html con doppio clic per usare l'app: serve il server.
 
-LIMITI DELLA VERIFICA INCLUSA
-
-I test automatici verificano codice, sessioni simulate, date, timer, opere 3D,
-instradamento API e file necessari. Non sostituiscono una prova nel tuo account.
-Nessun test reale di invio email, credenziali Spotify/OpenAI o scrittura sul tuo
-Supabase è stato eseguito. Non è stata eseguita una verifica visiva in browser.
-
-Riferimenti ufficiali consultati:
-https://supabase.com/docs/guides/auth/sessions
-https://supabase.com/docs/guides/auth/redirect-urls
-https://supabase.com/docs/guides/auth/passwords
-https://supabase.com/docs/guides/functions/auth
-https://developers.cloudflare.com/pages/functions/get-started/
+Buon divertimento!

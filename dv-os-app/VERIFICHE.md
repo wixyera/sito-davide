@@ -1,31 +1,21 @@
-# Modifiche e verifiche
+# Verifiche della versione 4
 
-## Correzioni
+## Email
 
-- Percorsi degli import dinamici corretti: Focus e galleria ora cercano i moduli nella cartella effettiva del file JavaScript, eliminando i riferimenti `js/js/...`.
-- Rinnovo della sessione con refresh token, deduplicazione delle richieste concorrenti e coordinamento tra schede dove Web Locks è disponibile. Gli errori di rete non eliminano le credenziali.
-- Gli errori di autorizzazione del database non vengono più interpretati automaticamente come logout.
-- Il recupero password riconosce i link email Supabase; il codice personale viene mostrato anche quando la registrazione richiede conferma email.
-- Eliminati listener doppi sui pulsanti di autenticazione e bloccati invii ripetuti durante la richiesta.
-- Azzeramento delle viste del precedente account prima di mostrare il nuovo spazio.
-- Caricamento indipendente dei cinque moduli e messaggi con pulsante Riprova per gli errori.
-- Wishlist: totali separati per valuta, validazione di prezzi e URL, pulsante carrello protetto dai doppi clic e stato ripristinato correttamente in caso di errore.
-- ICS: UTC e fusi IANA, descrizioni, luoghi, durate, giorni interi e righe Unicode lunghe. Eventi ricorrenti o formati non supportati generano un messaggio prima di importare, senza importazione parziale. Reinserire lo stesso file può creare duplicati.
-- Il calendario permette una data finale e mantiene gli orari importati che non sono multipli di 15 minuti.
-- Rimosso l'effetto che sovrascriveva l'avanzamento reale dell'anello Focus.
-- Il player Spotify carica l'embed all'apertura del pannello.
-- Generatore password: casualità crittografica, messaggio per selezioni impossibili e nessun ciclo infinito con caratteri unici insufficienti.
-- Cache aggiornata per i nuovi asset; una pagina non disponibile offline non viene sostituita dalla home come se fosse il contenuto richiesto.
-- Script SQL completo con isolamento per proprietario anche in presenza di vecchie policy permissive; funzione di recupero con paginazione degli account, timeout e gestione errori.
+Il sito non genera più codici di recupero e non chiama più `functions/v1/password-reset`. Registrazione, reinvio della conferma e recupero passano dalle API native Supabase. Il link di recupero verifica la sessione, apre il modulo nuova password e rimuove i token dalla barra degli indirizzi. Ricaricare quella pagina conserva il recupero in corso. I link scaduti restituiscono un messaggio; gli errori di invio non vengono mostrati come successi. La mail Password changed è una notifica server da attivare in Supabase.
 
-## Verifiche eseguite
+## Animazioni
 
-28 test automatici superati (`node --test tests/*.test.mjs`). Coprono sessioni, autenticazione simulata, isolamento nelle richieste, calendario, ICS, Focus, costruzione delle sette opere della galleria, API e asset precache.
+Ingresso con scultura tridimensionale locale, illuminazione ambientale, risposta morbida al puntatore, titoli con comparsa progressiva, transizioni di navigazione, comparsa delle schede allo scorrimento, pulsanti reattivi e profondità della copertina. La scena usa una risoluzione limitata su mobile e si ferma quando non visibile, in pausa o con scheda in background. Il movimento ridotto mantiene tutti i contenuti leggibili. Il fallback usa l'immagine originale inclusa.
 
-Controllo della sintassi dei file JavaScript e degli script inline HTML; controllo dei riferimenti ai file locali. Build Cloudflare Pages completata e output `dist` prodotto.
+Le transizioni native sono riservate ai clic di navigazione: le azioni operative, come creare un evento o aprire un risultato, mantengono il cambio sezione sincrono.
 
-I test di calendario e ICS vengono eseguiti anche con fuso Europe/Rome per controllare le conversioni locali.
+## Controlli
 
-## Da verificare online
+38 test automatici: autenticazione e flussi email simulati, persistenza del recupero dopo un refresh, sessioni, isolamento richieste, calendario e ICS, timer Focus, moduli dinamici, galleria, geometria della nuova scultura, API e cache degli asset. Sono mantenute le correzioni funzionali della versione precedente.
 
-Configurazione effettiva di Supabase/RLS, login con credenziali reali, recapito email, deploy della Edge Function, API OpenAI/Spotify e fornitori esterni. Non sono state effettuate scritture sui servizi remoti né prove visive o interazioni in browser. Il codice SQL è fornito ma non è stato eseguito su un database PostgreSQL in questa sessione.
+Controllati sintassi JavaScript, script inline e riferimenti ai file locali. Build Cloudflare Pages generata.
+
+## Non verificato da questa sessione
+
+Recapito email reale, impostazioni SMTP e notifiche nel progetto remoto, scritture su Supabase, credenziali delle API esterne e resa visiva/interazioni in un browser. I test della scultura verificano la geometria e le trasformazioni, non il rendering su una GPU reale. Nessuna modifica è stata pubblicata automaticamente nel tuo ambiente Cloudflare o Supabase.
