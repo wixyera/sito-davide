@@ -16,7 +16,7 @@
 <meta name="twitter:description" content="Calendario, percorso professionale, contatti, wishlist e spese in un unico spazio di lavoro personale.">
 <meta name="twitter:image" content="assets/icons/icon-512.png">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#111310">
+<meta name="theme-color" content="#090d17">
 <link rel="icon" href="assets/icons/space-192.png" type="image/png">
 <link rel="icon" href="assets/icons/space-32.png" sizes="32x32" type="image/png">
 <link rel="icon" href="assets/icons/favicon-16.png" sizes="16x16" type="image/png">
@@ -29,6 +29,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/aurora.css">
 <link rel="preload" href="assets/art/chrome-loop.png" as="image" fetchpriority="high">
 </head>
 <body class="space-site" data-scene="home">
@@ -39,7 +40,7 @@
 <div id="authOverlay" class="auth-overlay" role="dialog" aria-modal="true" aria-label="Accesso al tuo spazio personale">
   <section class="auth-welcome" aria-label="DV / SPACE, il tuo spazio personale">
     <div class="welcome-top"><a class="space-brand" href="./" aria-label="DV Space, home"><span class="brand-square">dv.</span><span>SPACE<span class="brand-slash">/</span></span></a><span class="welcome-edition">PERSONAL EDITION<br>BY DAVIDE VILLANO</span></div>
-    <div class="welcome-head"><span class="eyebrow">UN POSTO PER TUTTO QUELLO CHE SEI</span><h1>Il tuo spazio.<br><em>Senza limiti.</em></h1></div>
+    <div class="welcome-head"><span class="eyebrow">DAVIDE VILLANO / PERSONAL SPACE</span><h1>Tutto il tuo mondo.<br><em>Un solo spazio.</em></h1></div>
     <div class="auth-art"><img src="assets/art/chrome-loop.png" width="1536" height="1024" alt="Scultura astratta in cromo, illuminata da riflessi verde lime" fetchpriority="high" decoding="async"></div>
     <div class="art-caption" aria-hidden="true"><span>FIG. 01 — POSSIBILITÀ</span><span>∞</span></div>
     <div class="welcome-bottom"><p>Le tue giornate. Le tue idee.<br><span>Tutto trova il suo spazio.</span></p><button type="button" id="welcomeMotion" class="motion-switch" aria-pressed="false" aria-label="Metti in pausa le animazioni">Ⅱ</button></div>
@@ -69,19 +70,27 @@
     <div id="authViewForgot" class="auth-view hidden">
       <button class="auth-back" id="forgotBackBtn" type="button">← Torna al login</button>
       <h2>Recupera password</h2>
-      <p>Nessuna email in uscita: usa il codice di recupero che hai salvato in fase di registrazione.</p>
+      <p>Usa il codice salvato alla registrazione, oppure ricevi un link via email.</p>
       <label for="forgotEmail">Email</label>
       <input id="forgotEmail" type="email" autocomplete="email" placeholder="nome@email.com">
       <label for="recoveryCodeInput">Codice di recupero</label>
-      <input id="recoveryCodeInput" type="text" placeholder="XXXX-XXXX-XXXX-XXXX" autocomplete="off" style="font-family:var(--font-clock); letter-spacing:.04em;">
+      <input id="recoveryCodeInput" type="text" placeholder="XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX" autocomplete="off" style="font-family:var(--font-clock); letter-spacing:.04em;">
       <label for="newPassword">Nuova password</label>
       <input id="newPassword" type="password" autocomplete="new-password" placeholder="Almeno 6 caratteri">
       <div class="auth-actions">
         <button id="forgotSendBtn" type="button">Reimposta password</button>
       </div>
-      <div id="forgotMsg" class="auth-msg"></div>
+      <div class="auth-recovery-divider"><b>Non hai il codice?</b><p>Inserisci l’email qui sopra per ricevere un link di recupero.</p><div class="auth-actions"><button id="emailRecoveryBtn" type="button">Invia link via email</button></div></div>
+      <div id="forgotMsg" class="auth-msg" role="status" aria-live="polite"></div>
     </div>
 
+    <div id="authViewNewPassword" class="auth-view hidden">
+      <h2>Una nuova password.</h2><p>Scegli la nuova password del tuo account.</p>
+      <label for="emailNewPassword">Nuova password</label><input id="emailNewPassword" type="password" autocomplete="new-password" minlength="6">
+      <label for="emailConfirmPassword">Conferma password</label><input id="emailConfirmPassword" type="password" autocomplete="new-password" minlength="6">
+      <div class="auth-actions"><button id="saveNewPasswordBtn" type="button">Salva e torna al login</button><button id="cancelEmailReset" type="button">Annulla</button></div>
+      <div id="newPasswordMsg" class="auth-msg" role="status" aria-live="polite"></div>
+    </div>
     <div id="authViewRecoveryCode" class="auth-view hidden">
       <h2>Salva il tuo codice di recupero</h2>
       <p>Ti servirà per reimpostare la password se la dimentichi — <b>non possiamo mostrartelo di nuovo</b>. Copialo e conservalo in un posto sicuro (note del telefono, password manager...).</p>
@@ -134,7 +143,7 @@
     <div class="music-custom-msg" id="musicCustomMsg"></div>
 
     <div class="music-embed-wrap">
-      <iframe id="musicEmbed" title="Player Spotify" src="https://open.spotify.com/embed/playlist/37i9dQZF1DWZeKCadgRdKQ?utm_source=generator&theme=0" width="100%" height="152" style="border-radius:12px" frameborder="0" allowfullscreen loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+      <iframe id="musicEmbed" title="Player Spotify" data-src="https://open.spotify.com/embed/playlist/37i9dQZF1DWZeKCadgRdKQ?utm_source=generator&theme=0" width="100%" height="152" style="border-radius:12px" frameborder="0" allowfullscreen loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
       <a id="musicOpenSpotify" class="music-open-spotify" href="https://open.spotify.com/playlist/37i9dQZF1DWZeKCadgRdKQ" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 15c2.5-1.2 5.5-1.2 8 0M7.5 12c3-1.4 6-1.4 9 0M7 9c3.5-1.6 7-1.6 10.5 0" stroke="currentColor" fill="none" stroke-width="1.4" stroke-linecap="round"/></svg>
         Ascolta il brano intero in Spotify
@@ -153,7 +162,7 @@
   <div id="loaderText">Caricamento in corso</div>
 </div>
 
-<div id="offlineBanner" role="status">Sei offline — stai vedendo l'ultima versione salvata dei tuoi dati.</div>
+<div id="offlineBanner" role="status">Sei offline. Per accedere e aggiornare i tuoi dati serve una connessione.</div>
 
 <button type="button" id="backToTop" class="back-to-top" aria-label="Torna in cima">
   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
@@ -189,11 +198,11 @@
 
   <!-- ============ HOME ============ -->
   <section class="module active" id="mod-home" role="tabpanel" aria-labelledby="tab-home" tabindex="-1">
-    <div class="dashboard-heading"><div><span class="eyebrow" id="homeDate">IL TUO OGGI</span><h1 id="greetingText">Bentornato.</h1><p>Un nuovo giorno, spazio a nuove possibilità.</p></div><button class="primary-button" id="newEventQuick" type="button"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg> Nuovo evento</button></div>
+    <div class="dashboard-heading"><div><span class="eyebrow" id="homeDate">IL TUO OGGI</span><h1 id="greetingText">Bentornato.</h1><p>Impegni, idee e passioni. Parti da qui.</p></div><button class="primary-button" id="newEventQuick" type="button"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg> Nuovo evento</button></div>
     <div class="home-feature-grid">
       <article class="inspiration-card" data-tilt>
-        <img src="assets/art/chrome-loop.png" alt="" width="1536" height="1024" decoding="async" class="feature-art">
-        <div class="feature-content"><span class="eyebrow">LA TUA PROSSIMA IDEA INIZIA QUI</span><h2>Fai spazio<br>alle <em>possibilità.</em></h2><p>Organizza il presente.<br>Immagina tutto il resto.</p><button class="light-button" type="button" data-goto="esperimenti">Esplora il laboratorio <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></button></div>
+        <img src="assets/backgrounds/chrome-figure.jpg" alt="" width="2048" height="1152" decoding="async" class="feature-art">
+        <div class="feature-content"><span class="eyebrow">OLTRE LA ROUTINE</span><h2>La curiosità<br>non ha <em>confini.</em></h2><p>Giochi, universi e piccoli esperimenti.<br>Prenditi un momento per esplorare.</p><button class="light-button" type="button" data-goto="esperimenti">Esplora il laboratorio <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></button></div>
         <div class="feature-bottom"><span>PERSONAL SPACE / 2026</span><button type="button" id="openGallery" class="gallery-link"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-cube"/></svg> Galleria 3D</button></div>
       </article>
       <article class="focus-card" id="focusCard"><div class="card-topline"><span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-focus"/></svg> MOMENTO FOCUS</span><span class="small-badge">PER TE</span></div>
@@ -202,7 +211,7 @@
        <div class="focus-actions"><button type="button" class="primary-button" id="focusStart">Inizia la sessione</button><button type="button" class="icon-button" id="focusReset" aria-label="Reimposta il timer">↺</button></div><p class="sr-only" id="focusAnnouncement" aria-live="polite"></p>
       </article>
     </div>
-    <div class="section-topline"><h2>A portata di mano</h2><span>I piccoli passi fanno spazio alle grandi cose.</span></div>
+    <div class="section-topline"><h2>A portata di mano</h2><span>Le tue sezioni, a un clic.</span></div>
     <div class="home-shortcuts">
       <button type="button" class="shortcut-card" data-goto="calendario"><span class="shortcut-icon lime"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-calendar"/></svg></span><span><b>Calendario</b><small>Il tempo, dalla tua parte.</small></span><svg class="icon shortcut-arrow" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></button>
       <button type="button" class="shortcut-card" data-goto="percorso"><span class="shortcut-icon blue"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-career"/></svg></span><span><b>Percorso</b><small>Ogni passo conta.</small></span><svg class="icon shortcut-arrow" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></button>
@@ -253,6 +262,7 @@
           <div class="ev-row"><div><label for="evTime">Ora inizio</label><div class="time-field"><span class="time-ico">⏱</span><select id="evTime"></select></div></div><div><label for="evEndTime">Ora fine</label><div class="time-field"><span class="time-ico">⏱</span><select id="evEndTime"></select></div></div></div>
           <div class="ev-row"><div><label for="evLocation">Luogo</label><input type="text" id="evLocation" placeholder="Es. Bologna, SAIS..."></div></div>
           <div class="ev-row"><div><label for="evCategory">Categoria</label><select id="evCategory"><option>Personale</option><option>Lavoro</option><option>Sport</option><option>Studio</option><option>Famiglia</option><option>Viaggio</option><option>Altro</option></select></div><div><label for="evColor">Colore</label><input class="ev-color" type="color" id="evColor" value="#d6fc52"></div></div>
+          <label for="evEndDate">Data di fine (vuota = stesso giorno)</label><input type="date" id="evEndDate">
           <label style="display:flex;gap:8px;align-items:center;margin-top:12px"><input type="checkbox" id="evAllDay"> Tutto il giorno</label>
           <button type="submit" class="ev-add-btn">+ Aggiungi evento</button>
         <div id="authMessage" aria-live="polite"></div></form>

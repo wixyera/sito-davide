@@ -111,12 +111,12 @@ function clearSkeleton(container) {
   if (container) container.classList.remove('is-skeleton');
 }
 
-function showLoadError(container, retry) {
+function showLoadError(container, retry, detail) {
   if (!container) return;
   clearSkeleton(container);
   container.replaceChildren();
   const box = document.createElement('div'); box.className = 'ev-empty load-error';
-  const message = document.createElement('p'); message.textContent = 'Non è stato possibile caricare i dati. Controlla la connessione e riprova.';
+  const message = document.createElement('p'); message.textContent = detail || 'Non è stato possibile caricare i dati. Controlla la connessione e riprova.';
   const button = document.createElement('button'); button.type = 'button'; button.className = 'export-all-btn'; button.textContent = 'Riprova';
   button.addEventListener('click', retry);
   box.append(message, button); container.append(box);

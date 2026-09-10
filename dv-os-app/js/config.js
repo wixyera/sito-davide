@@ -10,113 +10,114 @@ const WISHLIST_ENDPOINT = `${SUPABASE_URL}/rest/v1/wishlist_items`;
 const EXPENSES_ENDPOINT = `${SUPABASE_URL}/rest/v1/expenses`;
 const AUTH_ENDPOINT = `${SUPABASE_URL}/auth/v1`;
 let accessToken = localStorage.getItem('dv_os_access_token') || null;
+let currentUser = null;
+let refreshInFlight = null;
+let sessionExpiredHandled = false;
 
-/* ===================================================================
-   RICHIESTE DI AUTENTICAZIONE
-   =================================================================== */
+function saveSession(session) {
+  if (!session?.access_token) throw new Error('Il server non ha restituito una sessione valida.');
+  accessToken = session.access_token;
+  localStorage.setItem('dv_os_access_token', accessToken);
+  if (session.refresh_token) localStorage.setItem('dv_os_refresh_token', session.refresh_token);
+  else localStorage.removeItem('dv_os_refresh_token');
+  const expiry = session.expires_at ? Number(session.expires_at) * 1000 : session.expires_in ? Date.now() + Number(session.expires_in) * 1000 : 0;
+  localStorage.setItem('dv_os_expires_at', String(expiry));
+  currentUser = null;
+  sessionExpiredHandled = false;
+}
+function clearSession() {
+  accessToken = null; currentUser = null;
+  ['dv_os_access_token', 'dv_os_refresh_token', 'dv_os_expires_at'].forEach(key => localStorage.removeItem(key));
+}
 async function authRequest(path, options = {}) {
-  const res = await fetch(`${AUTH_ENDPOINT}${path}`, { ...options, headers: { apikey: SUPABASE_KEY, 'Content-Type': 'application/json', ...(options.headers || {}) } });
+  const res = await fetch(`${AUTH_ENDPOINT}${path}`, { ...options, cache: 'no-store', signal: options.signal || AbortSignal.timeout(20000), headers: { apikey: SUPABASE_KEY, 'Content-Type': 'application/json', ...(options.headers || {}) } });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error_description || data.msg || data.message || `Errore ${res.status}`);
+  if (!res.ok) {
+    const err = new Error(data.error_description || data.msg || data.message || `Errore ${res.status}`);
+    err.status = res.status; throw err;
+  }
   return data;
 }
-
-/* ===================================================================
-   UTENTE CORRENTE (unica fonte di verità, con cache)
-   =================================================================== */
-let currentUser = null;
-
-async function getCurrentUser() {
-  if (currentUser) return currentUser;
-  if (!accessToken) return null;
-  const r = await fetch(`${AUTH_ENDPOINT}/user`, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${accessToken}` } });
-  if (!r.ok) {
-    if (r.status === 401 || r.status === 403) handleExpiredSession();
-    throw new Error('Sessione non valida. Effettua nuovamente l\u2019accesso.');
+async function refreshSession(force = false) {
+  const expiry = Number(localStorage.getItem('dv_os_expires_at') || 0);
+  if (!force && (!expiry || Date.now() < expiry - 60000)) return;
+  if (refreshInFlight) return refreshInFlight;
+  const attemptedToken = accessToken;
+  const renew = async () => {
+    // Another tab may have refreshed while this tab waited for the lock.
+    const stored = localStorage.getItem('dv_os_access_token');
+    if (stored && stored !== attemptedToken) { accessToken = stored; currentUser = null; return; }
+    const token = localStorage.getItem('dv_os_refresh_token');
+    if (!token) { if (force) handleExpiredSession(); return; }
+    try {
+      saveSession(await authRequest('/token?grant_type=refresh_token', { method: 'POST', body: JSON.stringify({ refresh_token: token }) }));
+    } catch (err) {
+      if ([400, 401, 403].includes(err.status)) handleExpiredSession();
+      throw err;
+    }
+  };
+  refreshInFlight = (navigator.locks?.request ? navigator.locks.request('dv-space-session', renew) : renew()).finally(() => { refreshInFlight = null; });
+  return refreshInFlight;
+}
+async function authorizedFetch(url, options = {}) {
+  await refreshSession();
+  const send = () => fetch(url, { ...options, signal: options.signal || AbortSignal.timeout(20000), headers: { ...options.headers, apikey: SUPABASE_KEY, Authorization: `Bearer ${accessToken}` } });
+  let response = await send();
+  if (response.status === 401) {
+    await refreshSession(true);
+    if (accessToken) response = await send();
+    if (response.status === 401) handleExpiredSession();
   }
-  currentUser = await r.json();
+  return response;
+}
+async function getCurrentUser() {
+  if (!accessToken) return null;
+  await refreshSession();
+  if (currentUser) return currentUser;
+  const response = await authorizedFetch(`${AUTH_ENDPOINT}/user`, { cache: 'no-store' });
+  if (!response.ok) throw new Error(response.status === 401 ? 'Sessione non valida. Accedi di nuovo.' : 'Impossibile verificare l’account. Controlla la connessione e riprova.');
+  currentUser = await response.json();
   return currentUser;
 }
-
-/* ===================================================================
-   SESSIONE SCADUTA (mid-uso) — se un token valido all'apertura scade
-   mentre l'app è già in uso (es. rimasta aperta per ore), le richieste
-   successive ricevono 401 dalla API. Invece di un errore criptico
-   ("JWT expired") mostriamo un messaggio chiaro e riportiamo l'utente
-   al login, una sola volta anche se più richieste falliscono insieme.
-   =================================================================== */
-let sessionExpiredHandled = false;
 function handleExpiredSession() {
   if (sessionExpiredHandled) return;
-  sessionExpiredHandled = true;
-  accessToken = null;
-  currentUser = null;
-  localStorage.removeItem('dv_os_access_token');
-  if (typeof toastError === 'function') toastError('Sessione scaduta. Stai per essere riportato al login.');
-  setTimeout(() => location.reload(), 1600);
+  sessionExpiredHandled = true; clearSession();
+  document.getElementById('authOverlay')?.classList.remove('hidden');
+  if (typeof setAuthMessage === 'function') setAuthMessage('Sessione scaduta. Accedi nuovamente.', true);
 }
-
-/* ===================================================================
-   RICHIESTE GENERICHE VERSO LE TABELLE "events", "career_entries" e
-   "contacts", TUTTE ISOLATE PER UTENTE (ogni utente vede/modifica solo
-   le proprie righe, grazie al filtro su user_id + alle policy RLS).
-   =================================================================== */
 async function tableRequest(endpoint, path = '', options = {}) {
   const method = (options.method || 'GET').toUpperCase();
   const user = await getCurrentUser();
-  if (!user) throw new Error('Devi effettuare l\u2019accesso.');
-
-  let finalPath = path;
-
-  if (method === 'GET') {
-    const sep = finalPath.includes('?') ? '&' : '?';
-    finalPath = `${finalPath}${sep}user_id=eq.${user.id}`;
-  }
-
+  if (!user) throw new Error('Devi effettuare l’accesso.');
+  const url = new URL(endpoint + path);
+  if (['GET', 'PATCH', 'DELETE'].includes(method)) url.searchParams.set('user_id', `eq.${user.id}`);
   if (method === 'POST' && options.body) {
     const body = JSON.parse(options.body);
-    if (Array.isArray(body)) {
-      body.forEach(item => { item.user_id = user.id; });
-    } else {
-      body.user_id = user.id;
-    }
+    (Array.isArray(body) ? body : [body]).forEach(item => { item.user_id = user.id; });
     options = { ...options, body: JSON.stringify(body) };
   }
-
-  if (method === 'PATCH' || method === 'DELETE') {
-    const sep = finalPath.includes('?') ? '&' : '?';
-    finalPath = `${finalPath}${sep}user_id=eq.${user.id}`;
-  }
-
-  const res = await fetch(`${endpoint}${finalPath}`, {
-    ...options,
-    headers: {
-      apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      Prefer: options.headers?.Prefer || 'return=representation',
-      ...(options.headers || {})
-    }
-  });
-
+  const res = await authorizedFetch(url.toString(), { ...options, headers: { 'Content-Type': 'application/json', Prefer: 'return=representation', ...options.headers } });
   if (!res.ok) {
-    if (res.status === 401 || res.status === 403) {
-      handleExpiredSession();
-      throw new Error('Sessione scaduta.');
-    }
-    let detail = '';
-    try { detail = JSON.stringify(await res.json()); } catch (_) { detail = await res.text(); }
-    throw new Error(detail || `Errore ${res.status}`);
+    const data = await res.json().catch(() => ({}));
+    if (res.status === 403) throw new Error('Accesso ai dati negato. Verifica le autorizzazioni del database.');
+    if (res.status === 404 || data.code === '42P01' || data.code === 'PGRST205') throw new Error('Questa sezione non è ancora configurata nel database. Consulta la guida inclusa nel sito.');
+    throw new Error(data.message || `Errore ${res.status}. Riprova.`);
   }
   if (res.status === 204) return null;
-  return res.json();
+  const content = await res.text();
+  return content ? JSON.parse(content) : null;
 }
-
 const supabaseRequest = (path, options) => tableRequest(EVENTS_ENDPOINT, path, options);
-const careerRequest   = (path, options) => tableRequest(CAREER_ENDPOINT, path, options);
+const careerRequest = (path, options) => tableRequest(CAREER_ENDPOINT, path, options);
 const contactsRequest = (path, options) => tableRequest(CONTACTS_ENDPOINT, path, options);
 const wishlistRequest = (path, options) => tableRequest(WISHLIST_ENDPOINT, path, options);
 const expensesRequest = (path, options) => tableRequest(EXPENSES_ENDPOINT, path, options);
+window.addEventListener('storage', event => {
+  if (event.key !== 'dv_os_access_token') return;
+  accessToken = event.newValue; currentUser = null;
+  // Remove the previous account's rendered data before any new session starts.
+  location.reload();
+});
 
 /* ===================================================================
    SALUTO DINAMICO: mostra il nome dell'utente loggato ovunque

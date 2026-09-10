@@ -14,4 +14,4 @@ for(const [,file] of html.matchAll(/(?:src|href)="([^"?#]+)(?:[?#][^"]*)?"/g)){
  if(!file.startsWith('http')&&!file.startsWith('data:')&&!file.startsWith('mailto:'))await access(path.join(output,file));
 }
 for(const api of ['oracolo','spotify-search','fetch-product'])await access(path.join(root,'functions/api',api+'.js'));
-console.log('Cloudflare Pages build ready in dist/. Original Pages Functions remain in functions/.');
+console.log('Cloudflare Pages build ready in dist/. Pages Functions remain in functions/.');

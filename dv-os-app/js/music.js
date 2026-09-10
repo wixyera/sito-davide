@@ -24,6 +24,7 @@
   }
 
   function openPanel() {
+    if (!embed.getAttribute('src')) embed.src = embed.dataset.src;
     panel.classList.add('open');
     toggle.setAttribute('aria-expanded', 'true');
   }

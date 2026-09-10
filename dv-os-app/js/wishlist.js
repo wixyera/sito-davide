@@ -16,6 +16,7 @@ async function loadWishlist() {
     renderWishlist();
   } catch (err) {
     console.error('Errore nel caricamento della wishlist:', err);
+    showLoadError(wlGrid, loadWishlist, err.message);
   }
 }
 
@@ -43,7 +44,7 @@ function renderWishlist() {
 
   wishlistEntries.forEach(item => {
     const price = Number(item.price);
-    const hasPrice = !Number.isNaN(price);
+    const hasPrice = item.price !== null && item.price !== '' && Number.isFinite(price);
     if (hasPrice) totalAll += price;
     if (item.in_cart && hasPrice) { totalCart += price; }
     if (item.in_cart) countCart++;
@@ -59,7 +60,7 @@ function renderWishlist() {
         <span class="wl-cart-label">${item.in_cart ? 'Nel carrello' : 'Aggiungi al carrello'}</span>
       </button>
       <div class="wl-img-wrap">
-        ${item.image_url ? `<img src="${escapeAttr(item.image_url)}" alt="" loading="lazy" onerror="this.closest('.wl-img-wrap').classList.add('broken')">` : ''}
+        ${item.image_url ? `<img src="${escapeAttr(safeWebUrl(item.image_url))}" alt="" loading="lazy" onerror="this.closest('.wl-img-wrap').classList.add('broken')">` : ''}
         <span class="wl-noimg">SENZA IMMAGINE</span>
       </div>
       <div class="wl-body">
@@ -68,7 +69,7 @@ function renderWishlist() {
         <div class="wl-price">${fmtPrice(item.price, item.currency)}</div>
         ${item.category ? `<span class="wl-cat">${escapeHtml(item.category)}</span>` : ''}
         <div class="wl-actions">
-          ${item.product_url ? `<a class="wl-link" href="${escapeAttr(item.product_url)}" target="_blank" rel="noopener">Apri <svg viewBox="0 0 24 24" style="width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg></a>` : '<span></span>'}
+          ${item.product_url ? `<a class="wl-link" href="${escapeAttr(safeWebUrl(item.product_url))}" target="_blank" rel="noopener">Apri <svg viewBox="0 0 24 24" style="width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg></a>` : '<span></span>'}
           <div class="ev-item-actions">
             <button class="ev-edit" type="button" title="Modifica" aria-label="Modifica"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
             <button class="ev-del" type="button" title="Elimina" aria-label="Elimina"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
@@ -80,6 +81,7 @@ function renderWishlist() {
 
     const cartBtn = card.querySelector('.wl-cart-btn');
     cartBtn.onclick = async () => {
+      cartBtn.disabled = true;
       const checked = !item.in_cart;
       cartBtn.classList.toggle('in-cart', checked);
       cartBtn.setAttribute('aria-pressed', checked ? 'true' : 'false');
@@ -102,8 +104,9 @@ function renderWishlist() {
         toastError('Errore nell\u2019aggiornamento: ' + err.message);
         cartBtn.classList.toggle('in-cart', !checked);
         card.classList.toggle('in-cart', !checked);
+        cartBtn.setAttribute('aria-pressed', String(!checked));
         cartBtn.querySelector('.wl-cart-label').textContent = !checked ? 'Nel carrello' : 'Aggiungi al carrello';
-      }
+      } finally { cartBtn.disabled = false; }
     };
 
     card.querySelector('.ev-edit').onclick = () => editWishlistItem(item);
@@ -119,32 +122,31 @@ function renderWishlist() {
     wlGrid.appendChild(card);
   });
 
-  document.getElementById('wlTotalAll').textContent = fmtPrice(totalAll, 'EUR');
-  document.getElementById('wlTotalCart').textContent = fmtPrice(totalCart, 'EUR');
-  document.getElementById('wlCountAll').textContent = wishlistEntries.length;
-  document.getElementById('wlCountCart').textContent = countCart;
+  renderTotalsOnly();
 }
-
-/* Ricalcola solo i totali (usato dal toggle carrello, per non interrompere l'animazione ridisegnando la card) */
 function renderTotalsOnly() {
-  let totalAll = 0, totalCart = 0, countCart = 0;
+  const all = new Map(), cart = new Map();
   wishlistEntries.forEach(item => {
-    const price = Number(item.price);
-    const hasPrice = !Number.isNaN(price);
-    if (hasPrice) totalAll += price;
-    if (item.in_cart && hasPrice) totalCart += price;
-    if (item.in_cart) countCart++;
+    if (item.price === null || item.price === '') return;
+    const price = Number(item.price), currency = item.currency || 'EUR';
+    if (!Number.isFinite(price)) return;
+    all.set(currency, (all.get(currency) || 0) + price);
+    if (item.in_cart) cart.set(currency, (cart.get(currency) || 0) + price);
   });
-  document.getElementById('wlTotalAll').textContent = fmtPrice(totalAll, 'EUR');
-  document.getElementById('wlTotalCart').textContent = fmtPrice(totalCart, 'EUR');
+  const format = totals => totals.size ? [...totals].map(([currency, price]) => fmtPrice(price, currency)).join(' + ') : fmtPrice(0, 'EUR');
+  document.getElementById('wlTotalAll').textContent = format(all);
+  document.getElementById('wlTotalCart').textContent = format(cart);
   document.getElementById('wlCountAll').textContent = wishlistEntries.length;
-  document.getElementById('wlCountCart').textContent = countCart;
+  document.getElementById('wlCountCart').textContent = wishlistEntries.filter(item => item.in_cart).length;
 }
 
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 function escapeAttr(s) { return escapeHtml(s); }
+function safeWebUrl(value) {
+  try { const url = new URL(value); return /^https?:$/.test(url.protocol) ? url.href : ''; } catch { return ''; }
+}
 
 /* ---------- Analisi automatica da URL (chiama la Cloudflare Function) ---------- */
 const wlUrlInput = document.getElementById('wlUrlInput');
@@ -233,6 +235,8 @@ wlForm.addEventListener('submit', async e => {
     updated_at: new Date().toISOString()
   };
 
+  if (payload.price !== null && (!Number.isFinite(payload.price) || payload.price < 0)) return toastError('Inserisci un prezzo valido.');
+  if ([payload.image_url, payload.product_url].some(url => url && !safeWebUrl(url))) return toastError('Usa un indirizzo completo https:// o http://.');
   const btn = document.getElementById('wlSubmitBtn');
   btn.disabled = true; btn.textContent = 'Salvataggio...';
   try {

@@ -218,7 +218,7 @@
   window.addEventListener('workspace:module',scrollProgress);
 
   // Focus sessions never write to the account's personal data.
-  import('./js/focus-timer.js').then(({FocusTimer})=>{
+  import('./focus-timer.js').then(({FocusTimer})=>{
     const timer=new FocusTimer(25);
     let notified=false;
     function paint(){
@@ -284,7 +284,7 @@
     if(galleryLoading)return;
     galleryLoading=true;
     try{
-      const {mountGallery}=await import('./js/gallery.js');
+      const {mountGallery}=await import('./gallery.js');
       galleryApi=mountGallery({stage:$('galleryStage'),host:$('galleryArt'),dialog,paused:motionPaused});
       $('galleryLoading').hidden=true;
       if(dialog.open || dialog.hasAttribute('open'))galleryApi.start();

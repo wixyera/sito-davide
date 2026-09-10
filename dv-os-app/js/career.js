@@ -13,7 +13,7 @@ async function loadCareer() {
     renderCareer();
   } catch (err) {
     console.error('Errore nel caricamento del percorso:', err);
-    showLoadError(careerMenu, loadCareer);
+    showLoadError(careerMenu, loadCareer, err.message);
   }
 }
 

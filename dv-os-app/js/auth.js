@@ -15,9 +15,7 @@ async function login() {
   try {
     setAuthMessage('ACCESSO IN CORSO...');
     const d = await authRequest('/token?grant_type=password', { method: 'POST', body: JSON.stringify({ email, password }) });
-    accessToken = d.access_token;
-    localStorage.setItem('dv_os_access_token', accessToken);
-    currentUser = null;
+    saveSession(d);
     await startApp();
   } catch (e) {
     setAuthMessage(e.message, true);
@@ -54,20 +52,20 @@ async function signup() {
     setAuthMessage('CREAZIONE ACCOUNT...');
     const code = generateRecoveryCode();
     const recovery_code_hash = await hashRecoveryCode(email, code);
-    const d = await authRequest('/signup', {
+    const d = await authRequest('/signup?redirect_to=' + encodeURIComponent(location.origin + location.pathname), {
       method: 'POST',
       body: JSON.stringify({ email, password, data: { full_name: name || email.split('@')[0], recovery_code_hash } })
     });
-    if (d.access_token) {
-      accessToken = d.access_token;
-      localStorage.setItem('dv_os_access_token', accessToken);
-      currentUser = null;
-      pendingRecoveryCode = code;
-      document.getElementById('recoveryCodeBox').textContent = code;
-      showAuthView('authViewRecoveryCode');
-    } else {
-      setAuthMessage('Account creato. Controlla la tua email per confermare, poi accedi.');
+    if (d.identities && d.identities.length === 0) {
+      setAuthMessage('Controlla la tua email. Se hai già un account, accedi o recupera la password.');
+      return;
     }
+    if (d.access_token) saveSession(d);
+    else clearSession();
+    pendingRecoveryCode = code;
+    document.getElementById('recoveryCodeBox').textContent = code;
+    document.getElementById('recoveryCodeContinueBtn').textContent = d.access_token ? 'Ho salvato il codice, continua' : 'Ho salvato il codice, torna al login';
+    showAuthView('authViewRecoveryCode');
   } catch (e) {
     setAuthMessage(/email rate limit/i.test(String(e.message || '')) ? 'Limite email raggiunto: attendi e riprova.' : e.message, true);
   }
@@ -77,9 +75,7 @@ async function logout() {
   try {
     if (accessToken) await authRequest('/logout', { method: 'POST', headers: { Authorization: `Bearer ${accessToken}` } });
   } catch (_) {}
-  accessToken = null;
-  currentUser = null;
-  localStorage.removeItem('dv_os_access_token');
+  clearSession();
   if (typeof navigator !== 'undefined' && navigator.serviceWorker?.controller) navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_PERSONAL_CACHE' });
   location.reload();
 }
@@ -87,14 +83,11 @@ async function logout() {
 async function startApp() {
   const user = await getCurrentUser();
   if (!user) throw new Error('Accedi per continuare.');
+  if (typeof resetWorkspaceState === 'function') resetWorkspaceState();
   document.getElementById('authOverlay').classList.add('hidden');
   document.getElementById('logoutBtn').style.display = 'block';
   if (user) applyDisplayName(user);
-  await loadEvents();
-  await loadCareer();
-  await loadContacts();
-  await loadWishlist();
-  await loadExpenses();
+  await Promise.allSettled([loadEvents(), loadCareer(), loadContacts(), loadWishlist(), loadExpenses()]);
 
   // riapre l'ultimo modulo che stavi usando, invece di tornare sempre
   // alla Home ad ogni refresh — comodo per un'app che usi ogni giorno.
@@ -104,15 +97,20 @@ async function startApp() {
   } catch (_) {}
 }
 
-document.getElementById('loginBtn')?.addEventListener('click', login);
-document.getElementById('authPassword')?.addEventListener('keydown', e => { if (e.key === 'Enter') { if (authMode === 'signup') signup(); else login(); } });
-document.getElementById('signupBtn')?.addEventListener('click', signup);
+document.getElementById('loginBtn')?.addEventListener('click', () => runAuthAction(login));
+document.getElementById('authPassword')?.addEventListener('keydown', e => { if (e.key === 'Enter') { runAuthAction(authMode === 'signup' ? signup : login); } });
+document.getElementById('signupBtn')?.addEventListener('click', () => runAuthAction(signup));
 document.getElementById('logoutBtn')?.addEventListener('click', logout);
 
 document.getElementById('recoveryCodeContinueBtn')?.addEventListener('click', async () => {
   pendingRecoveryCode = '';
   showAuthView('authViewLogin');
-  await startApp();
+  if (accessToken) {
+    try { await startApp(); } catch (err) { setAuthMessage(err.message, true); }
+  } else {
+    setAuthMode('login');
+    setAuthMessage('Controlla la tua email e conferma l’account prima di accedere.');
+  }
 });
 document.getElementById('copyRecoveryCodeBtn')?.addEventListener('click', async () => {
   try {
@@ -123,29 +121,11 @@ document.getElementById('copyRecoveryCodeBtn')?.addEventListener('click', async 
   }
 });
 
-/* ===================================================================
-   RESET PASSWORD — TUTTO SUL SITO, NESSUNA EMAIL IN USCITA.
-   Necessario perché molti account (creati da amici per prova) hanno
-   email non reali/non raggiungibili: un reset via email non
-   funzionerebbe per loro.
-
-   Al posto della vecchia "domanda di sicurezza" (indovinabile: città
-   natale, nome del cane...) ogni account riceve, una sola volta in
-   fase di registrazione, un CODICE DI RECUPERO casuale a 128 bit.
-   Solo il suo hash SHA-256 viene salvato lato server; il codice in
-   chiaro esiste solo nel browser dell'utente per il tempo necessario
-   a copiarlo.
-
-   La verifica vera e propria (hash del codice + reset password) deve
-   avvenire lato server con la service role key di Supabase, quindi
-   passa da un'unica Edge Function ("password-reset"): il file
-   supabase-functions/password-reset.ts incluso in questo pacchetto va
-   (ri)caricato sul progetto Supabase per sostituire la vecchia
-   versione basata sulla domanda di sicurezza.
-   =================================================================== */
+/* Recovery-code verification is server-side in supabase/functions/password-reset.
+   The email recovery flow below uses Supabase Auth directly. */
 const PASSWORD_RESET_ENDPOINT = `${SUPABASE_URL}/functions/v1/password-reset`;
 function showAuthView(view) {
-  ['authViewLogin', 'authViewForgot', 'authViewRecoveryCode'].forEach(id => {
+  ['authViewLogin', 'authViewForgot', 'authViewRecoveryCode', 'authViewNewPassword'].forEach(id => {
     document.getElementById(id)?.classList.toggle('hidden', id !== view);
   });
 }
@@ -175,7 +155,7 @@ async function resetPasswordWithCode() {
     setForgotMessage('VERIFICA IN CORSO...');
     const res = await fetch(PASSWORD_RESET_ENDPOINT, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
+      headers: { 'Content-Type': 'application/json', apikey: SUPABASE_KEY },
       body: JSON.stringify({ email, code, newPassword: password })
     });
     const data = await res.json().catch(() => ({}));
@@ -190,8 +170,8 @@ async function resetPasswordWithCode() {
     setForgotMessage(e.message, true);
   }
 }
-document.getElementById('forgotSendBtn')?.addEventListener('click', resetPasswordWithCode);
-document.getElementById('newPassword')?.addEventListener('keydown', e => { if (e.key === 'Enter') resetPasswordWithCode(); });
+document.getElementById('forgotSendBtn')?.addEventListener('click', () => runAuthAction(resetPasswordWithCode));
+document.getElementById('newPassword')?.addEventListener('keydown', e => { if (e.key === 'Enter') runAuthAction(resetPasswordWithCode); });
 
 /* Toggle tra modalità login/registrazione: mostra il campo nome solo in signup */
 let authMode = 'login';
@@ -209,10 +189,36 @@ function setAuthMode(mode) {
   const nameWrap = document.getElementById('nameFieldWrap');
   if (nameWrap) nameWrap.style.display = mode === 'signup' ? 'block' : 'none';
 }
-document.getElementById('signupBtn')?.addEventListener('click', () => {
-  if (authMode !== 'signup') setAuthMode('signup');
-});
-document.getElementById('loginBtn')?.addEventListener('click', () => {
-  if (authMode !== 'login') setAuthMode('login');
-});
 
+// Prevent duplicate submissions while the same authentication request is running.
+let authBusy = false;
+async function runAuthAction(action) {
+  if (authBusy) return;
+  authBusy = true;
+  const buttons = ['loginBtn','signupBtn','forgotSendBtn','emailRecoveryBtn','saveNewPasswordBtn'].map(id => document.getElementById(id)).filter(Boolean);
+  buttons.forEach(button => { button.disabled = true; });
+  try { await action(); }
+  finally { authBusy = false; buttons.forEach(button => { button.disabled = false; }); }
+}
+async function sendRecoveryEmail() {
+  const email = document.getElementById('forgotEmail').value.trim();
+  if (!email) return setForgotMessage('Inserisci la tua email.', true);
+  try {
+    await authRequest('/recover?redirect_to=' + encodeURIComponent(location.origin + location.pathname), { method:'POST', body:JSON.stringify({email}) });
+    setForgotMessage('Se l’account esiste, riceverai un’email con il link per scegliere una nuova password. Controlla anche lo spam.');
+  } catch (error) { setForgotMessage(error.message, true); }
+}
+async function saveNewPassword() {
+  const password = document.getElementById('emailNewPassword').value;
+  const confirmation = document.getElementById('emailConfirmPassword').value;
+  const msg = document.getElementById('newPasswordMsg');
+  if (password.length < 6) { msg.textContent = 'Inserisci almeno 6 caratteri.'; return; }
+  if (password !== confirmation) { msg.textContent = 'Le password non coincidono.'; return; }
+  try {
+    await authRequest('/user', { method:'PUT', headers:{Authorization:`Bearer ${accessToken}`}, body:JSON.stringify({password}) });
+    await logout();
+  } catch (error) { msg.textContent = error.message; }
+}
+document.getElementById('emailRecoveryBtn')?.addEventListener('click', () => runAuthAction(sendRecoveryEmail));
+document.getElementById('saveNewPasswordBtn')?.addEventListener('click', () => runAuthAction(saveNewPassword));
+document.getElementById('cancelEmailReset')?.addEventListener('click', logout);

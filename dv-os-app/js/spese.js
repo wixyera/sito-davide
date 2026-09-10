@@ -24,6 +24,7 @@ async function loadExpenses() {
     renderExpenses();
   } catch (err) {
     console.error('Errore nel caricamento delle spese:', err);
+    showLoadError(spList, loadExpenses, err.message);
   }
 }
 

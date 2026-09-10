@@ -1,55 +1,43 @@
-# DV / SPACE
+# DV / SPACE 3
 
-Lo spazio personale di Davide Villano è stato ridisegnato da zero con una direzione visiva **Obsidian & Electric Lime**: accesso editoriale, navigazione laterale, dashboard operativa, timer Focus, galleria 3D e laboratorio con esperimenti interattivi e tre test personali (Space DNA, Rhythm Scan e Next Horizon).
+Il sito di Davide, aggiornato con un’interfaccia scura e azzurra, superfici più leggibili, immagini cromate, transizioni più leggere e layout adattati a telefono e PC. Tutte le sezioni originali sono conservate.
 
-Le funzioni originali restano disponibili:
+**Apri prima `LEGGIMI.txt`**: contiene la procedura per aggiornare GitHub / Cloudflare Pages e completare Supabase.
 
-- login, registrazione e recupero password con codice;
-- calendario personale con importazione/esportazione `.ics`;
-- percorso professionale, contatti, wishlist e spese, isolati per utente;
-- ricerca globale, player Spotify, PWA/offline e API Pages Functions;
-- tutti gli esperimenti presenti nel progetto originale.
+## Contenuto
 
-## Caricamento su GitHub e Cloudflare Pages
+- `index.html`, `css`, `js`, `assets`, `experiments`, `vendor`: sorgenti e immagini del sito.
+- `functions/api`: le tre API Cloudflare Pages originali.
+- `supabase/functions/password-reset/index.ts`: recupero con codice personale.
+- `supabase/config.toml`: configurazione della funzione di recupero per utenti non autenticati. Il codice viene verificato nella funzione.
+- `sql/SETUP_COMPLETO.sql`: configurazione delle cinque tabelle con regole per proprietario; non cancella righe.
+- `dist`: copia pubblica generata, già inclusa per comodità. Per pubblicare tutte le API usa l’integrazione Git oppure Wrangler, come nella guida.
+- `VERIFICHE.md`: modifiche, controlli eseguiti e limiti della verifica.
 
-1. Estrai lo ZIP e carica **il contenuto di questa cartella** nella radice del repository GitHub.
-2. In Cloudflare Pages crea un progetto collegato al repository.
-3. Usa queste impostazioni:
+## Comandi locali
 
-| Campo | Valore |
-| --- | --- |
-| Framework preset | None / Nessuno |
-| Production branch | `main` (o il ramo scelto) |
-| Build command | `npm run build` |
-| Build output directory | `dist` |
-| Root directory | vuota, se il progetto è nella radice del repository |
-
-La cartella `functions` deve restare nella radice del repository: Pages la usa per le API `/api/oracolo`, `/api/spotify-search` e `/api/fetch-product`.
-
-Cloudflare documenta [l’integrazione Git](https://developers.cloudflare.com/pages/get-started/git-integration/), la [configurazione della build](https://developers.cloudflare.com/pages/configuration/build-configuration/) e le [Pages Functions](https://developers.cloudflare.com/pages/functions/get-started/).
-
-## Configurazione dei servizi
-
-Il progetto continua a usare la configurazione Supabase già presente in `js/config.js`. Non sono stati modificati account, tabelle o dati personali.
-
-Per Oracolo IA e ricerca Spotify conserva nel progetto Pages i segreti già esistenti:
-
-- `OPENAI_API_KEY`
-- `SPOTIFY_CLIENT_ID`
-- `SPOTIFY_CLIENT_SECRET`
-
-Non inserire mai i valori reali nel repository. `.env.example` contiene solo i nomi delle variabili.
-
-## Avvio locale
+Richiede Node.js 22 o superiore. Non ci sono dipendenze npm da installare.
 
 ```sh
 npm run dev
+npm test
+npm run build
 ```
 
-Apri `http://127.0.0.1:4173`. Per generare la cartella pubblica usa `npm run build`; per eseguire le verifiche usa `npm test`.
+`npm run dev` serve il sito su `http://127.0.0.1:4173`. In locale le API leggono le variabili dell’ambiente del terminale. Per caricare un file `.env` con Node:
 
-Il timer Focus è locale al browser e non scrive dati nel database. La galleria viene caricata solo quando viene aperta, così la dashboard resta veloce anche su dispositivi meno potenti: con WebGL attivo mostra le opere 3D, mentre in browser/desktop remoti che bloccano WebGL passa automaticamente a un fallback orbitale con le stesse stanze, drag e pausa. Il comando pausa in alto sincronizza galleria, timer visivo e particelle ambientali; il sito rispetta anche `prefers-reduced-motion`.
+```sh
+node --env-file=.env serve.mjs
+```
 
-## Asset e licenze
+Usa `.env.example` come schema. Il normale doppio clic su `index.html` non è sufficiente per moduli JavaScript, API e autenticazione: usa il server locale o Cloudflare.
 
-La nuova opera cromata è un asset originale creato per DV / SPACE. Three.js è incluso localmente con licenza MIT in `vendor`; la texture terrestre proviene dagli [esempi ufficiali Three.js](https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg).
+## Servizi
+
+La configurazione pubblica Supabase originale è conservata in `js/config.js`. Non sono state cambiate le credenziali o modificati i dati del progetto remoto. Il salvataggio dei dati richiede Supabase attivo, tabelle e policy compatibili. La registrazione e il recupero via email richiedono gli URL di ritorno autorizzati e un servizio email configurato in Supabase. [Sessioni Supabase](https://supabase.com/docs/guides/auth/sessions), [URL di ritorno](https://supabase.com/docs/guides/auth/redirect-urls), [autenticazione con password](https://supabase.com/docs/guides/auth/passwords).
+
+Le chiavi private di OpenAI e Spotify vanno nelle variabili server di Cloudflare, mai nel frontend o nel repository. Le Pages Functions vengono pubblicate tramite Git o Wrangler: il caricamento diretto dal pannello Cloudflare non pubblica questa cartella di funzioni. [Documentazione Cloudflare](https://developers.cloudflare.com/pages/functions/get-started/).
+
+## Asset
+
+Sono riutilizzati gli asset inclusi nel progetto originale. Three.js mantiene la licenza MIT in `vendor/THREE-LICENSE.txt`. Alcuni esperimenti caricano librerie e dati esterni e richiedono una connessione. Il timer e la galleria principale caricano i propri moduli e Three.js dal progetto.

@@ -71,7 +71,7 @@ function mountFallbackGallery({stage, host, dialog, paused = false}) {
         <button type="button" data-art="pause" aria-label="Ferma le animazioni" aria-pressed="false">Ⅱ</button>
       </div>
     </div>
-    <span class="fallback-badge">SPACE / FALLBACK VISUALE · trascina per esplorare</span>`;
+    <span class="fallback-badge">Trascina per esplorare</span>`;
   host.append(visual);
   const loading = document.getElementById('galleryLoading');
   if (loading) loading.hidden = true;

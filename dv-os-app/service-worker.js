@@ -1,9 +1,9 @@
 /* DV / SPACE: offline static shell and existing per-user read cache.
    Auth and write requests always use the network. */
-const CACHE_NAME = 'dv-os-shell-space-v5';
+const CACHE_NAME = 'dv-os-shell-space-v6';
 const DATA_CACHE_NAME = 'dv-os-data-v2';
 const APP_SHELL = [
- './','./index.html','./manifest.json','./css/style.css','./css/lab.css',
+ './','./index.html','./manifest.json','./css/style.css','./css/lab.css','./css/aurora.css','./assets/backgrounds/chrome-figure.jpg',
  './js/config.js','./js/toast.js','./js/auth.js','./js/ui-core.js','./js/calendar.js',
  './js/career.js','./js/contacts.js','./js/wishlist.js','./js/spese.js','./js/ics.js',
  './js/search.js','./js/init.js','./js/theme.js','./js/music.js','./js/ambient-fx.js','./js/experience.js',
@@ -41,7 +41,7 @@ self.addEventListener('fetch',event=>{
   const cached=await caches.match(req);
   if(cached)return cached;
   // A missing script or image must never receive HTML as its fallback.
-  if(req.mode==='navigate')return await caches.match('./index.html')||Response.error();
+  if(req.mode==='navigate')return new Response('<!doctype html><html lang=it><meta charset=utf-8><meta name=viewport content="width=device-width"><title>Connessione assente</title><body style="background:#090d17;color:#eaf4ff;font:18px system-ui;padding:40px"><h1>Sei offline.</h1><p>Questa pagina non è ancora disponibile offline.</p><a href="/" style="color:#8ce9ff">Torna al tuo spazio</a></body></html>',{status:503,headers:{'Content-Type':'text/html; charset=utf-8'}});
   return Response.error();
  }));
 });

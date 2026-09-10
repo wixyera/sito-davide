@@ -51,7 +51,7 @@ label,.day-detail label,.auth-card label{font-size:.875rem}.module-heading p,.au
 .feature-content,.feature-bottom{position:relative;z-index:2}
 .feature-bottom .gallery-link{transition:transform .25s ease,background .25s ease,color .25s ease}
 .feature-bottom .gallery-link:hover{transform:translateX(4px);color:var(--accent);background:#d6fc5212}
-.focus-card.running .focus-ring circle:last-child{animation:focus-orbit 2.4s linear infinite}
+.focus-card.running .focus-ring circle:last-child{filter:drop-shadow(0 0 5px var(--accent-line))}
 .quick-card{transform:translateY(0) rotateX(0deg);transition:transform .45s var(--ease),border-color .3s,box-shadow .45s var(--ease)}
 .quick-card:hover{transform:translateY(-7px) rotateX(1deg);box-shadow:0 22px 45px #0003,0 0 0 1px var(--accent-line)}
 .module-heading .module-emblem{animation:emblem-breathe 4s ease-in-out infinite}

@@ -41,8 +41,8 @@ function mapRow(row) {
   const time = row.all_day ? '' : validStart ? localTime(start) : iso.slice(11, 16);
   const endTime = row.all_day || !end || !Number.isFinite(end.getTime()) ? '' : localTime(end);
   return {
-    id: row.id, title: row.title || 'Senza titolo', description: row.description || '',
-    time, endTime, dateKey: key, endDateKey: end && Number.isFinite(end.getTime()) ? dateKey(end.getFullYear(), end.getMonth(), end.getDate()) : key, all_day: !!row.all_day, location: row.location || '',
+    id: row.id, start_at: row.start_at, end_at: row.end_at, title: row.title || 'Senza titolo', description: row.description || '',
+    time, endTime, dateKey: key, endDateKey: row.all_day && endIso ? endIso.slice(0, 10) : end && Number.isFinite(end.getTime()) ? dateKey(end.getFullYear(), end.getMonth(), end.getDate()) : key, all_day: !!row.all_day, location: row.location || '',
     category: row.category || 'Personale', color: row.color || '#d6fc52'
   };
 }
@@ -57,7 +57,8 @@ async function loadEvents() {
     if (selectedDateKey) renderEventList(); else clearSkeleton(evList);
   } catch (err) {
     console.error('Errore nel caricamento degli eventi:', err);
-    clearSkeleton(evList);
+    renderCalendar();
+    showLoadError(evList, loadEvents, err.message);
     if (!navigator.onLine) toastInfo('Offline: eventi non aggiornabili ora.');
   }
 }
@@ -135,12 +136,13 @@ function editEvent(ev) {
   if (evPicker) evPicker.value = ev.id;
   document.getElementById('evTitle').value = ev.title || '';
   document.getElementById('evDescription').value = ev.description || '';
-  document.getElementById('evTime').value = ev.time || '';
-  document.getElementById('evEndTime').value = ev.endTime || '';
+  setEventTime('evTime', ev.time);
+  setEventTime('evEndTime', ev.endTime);
   document.getElementById('evLocation').value = ev.location || '';
   document.getElementById('evCategory').value = ev.category || 'Personale';
   document.getElementById('evColor').value = ev.color || '#d6fc52';
   document.getElementById('evAllDay').checked = !!ev.all_day;
+  document.getElementById('evEndDate').value = ev.endDateKey || ev.dateKey;
   evForm.querySelector('button[type="submit"]').textContent = 'Salva modifiche';
   evForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
@@ -197,13 +199,13 @@ function toDbPayload(data, key) {
   if (allDay) {
     return {
       title: data.title, description: data.description || null,
-      start_at: `${key}T00:00:00.000Z`, end_at: `${key}T23:59:59.999Z`,
+      start_at: `${key}T00:00:00.000Z`, end_at: `${data.endDateKey || key}T23:59:59.999Z`,
       all_day: true, location: data.location || null,
       category: data.category || 'Personale', color: data.color || '#d6fc52'
     };
   }
   const startTime = data.time || '00:00', endTime = data.endTime || startTime;
-  const start = new Date(`${key}T${startTime}:00`), end = new Date(`${key}T${endTime}:00`);
+  const start = new Date(`${key}T${startTime}:00`), end = new Date(`${data.endDateKey || key}T${endTime}:00`);
   if (!data.endTime) end.setHours(end.getHours() + 1);
   return {
     title: data.title, description: data.description || null,
@@ -221,13 +223,15 @@ evForm.addEventListener('submit', async e => {
     description: document.getElementById('evDescription').value.trim(),
     time: document.getElementById('evTime').value,
     endTime: document.getElementById('evEndTime').value,
+    endDateKey: document.getElementById('evEndDate').value || selectedDateKey,
     location: document.getElementById('evLocation').value.trim(),
     category: document.getElementById('evCategory').value,
     color: document.getElementById('evColor').value,
     allDay: document.getElementById('evAllDay').checked
   };
   if (!data.title) return;
-  if (!data.allDay && data.time && data.endTime && data.endTime <= data.time) { toastError('L’ora di fine deve essere successiva all’ora di inizio.'); return; }
+  if (data.endDateKey < selectedDateKey) return toastError('La data di fine deve essere successiva o uguale a quella iniziale.');
+  if (!data.allDay && data.endDateKey === selectedDateKey && data.time && data.endTime && data.endTime <= data.time) { toastError('L’ora di fine deve essere successiva all’ora di inizio.'); return; }
   const btn = evForm.querySelector('button[type="submit"]');
   btn.disabled = true; btn.textContent = 'Salvataggio...';
   try {
@@ -257,3 +261,11 @@ evPicker.addEventListener('change', () => {
   if (ev) editEvent(ev);
 });
 
+
+function setEventTime(id, value) {
+  const select = document.getElementById(id);
+  if (value && ![...select.options].some(option => option.value === value)) {
+    const option = document.createElement('option'); option.value = value; option.textContent = value; select.appendChild(option);
+  }
+  select.value = value || '';
+}
