@@ -31,6 +31,8 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
   function draw(now) {
+    frame = 0;
+    if (paused || document.hidden) return;
     const delta = last ? Math.min((now - last) / 1000, .06) : 0;
     last = now;
     ctx.clearRect(0, 0, width, height);
@@ -42,22 +44,22 @@
         const y = dot.y * height;
         const alpha = .16 + (Math.sin(now * .001 + dot.phase) + 1) * .07;
         ctx.beginPath();
-        ctx.fillStyle = `rgba(214,252,82,${alpha})`;
+        ctx.fillStyle = `rgba(166,214,247,${alpha})`;
         ctx.arc(x, y, dot.r, 0, Math.PI * 2);
         ctx.fill();
       }
       const px = pointer.x * width;
       const py = pointer.y * height;
       const halo = ctx.createRadialGradient(px, py, 0, px, py, Math.min(width, height) * .28);
-      halo.addColorStop(0, 'rgba(214,252,82,.08)');
-      halo.addColorStop(1, 'rgba(214,252,82,0)');
+      halo.addColorStop(0, 'rgba(166,214,247,.08)');
+      halo.addColorStop(1, 'rgba(166,214,247,0)');
       ctx.fillStyle = halo;
       ctx.fillRect(0, 0, width, height);
       if (pointer.active) {
         ctx.save();
         ctx.translate(px, py);
         ctx.rotate(now * .00015);
-        ctx.strokeStyle = 'rgba(214,252,82,.17)';
+        ctx.strokeStyle = 'rgba(166,214,247,.17)';
         ctx.lineWidth = 1;
         for (const radius of [38, 54]) {
           ctx.beginPath();
@@ -72,6 +74,8 @@
   function sync() {
     paused = reduced.matches || document.body.classList.contains('motion-paused');
     canvas.classList.toggle('is-paused', paused);
+    if (paused || document.hidden) { cancelAnimationFrame(frame); frame = 0; last = 0; ctx.clearRect(0,0,width,height); }
+    else if (!frame) frame = requestAnimationFrame(draw);
   }
   resize();
   sync();
@@ -82,6 +86,6 @@
     pointer = {x: event.clientX / Math.max(1, innerWidth), y: event.clientY / Math.max(1, innerHeight), active: true};
   }, {passive: true});
   addEventListener('pointerleave', () => { pointer.active = false; }, {passive: true});
-  frame = requestAnimationFrame(draw);
+  document.addEventListener('visibilitychange', sync);
   addEventListener('pagehide', () => cancelAnimationFrame(frame), {once: true});
 })();

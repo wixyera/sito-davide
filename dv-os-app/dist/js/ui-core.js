@@ -55,7 +55,17 @@ const MODULE_TITLES = {
   wishlist: 'Wishlist', spese: 'Spese', esperimenti: 'Laboratorio'
 };
 
-function showModule(name) {
+let activeViewTransition = null;
+function showModule(name, options = {}) {
+  if (!document.getElementById('mod-' + name)) return;
+  const apply = () => applyModule(name);
+  const canAnimate = options.transition && document.startViewTransition && !window.matchMedia('(prefers-reduced-motion:reduce)').matches && !document.body.classList.contains('motion-paused') && !document.getElementById('appShell').inert;
+  if (!canAnimate) { apply(); return; }
+  activeViewTransition?.skipTransition();
+  activeViewTransition = document.startViewTransition(apply);
+  activeViewTransition.finished.catch(() => {});
+}
+function applyModule(name) {
   if (!document.getElementById('mod-' + name)) return;
   document.body.dataset.scene = name;
   modules.forEach(m => m.classList.toggle('active', m.id === 'mod-' + name));
@@ -80,8 +90,8 @@ function showModule(name) {
     setTimeout(() => panel.focus({ preventScroll: true }), reducedMotion ? 0 : 350);
   }
 }
-tabBtns.forEach(b => b.addEventListener('click', () => showModule(b.dataset.module)));
-document.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', () => showModule(b.dataset.goto)));
+tabBtns.forEach(b => b.addEventListener('click', () => showModule(b.dataset.module, {transition:true})));
+document.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', () => showModule(b.dataset.goto, {transition:true})));
 document.getElementById('navToggle').addEventListener('click', () => {
   const open = document.body.classList.toggle('menu-open');
   document.getElementById('navToggle').setAttribute('aria-expanded', String(open));
