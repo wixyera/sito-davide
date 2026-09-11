@@ -1,0 +1,99 @@
+DV / SPACE 4 — KINETIC
+=====================
+
+Davide, questa è la nuova versione: recupero e conferma via email,
+nuovo ingresso 3D, titoli animati, transizioni e microinterazioni.
+
+PARTI DA APRI-QUI.html: si apre con il browser e contiene la guida sintetica.
+Per le email la guida completa è EMAIL-SUPABASE.md.
+
+1. AGGIORNA IL SITO
+
+Estrai lo ZIP. Nel repository mantieni la cartella dv-os-app oppure caricane
+il contenuto nella radice. Non creare cartelle annidate aggiuntive.
+
+Cloudflare Pages:
+- Framework preset: None
+- Build command: npm run build
+- Build output directory: dist
+- Root directory: dv-os-app se package.json è in quella cartella;
+  vuota se package.json è nella radice del repository.
+
+Pubblica tramite il repository GitHub collegato. La cartella functions deve
+rimanere accanto a package.json. Il solo trascinamento di dist nel pannello
+Cloudflare non pubblica le Pages Functions del progetto.
+
+Puoi usare il dominio pages.dev esistente senza cambiare altri domini.
+
+2. ATTIVA LE EMAIL IN SUPABASE
+
+- Authentication > provider Email: attiva Confirm email.
+- Authentication > URL Configuration: Site URL e Redirect URLs devono contenere
+  l'indirizzo reale della home, con slash finale.
+- Authentication > Email / SMTP Settings: configura il servizio SMTP.
+  Se lo hai già configurato e funziona, mantieni i valori esistenti.
+- Authentication > Email Templates:
+    Confirm sign up  -> email-templates/conferma-account.html
+    Reset password   -> email-templates/recupero-password.html
+    Password changed -> email-templates/password-modificata.html
+- Per Password changed devi anche ATTIVARE la relativa notifica di sicurezza.
+
+Apri i template con un editor di testo e copia il codice HTML nel pannello.
+Non sostituire {{ .ConfirmationURL }} con un URL generico.
+
+Ora il recupero funziona così: inserisci l'email, ricevi il link, apri il link,
+scegli e confermi la nuova password, poi accedi. Non c'è più il codice personale.
+
+NON DEVI PUBBLICARE LA EDGE FUNCTION password-reset.
+Se l'avevi già pubblicata, dopo aver provato il flusso email puoi rimuoverla
+dal pannello Supabase > Edge Functions. Questa modifica non è stata eseguita
+a distanza e caricare lo ZIP non elimina automaticamente funzioni già online.
+
+Gli account esistenti restano. Se un account ha un'email inventata o non più
+accessibile, il proprietario del progetto dovrà correggerla in Supabase.
+
+3. DATABASE E ALTRE INTEGRAZIONI
+
+La configurazione pubblica Supabase originale è conservata in js/config.js.
+Se calendario, percorso, contatti, wishlist e spese funzionano, non devi
+ricreare le tabelle. Se mancano, esegui sql/SETUP_COMPLETO.sql nel SQL Editor.
+Lo script non cancella righe e non assegna automaticamente dati senza proprietario.
+
+Le API originali restano. In Cloudflare conserva queste variabili server:
+- OPENAI_API_KEY
+- SPOTIFY_CLIENT_ID
+- SPOTIFY_CLIENT_SECRET
+
+La ricerca Spotify e l'Oracolo richiedono i rispettivi servizi configurati.
+Le playlist/link Spotify funzionano tramite il player esterno. L'analisi prodotti
+può essere bloccata da alcuni negozi: l'inserimento manuale resta disponibile.
+Meteo, mappe, Serie A e gli altri servizi esterni richiedono una connessione.
+
+4. PROVA ONLINE
+
+- Registra un account di prova e apri la mail di conferma.
+- Esci, richiedi il recupero password e apri la nuova mail.
+- Salva una nuova password e accedi.
+- Controlla la mail Password changed, se hai attivato la notifica.
+- Prova i moduli del sito, Focus e Galleria 3D.
+- Prova il pulsante pausa nell'ingresso e nella barra superiore.
+
+I test inclusi verificano il codice con richieste simulate. L'invio SMTP e le
+impostazioni del tuo account non sono stati configurati né verificati da qui.
+Non sono state eseguite prove visive in browser.
+
+5. SE NON VEDI LE MODIFICHE
+
+Attendi il completamento del nuovo deploy, poi chiudi e riapri il sito.
+Su Windows prova Ctrl+F5. Una finestra privata aiuta a verificare la cache.
+
+6. AVVIO DAL PC
+
+Con Node.js 22 o superiore, apri un terminale nella cartella del progetto:
+
+    npm run dev
+
+Apri http://127.0.0.1:4173. Per i test: npm test. Per la build: npm run build.
+Non aprire index.html con doppio clic per usare l'app: serve il server.
+
+Buon divertimento!

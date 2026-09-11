@@ -1,0 +1,32 @@
+{
+  "name": "DV / SPACE — Il tuo spazio personale",
+  "short_name": "DV Space",
+  "description": "Il tuo spazio per calendario, percorso, contatti, wishlist, spese e idee.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#090d17",
+  "theme_color": "#090d17",
+  "lang": "it",
+  "icons": [
+    {
+      "src": "assets/icons/space-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/space-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/space-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
