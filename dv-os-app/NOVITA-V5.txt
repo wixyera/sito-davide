@@ -1,9 +1,0 @@
-DV / SPACE — Cinematic edition
-
-Intro automatica di 4 secondi, saltabile con pulsante o Escape, una volta per sessione. Si puo rivedere dal menu. I link email e le preferenze di movimento ridotto evitano l'intro automatica.
-Menu immersivo con tutte e sette le sezioni, focus, uscita account e replay intro.
-Transizioni a schermo intero con alternativa per browser senza View Transitions.
-Autenticazione, configurazione, database e API originali conservati.
-
-Avvio: nella cartella dv-os-app eseguire npm run dev con Node 22 o successivo e aprire http://127.0.0.1:4173. La cartella dist contiene la build aggiornata. Le istruzioni originali per email e hosting sono incluse.
-Verifiche: 38 test automatici originali superati. Invio reale di email non verificato con un account reale.

@@ -1,6 +1,0 @@
-ORBIT / SPACE — V8
-Simbolo originale vettoriale: orbita aperta con punto luminoso. Varianti SVG lime, scura, bianca e firma completa in assets/brand.
-Intro con firma disegnata, alone orbitale e luce in movimento.
-Sei testate di sezione con profondita, schede reattive, comparsa progressiva, racconto visivo nella home controllato dallo scorrimento nativo. Supporto movimento ridotto e pausa animazioni.
-Nessuna modifica a database o autenticazione. I servizi email restano da configurare come indicato in EMAIL-SUPABASE.md.
-Avvio: npm run dev. Build: npm run build.
