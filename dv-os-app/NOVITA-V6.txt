@@ -1,4 +1,0 @@
-ATELIER / 06
-Nuova direzione editoriale in avorio, nero e lime. Accesso a doppia pagina, dashboard a contrasto, sezioni e laboratorio coordinati. Intro, menu e transizioni della versione precedente conservati e rifiniti. Tema chiaro, adattamento mobile e preferenze di movimento ridotto supportati.
-Avvio: npm run dev, quindi http://127.0.0.1:4173. Build: npm run build.
-Autenticazione e servizi originali conservati; invio email reale non verificato.
