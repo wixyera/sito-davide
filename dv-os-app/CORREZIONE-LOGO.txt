@@ -1,2 +1,0 @@
-Logo ORBIT presente nella schermata di accesso, nella barra laterale, nella barra superiore anche su mobile, nel menu e nella intro.
-Sostituire i file della versione precedente mantenendo la stessa struttura del repository. Questa correzione non modifica SMTP o recupero password.
