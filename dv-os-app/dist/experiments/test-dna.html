@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SPACE DNA — DV / SPACE</title>
+<link rel="stylesheet" href="../css/lab.css"><link rel="stylesheet" href="test.css">
+<link rel="icon" href="../assets/icons/space.svg" type="image/svg+xml">
+</head>
+<body class="test-lab" data-test="dna">
+<canvas id="testCanvas" aria-hidden="true"></canvas>
+<a class="dv-lab-bar" href="../index.html" aria-label="Torna al tuo spazio personale"><span class="dv-lab-mark">dv.</span><span>SPACE / LAB</span><span>↖</span></a>
+<main class="test-shell">
+  <header class="test-header"><div><span class="test-kicker" id="testKicker">TEST 01 / SPACE DNA</span><h1 id="testTitle">Che cosa sta orbitando dentro di te?</h1><p id="testIntro">Cinque scelte rapide per capire quale energia porti nel tuo spazio.</p></div><div class="test-index" id="testNumber" aria-label="Test 1 di 3"><b>01</b><span>/ 03</span></div></header>
+  <section class="test-card" id="testCard" aria-label="Test interattivo">
+    <div class="test-meta"><span>SCANSIONE IN CORSO</span><span class="test-progress"><span><b id="testCurrent">01</b> / <span id="testTotal">05</span></span><span class="test-progress-track" aria-hidden="true"><span id="testProgressBar"></span></span></span></div>
+    <div class="question-card" id="questionCard">
+      <h2 id="questionText" tabindex="-1"></h2><p class="question-note" id="questionNote"></p>
+      <div class="answers" id="answers" role="group" aria-labelledby="questionText"></div>
+      <div class="test-actions"><button class="test-button ghost" id="backQuestion" type="button" hidden>← Indietro</button><span class="test-hint">Tasti ← → per muoverti tra le risposte</span><button class="test-button" id="nextQuestion" type="button" disabled>Prossima domanda ↗</button></div>
+    </div>
+    <div class="test-result" id="result" role="status" aria-live="polite">
+      <div class="result-orb" aria-hidden="true"><span></span></div><span class="result-eyebrow">SEGNALE DECODIFICATO</span><h2 id="resultTitle" tabindex="-1"></h2><p id="resultCopy"></p><div class="result-tags" id="resultTags"></div><div class="result-actions"><button class="test-button" id="restartTest" type="button">Rifai il test ↺</button><button class="result-share" id="resultShare" type="button">Copia il risultato</button></div>
+    </div>
+  </section>
+  <footer class="test-foot"><span>NESSUNA RISPOSTA VIENE SALVATA ONLINE</span><span>DV / SPACE · PERSONAL SIGNALS</span></footer>
+</main>
+<script src="test-engine.js"></script>
+</body>
+</html>
