@@ -1,0 +1,2 @@
+import {configured,DEMO_CATALOG} from '../_lib/paypal-sandbox.js';
+export async function onRequestGet({env={}}){return Response.json({environment:'sandbox',configured:configured(env),clientId:configured(env)?env.PAYPAL_SANDBOX_CLIENT_ID:null,currency:'EUR',products:Object.entries(DEMO_CATALOG).map(([id,item])=>({id,...item}))},{headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}})}
