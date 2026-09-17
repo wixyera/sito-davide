@@ -1,0 +1,2 @@
+/* Preserve existing Supabase email-return URLs without exposing tokens to page assets. */
+(()=>{const query=new URLSearchParams(location.search),hash=new URLSearchParams(location.hash.slice(1));if(['access_token','refresh_token','error','error_description','type'].some(k=>hash.has(k))||['code','token_hash','error','error_description'].some(k=>query.has(k)))location.replace('workspace.html'+location.search+location.hash)})();
