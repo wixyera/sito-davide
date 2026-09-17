@@ -1,0 +1,6 @@
+/* Bounded user-owned outfit data. Product photos are references, never inferred 3D textures. */
+const OUTFIT_SHAPES={top:['tshirt','hoodie','shirt'],outer:['jacket','coat'],bottom:['trousers','shorts','skirt'],shoes:['sneakers','boots']};
+const OUTFIT_LABELS={tshirt:'T-shirt / maglia',hoodie:'Felpa',shirt:'Camicia',jacket:'Giacca',coat:'Cappotto',trousers:'Pantaloni',shorts:'Pantaloncini',skirt:'Gonna',sneakers:'Sneakers',boots:'Stivaletti'};
+function outfitWebUrl(v){try{const u=new URL(v);return ['https:','http:'].includes(u.protocol)&&!u.username&&!u.password?u.href.slice(0,2048):''}catch{return ''}}
+function cleanOutfitItems(value){const out={};for(const [slot,shapes] of Object.entries(OUTFIT_SHAPES)){const x=value?.[slot];if(!x||typeof x!=='object')continue;out[slot]={shape:shapes.includes(x.shape)?x.shape:shapes[0],color:/^#[\da-f]{6}$/i.test(x.color)?x.color:'#e9dfcf',title:typeof x.title==='string'?x.title.slice(0,100):'',url:outfitWebUrl(x.url),image:outfitWebUrl(x.image)}}return out}
+function cleanSavedOutfits(value){if(!Array.isArray(value))return [];return value.slice(0,12).filter(x=>x&&typeof x.id==='string'&&typeof x.name==='string').map(x=>({id:x.id.slice(0,80),name:x.name.slice(0,70),items:cleanOutfitItems(x.items)}))}
